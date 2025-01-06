@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tro_hay_ho_app.apps.TimtroAppConfig',
+    'tro_hay_ho_app.apps.TroHayHoAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -79,11 +79,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'timtrodb',
         'USER': 'root',
-        'PASSWORD': '12345678',
+        'PASSWORD': 'Admin@123',
         'HOST': ''  # mặc định localhost
     }
 }
 
+AUTH_USER_MODEL='tro_hay_ho_app.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -125,3 +126,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_ROOT = '%s/tro_hay_ho_app/static/' % BASE_DIR
