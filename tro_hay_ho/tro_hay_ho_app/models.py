@@ -1,3 +1,6 @@
+from contextlib import nullcontext
+
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -22,8 +25,7 @@ class Role(models.Model):
 class User(AbstractUser):
     """Người dùng"""
     phone = models.CharField(max_length=15, blank=True, null=True)
-    avatar = models.ImageField(upload_to='tro_hay_ho_app/%Y/%m/',
-                               null=True, blank=True)
+    avatar = CloudinaryField('avatar',null=True)
 
     role = models.ForeignKey('Role', on_delete=models.SET_NULL, related_name='users', related_query_name='user',null=True)
     following = models.ManyToManyField('User', symmetrical=False, related_name='followers', through='Following')
@@ -95,8 +97,7 @@ class PostForRent(Post):
 
 
 class PostImage(models.Model):
-    image = models.ImageField(upload_to='tro_hay_ho_app/%Y/%m/',
-                              null=True, blank=True)
+    image = CloudinaryField('image',null=True)
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='images', related_query_name='image')
 
 

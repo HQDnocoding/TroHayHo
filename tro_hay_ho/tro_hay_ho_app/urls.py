@@ -1,6 +1,13 @@
-from django.contrib import admin
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+from .views import UserViewSet
+
+r=DefaultRouter()
+
+r.register('users', UserViewSet, basename='user')
+
+
 urlpatterns = [
-    path('', views.index,name='index'),
+    path('',include(r.urls))
 ]
