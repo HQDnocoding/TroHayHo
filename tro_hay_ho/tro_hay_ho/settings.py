@@ -37,7 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tro_hay_ho_app.apps.TroHayHoAppConfig',
     'rest_framework',
+    'oauth2_provider',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    )
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -135,3 +142,7 @@ cloudinary.config(
     api_secret = "HsIK1yhx7av6BeoVqVjKKVceikY", # Click 'View API Keys' above to copy your API secret
     secure=True
 )
+
+client_id = '0R6hMr4Zhgl9LeXoWrxDNSTkLgpZymmtLJeINUFN'
+client_secret = 'AG1n41T3umckBclAVuc97nNwW0YJTqxpDUanvjS2yju0kxLpwSp88FtuOZesCxm2jmPhwREN2wpHHq8xdztMEsBDUYGWaMnDPDS6vLG7o851KmYvrESeBeI8sGvYzsgw'
+

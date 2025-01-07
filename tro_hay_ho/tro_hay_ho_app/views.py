@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from .models import User
 from .serializers import UserSerializer
