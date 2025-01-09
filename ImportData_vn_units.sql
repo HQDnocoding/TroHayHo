@@ -2,7 +2,12 @@
 /* Created at:  Sat, 09 Nov 2024 19:05:29 +0700 */
 /* Reference: https://github.com/ThangLeQuoc/vietnamese-provinces-database */
 /* =============================================== */
-
+use timtrodb;
+DELETE FROM wards;
+DELETE FROM districts;
+DELETE FROM provinces;
+DELETE FROM administrative_units;
+DELETE FROM administrative_regions;
 -- DATA for administrative_regions --
 INSERT INTO administrative_regions(id,name,name_en,code_name,code_name_en) VALUES(1,'Đông Bắc Bộ','Northeast','dong_bac_bo','northest');
 INSERT INTO administrative_regions(id,name,name_en,code_name,code_name_en) VALUES(2,'Tây Bắc Bộ','Northwest','tay_bac_bo','northwest');

@@ -205,7 +205,7 @@ class District(models.Model):
     full_name = models.CharField(max_length=255, null=True, blank=True)
     full_name_en = models.CharField(max_length=255, null=True, blank=True)
     code_name = models.CharField(max_length=255, null=True, blank=True)
-    province = models.ForeignKey(Province, null=True, blank=True, on_delete=models.SET_NULL, related_name="districts")
+    province = models.ForeignKey(Province, null=True, blank=True, on_delete=models.SET_NULL, related_name="districts",db_column='province_code')
     administrative_unit = models.ForeignKey(AdministrativeUnit, null=True, blank=True, on_delete=models.SET_NULL, related_name="districts")
 
     class Meta:
@@ -221,7 +221,7 @@ class Ward(models.Model):
     full_name = models.CharField(max_length=255, null=True, blank=True)
     full_name_en = models.CharField(max_length=255, null=True, blank=True)
     code_name = models.CharField(max_length=255, null=True, blank=True)
-    district = models.ForeignKey(District, null=True, blank=True, on_delete=models.SET_NULL, related_name="wards")
+    district = models.ForeignKey(District, null=True, blank=True, on_delete=models.SET_NULL, related_name="wards",db_column='district_code')
     administrative_unit = models.ForeignKey(AdministrativeUnit, null=True, blank=True, on_delete=models.SET_NULL, related_name="wards")
 
     class Meta:
