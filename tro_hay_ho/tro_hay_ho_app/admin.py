@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import mark_safe
-from .models import User,PostWant,PostForRent
+from .models import User,PostWant,PostForRent,District,Province,Ward
 # Register your models here.
 
 
@@ -22,5 +22,8 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User,UserAdmin)
 admin.site.register(PostForRent)
 admin.site.register(PostWant)
+admin.site.register(Province)
+admin.site.register(District)
+admin.site.register(Ward)
 
 

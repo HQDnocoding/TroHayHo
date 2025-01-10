@@ -117,9 +117,9 @@ class Comment(models.Model):
 class Address(models.Model):
     specified_address = models.TextField(null=False, blank=False)
     coordinates = models.TextField(null=False, blank=False)
-    province = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, related_name='provinces')
-    district = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, related_name='districts')
-    ward = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, related_name='wards')
+    province = models.ForeignKey('Province', on_delete=models.SET_NULL, null=True, related_name='provinces')
+    district = models.ForeignKey('District', on_delete=models.SET_NULL, null=True, related_name='districts')
+    ward = models.ForeignKey('Ward', on_delete=models.SET_NULL, null=True, related_name='wards')
 
     def __str__(self):
         return self.specified_address
@@ -152,3 +152,80 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.content
+
+
+class AdministrativeRegion(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    name_en = models.CharField(max_length=255)
+    code_name = models.CharField(max_length=255, null=True, blank=True)
+    code_name_en = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        db_table = "administrative_regions"
+
+    def __str__(self):
+        return self.name
+
+class AdministrativeUnit(models.Model):
+    id = models.AutoField(primary_key=True)
+    full_name = models.CharField(max_length=255, null=True, blank=True)
+    full_name_en = models.CharField(max_length=255, null=True, blank=True)
+    short_name = models.CharField(max_length=255, null=True, blank=True)
+    short_name_en = models.CharField(max_length=255, null=True, blank=True)
+    code_name = models.CharField(max_length=255, null=True, blank=True)
+    code_name_en = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        db_table = "administrative_units"
+
+    def __str__(self):
+        return self.full_name or "Unnamed Administrative Unit"
+
+class Province(models.Model):
+    code = models.CharField(max_length=20, primary_key=True)
+    name = models.CharField(max_length=255)
+    name_en = models.CharField(max_length=255, null=True, blank=True)
+    full_name = models.CharField(max_length=255)
+    full_name_en = models.CharField(max_length=255)
+    code_name = models.CharField(max_length=255, null=True, blank=True)
+    administrative_unit = models.ForeignKey(AdministrativeUnit, null=True, blank=True, on_delete=models.SET_NULL, related_name="provinces")
+    administrative_region = models.ForeignKey(AdministrativeRegion, null=True, blank=True, on_delete=models.SET_NULL, related_name="provinces")
+
+    class Meta:
+        db_table = "provinces"
+
+    def __str__(self):
+        return self.name
+
+class District(models.Model):
+    code = models.CharField(max_length=20, primary_key=True)
+    name = models.CharField(max_length=255)
+    name_en = models.CharField(max_length=255, null=True, blank=True)
+    full_name = models.CharField(max_length=255, null=True, blank=True)
+    full_name_en = models.CharField(max_length=255, null=True, blank=True)
+    code_name = models.CharField(max_length=255, null=True, blank=True)
+    province = models.ForeignKey(Province, null=True, blank=True, on_delete=models.SET_NULL, related_name="districts",db_column='province_code')
+    administrative_unit = models.ForeignKey(AdministrativeUnit, null=True, blank=True, on_delete=models.SET_NULL, related_name="districts")
+
+    class Meta:
+        db_table = "districts"
+
+    def __str__(self):
+        return self.name
+
+class Ward(models.Model):
+    code = models.CharField(max_length=20, primary_key=True)
+    name = models.CharField(max_length=255)
+    name_en = models.CharField(max_length=255, null=True, blank=True)
+    full_name = models.CharField(max_length=255, null=True, blank=True)
+    full_name_en = models.CharField(max_length=255, null=True, blank=True)
+    code_name = models.CharField(max_length=255, null=True, blank=True)
+    district = models.ForeignKey(District, null=True, blank=True, on_delete=models.SET_NULL, related_name="wards",db_column='district_code')
+    administrative_unit = models.ForeignKey(AdministrativeUnit, null=True, blank=True, on_delete=models.SET_NULL, related_name="wards")
+
+    class Meta:
+        db_table = "wards"
+
+    def __str__(self):
+        return self.name
