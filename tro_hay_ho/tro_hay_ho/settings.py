@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-n_43$u^ws23_-lzo!&l(h13y3oqgb02f(s%q05(&_u%4u33!1p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.1.7"]
 
 # Application definition
 
@@ -43,7 +43,11 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-    )
+    ),
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ]
+
 }
 
 MIDDLEWARE = [
@@ -132,17 +136,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = '%s/tro_hay_ho_app/static/' % BASE_DIR
 
-
 import cloudinary.uploader
 
 # Configuration
 cloudinary.config(
-    cloud_name = "dmbvjjg5a",
-    api_key = "463513198463353",
-    api_secret = "HsIK1yhx7av6BeoVqVjKKVceikY", # Click 'View API Keys' above to copy your API secret
+    cloud_name="dmbvjjg5a",
+    api_key="463513198463353",
+    api_secret="HsIK1yhx7av6BeoVqVjKKVceikY",  # Click 'View API Keys' above to copy your API secret
     secure=True
 )
 
 client_id = '0R6hMr4Zhgl9LeXoWrxDNSTkLgpZymmtLJeINUFN'
 client_secret = 'AG1n41T3umckBclAVuc97nNwW0YJTqxpDUanvjS2yju0kxLpwSp88FtuOZesCxm2jmPhwREN2wpHHq8xdztMEsBDUYGWaMnDPDS6vLG7o851KmYvrESeBeI8sGvYzsgw'
 
+
+OAUTH2_PROVIDER = { 'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore' }
