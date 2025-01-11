@@ -4,6 +4,7 @@ import { Icon } from "react-native-paper";
 import PostCreatingStackNavigator from "../PostCreating/PostStackNavigator";
 import PostManagementStackNavigator from "../PostManagement/PostManagementStackNavigator";
 import { Tab } from "../../general/General";
+import HomeStackNavigator from "./HomeStackNavigator";
 
 
 
@@ -38,7 +39,7 @@ const BottomTabsNavigator = () => {
         },
       })}>
   
-        <Tab.Screen name="home" component={HomeTabNavigator} options={{ title: 'Trang chủ' }} />
+        <Tab.Screen name="home" component={HomeStackNavigator} options={{headerShown:false, title: 'Trang chủ' }} />
         <Tab.Screen name="post-management" component={PostManagementStackNavigator} options={{ title: 'Quản lý tin' }} />
         <Tab.Screen name="post-creating" component={PostCreatingStackNavigator} options={{ title: 'Đăng tin' }} />
         <Tab.Screen name="account" component={AccountStackNavigator} options={{ title: 'Tài khoản' }} />
