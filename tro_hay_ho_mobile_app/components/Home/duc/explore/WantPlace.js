@@ -1,30 +1,31 @@
-import {View, Text, StyleSheet} from "react-native";
+import {View, Text, StyleSheet, Touchable} from "react-native";
 import React from "react";
-import {Card, TextInput} from "react-native-paper";
+import {Card, Modal, TextInput} from "react-native-paper";
+import {TouchableNativeFeedback} from "react-native"
+import AddressDialog from "./AddressDialog";
+const WantPlace = ({openDialog}) => {
 
-const WantPlace = () => {
     return (
+
         <Card style={styles.container}>
             <View>
                 <Text style={styles.text}>Bạn muốn xem ở đâu</Text>
-                <TextInput
-                    label={"Địa điểm"}
-                    style={[styles.input]}
-                    selectionColor={'yellow'}
-                    cursorColor={'yellow'}
-                    activeOutlineColor={'yellow'}
-                    underlineColor={'yellow'}
-                />
+                <TouchableNativeFeedback onPress={openDialog}>
+                     <View style={styles.boxAddress}>
+                    <Text style={{fontSize: 15}}>Địa điểm</Text>
+                </View>
+                </TouchableNativeFeedback>
+
                 <View style={styles.smallInputContainer}>
                     <TextInput
                         label={"Giá"}
-                        style={[styles.smallInput,styles.input]}
+                        style={[styles.smallInput, styles.input]}
                         keyboardType={"numeric"}
                     />
                     <TextInput
                         label={"Diện tích"}
-                        style={[styles.smallInput,styles.input]}
-                          keyboardType={"numeric"}
+                        style={[styles.smallInput, styles.input]}
+                        keyboardType={"numeric"}
                     />
                 </View>
             </View>
@@ -52,9 +53,16 @@ const styles = StyleSheet.create({
         width: '48%',
         borderRadius: 8,
     },
-    input:{
-      backgroundColor:'white'
+    input: {
+        backgroundColor: 'white'
     },
+    boxAddress: {
+        backgroundColor: "white",
+        height: 50,
+        width: '100%', // Hoặc chiều rộng tùy chỉnh
+        justifyContent: 'center', // Căn giữa theo chiều dọc
+        padding: 10,
+    }
 
 })
 export default WantPlace;

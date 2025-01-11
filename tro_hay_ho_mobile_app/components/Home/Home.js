@@ -4,10 +4,15 @@ import PostForRent from "./duc/post/PostForRent";
 import PostWant from "./duc/post/PostWant";
 import WantPlace from "./duc/explore/WantPlace";
 import Banner from "./duc/explore/Banner";
+import React from "react";
+import AddressDialog from "./duc/explore/AddressDialog";
 
 
 const Home = () => {
-    // Data mẫu - sau này có thể fetch từ API
+     const[visibleModelAddress,setVisibleModelAddress] = React.useState(false)
+    const showModel=()=>{setVisibleModelAddress(true)}
+    const hideModel=()=>{setVisibleModelAddress(false)}
+
     const posts = [
         {
             id: 1,
@@ -20,9 +25,11 @@ const Home = () => {
     ];
 
     return (
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
+
+            <ScrollView >
            <Banner/>
-            <WantPlace/>
+            <WantPlace openDialog={showModel}/>
 
             {posts.map(post => (
                 <PostForRent key={post.id}/>
@@ -31,6 +38,10 @@ const Home = () => {
                 <PostWant key={post.id}/>
             ))}
         </ScrollView>
+                <AddressDialog visible={visibleModelAddress} onClose={hideModel}/>
+
+        </View>
+
     );
 }
 
