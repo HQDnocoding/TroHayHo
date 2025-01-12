@@ -3,27 +3,27 @@ import * as React from 'react';
 import { View, useWindowDimensions, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Home from "../Home/Home";
+import PostManagementShowing from "./PostManagementShowing";
 
-const FirstRoute = () => (<Home/>);
-const SecondRoute = () => (<Home/>);
-const tRoute = () => (<Home/>);
-const fRoute = () => (<Home/>);
+const Showing = () => (<PostManagementShowing/>);
+const Approve = () => (<Home/>);
+const Hidden = () => (<Home/>);
 
 const renderScene = SceneMap({
-  first: FirstRoute,
-  second: SecondRoute,
-  three: tRoute,
-  four: fRoute,
+  first: Showing,
+  second: Approve,
+  three: Hidden,
+
 });
 
 const routes = [
-  { key: 'first', title: 'First' },
-  { key: 'second', title: 'Second' },
-  { key: 'three', title: 'heh' },
-  { key: 'four', title: '4' },
+  { key: 'first', title: 'Đang hiện thị (3)' },
+  { key: 'second', title: 'Chờ phê duyệt (0)' },
+  { key: 'three', title: 'Đang ẩn (0)' },
+
 ];
 
-export default function PostManagement() {
+export default function PostManagementTabNavigator() {
   const layout = useWindowDimensions();
   const [index, setIndex] = React.useState(0);
 
@@ -35,7 +35,9 @@ export default function PostManagement() {
       labelStyle={styles.label}
       tabStyle={styles.tab}
       indicatorStyle={styles.indicator}
-      gap={100}
+      activeColor={'#000000'}
+      inactiveColor={'#9d9d9d'}
+      gap={20}
     />
   );
 
@@ -52,7 +54,7 @@ export default function PostManagement() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#fbb800',
+    backgroundColor: '#ffffff',
     elevation: 0,
     shadowOpacity: 0,
     borderBottomWidth: 1,
@@ -61,14 +63,16 @@ const styles = StyleSheet.create({
   label: {
     color: '#666',
     fontSize: 14,
-    textTransform: 'none', // Giữ nguyên chữ hoa/thường như đã định nghĩa
+    textTransform: 'none',
   },
   tab: {
-    width: 'auto', // Tab sẽ có chiều rộng tùy thuộc vào nội dung
+    width: 'auto',
+    minWidth:120,
     paddingHorizontal: 15,
+    color:'black',
   },
   indicator: {
-    backgroundColor: '#ff0000',
+    backgroundColor: '#000000',
     height: 2,
   },
 });
