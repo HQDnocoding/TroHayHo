@@ -10,6 +10,7 @@ class Base(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
 
     class Meta:
+    
         abstract = True
         ordering = ['-id']
 
@@ -17,6 +18,9 @@ class Base(models.Model):
 class Role(models.Model):
     """Vai trò"""
     role_name = models.CharField(max_length=100)
+
+    class Meta:
+        db_table='role'
 
     def __str__(self):
         return self.role_name
@@ -32,6 +36,8 @@ class User(AbstractUser):
     conversation = models.ManyToManyField('self', symmetrical=True, through='Conversation')
     notification = models.ManyToManyField('User', symmetrical=False, related_name='notifications',
                                           through='Notification')
+    class Meta:
+        db_table='user'
 
     def _str_(self):
         return self.username
@@ -43,6 +49,9 @@ class Following(models.Model):
     followed = models.ForeignKey('User', on_delete=models.CASCADE, related_name='follower_relations')
     followed_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        db_table='fllowing'
+
     def __str__(self):
         return self.followed_at
 
@@ -52,6 +61,9 @@ class Conversation(models.Model):
     user1 = models.ForeignKey('User', on_delete=models.SET_NULL,null=True, related_name='conversation_user1')
     user2 = models.ForeignKey('User', on_delete=models.SET_NULL,null=True, related_name='conversation_user2')
     date_start = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table='conversation'
 
     def __str__(self):
         return self.date_start
@@ -65,6 +77,9 @@ class Message(models.Model):
                                      related_query_name='message')
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='messages', related_query_name='message')
 
+    class Meta:
+        db_table='message'
+
     def __str__(self):
         return self.content
 
@@ -77,36 +92,36 @@ class Post(Base):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='posts', related_query_name='post')
     address = models.ForeignKey('Address', on_delete=models.SET_NULL, related_name='posts', related_query_name='post',null=models.SET_NULL)
 
-
-    class Meta:
-        abstract = True
-        ordering = ['-id']
-
     def __str__(self):
-        
         return self.title
 
 
 class PostWant(Post):
-    post_ptr = models.OneToOneField('Post', on_delete=models.CASCADE, primary_key=True, parent_link=True)
     price_range_min = models.FloatField(null=True, blank=True, default=0)
     price_range_max = models.FloatField(null=True, blank=True, default=0)
 
 
+    class Meta:
+        db_table='post_want'
+
 class PostForRent(Post):
-    post_ptr = models.OneToOneField('Post', on_delete=models.CASCADE, primary_key=True, parent_link=True)
     acreage = models.FloatField(null=True, blank=True, default=0)
     max_number_of_people = models.IntegerField(null=True, blank=True, default=0)
     phone_contact = models.CharField(max_length=15, null=False)
     name_agent = models.CharField(max_length=100, null=False)
     verified = models.BooleanField(default=True, null=False)
 
-
+  
+    class Meta:
+        db_table='post_for_rent'
 
 
 class PostImage(models.Model):
     image = CloudinaryField('image',null=True)
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='images', related_query_name='image')
+
+    class Meta:
+        db_table='post_image'
 
 
 class Comment(models.Model):
@@ -120,6 +135,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.content
+    
+    class Meta:
+        db_table='comment'
 
 
 class Address(models.Model):
@@ -132,12 +150,17 @@ class Address(models.Model):
     def __str__(self):
         return self.specified_address
 
+    class Meta:
+        db_table='address'
 
 class TypeLocation(models.Model):
     type = models.CharField(max_length=20, null=False)
 
     def __str__(self):
         return self.type
+    
+    class Meta:
+        db_table='type_loacation'
 
 
 class Location(models.Model):
@@ -147,6 +170,9 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        db_table='location'
 
 
 class Notification(models.Model):
@@ -160,6 +186,9 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.content
+    
+    class Meta:
+        db_table='notification'
 
 
 class AdministrativeRegion(models.Model):
