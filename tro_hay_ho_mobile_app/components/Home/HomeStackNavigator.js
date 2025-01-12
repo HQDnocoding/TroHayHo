@@ -5,10 +5,11 @@ import { IconButton, Searchbar } from "react-native-paper";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 import Home from "./Home";
-import NotificationScreen from "../Home/duc/NotificationScreen";
-import MessageScreen from "./duc/MessageScreen";
+import NotificationScreen from "./notification/NotificationScreen";
+import MessageScreen from "./message/MessageScreen";
 import HomeTabNavigator from "./HomeTabNavigator"
 import SearchScreen from "./SearchScreen";
+import NotificationTabNaviagtor from "./notification/NotificationTabNaviagtor";
 
 const HomeStackNavigator = () => {
     return (
@@ -65,7 +66,7 @@ const HomeStackNavigator = () => {
             />
             <Stack.Screen
                 name='notification'
-                component={NotificationScreen}
+                component={NotificationTabNaviagtor}
                 options={{ title: 'Thông báo' }}
             />
             <Stack.Screen
