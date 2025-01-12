@@ -28,6 +28,10 @@ export default function App() {
 
         <Stack.Screen name='register' component={Register} options={{
           tabBarVisible: true,
+          headerTitle: '',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
         }} />
       </Stack.Navigator>
     )

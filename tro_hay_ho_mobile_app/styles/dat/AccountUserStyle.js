@@ -33,14 +33,16 @@ export default StyleSheet.create({
         marginTop: 5,
     },
     tag: {
+        textAlign:'center',
+        fontWeight:600,
         width: 50,
         backgroundColor: '#4CAF50',
-        paddingVertical: 2,
+        paddingVertical: 1,
         paddingHorizontal: 8,
         borderRadius: 5,
         marginTop: 5,
         marginLeft: 5,
-        fontSize: 10,
+        fontSize: 13,
     },
 
     section: {

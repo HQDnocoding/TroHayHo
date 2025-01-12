@@ -8,7 +8,8 @@ const BASE_URL="http://192.168.1.10:8000/"
 export const endpoints={
     'login': '/o/token/',
     'current-user': '/users/current-user/',
-    'register':'/users/'
+    'register':'/users/',
+    'role':'/roles/'
 }
 
 
