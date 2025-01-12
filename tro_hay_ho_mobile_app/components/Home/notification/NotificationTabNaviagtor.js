@@ -1,48 +1,34 @@
-
 import * as React from 'react';
-import { View, useWindowDimensions, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import Home from "../Home/Home";
-import PostManagementShowing from "./PostManagementShowing";
-import PostManagementPendingApproval from "./PostManagementPendingApproval";
-import PostManagementHidden from "./PostManagementHidden";
+import {View, useWindowDimensions, StyleSheet} from 'react-native';
+import { TabView, SceneMap,TabBar } from 'react-native-tab-view';
+import NotificationScreen from "./NotificationScreen";
 
-const Showing = () => (<PostManagementShowing/>);
-const Approval = () => (<PostManagementPendingApproval/>);
-const Hidden = () => (<PostManagementHidden/>);
-
+const FirstRoute=()=>(<NotificationScreen/>)
+const SecondRoute=()=>(<NotificationScreen/>)
 const renderScene = SceneMap({
-  first: Showing,
-  second: Approval,
-  three: Hidden,
-
+  first: FirstRoute,
+  second: SecondRoute,
 });
 
 const routes = [
-  { key: 'first', title: 'Đang hiện thị (3)' },
-  { key: 'second', title: 'Chờ phê duyệt (0)' },
-  { key: 'three', title: 'Đang ẩn (0)' },
-
+  { key: 'first', title: 'Hoạt động' },
+  { key: 'second', title: 'Tin mới' },
 ];
 
-export default function PostManagementTabNavigator() {
+export default function NotificationTabNaviagtor() {
   const layout = useWindowDimensions();
   const [index, setIndex] = React.useState(0);
-
-  const renderTabBar = props => (
+const renderTabBar = props => (
     <TabBar
       {...props}
-      scrollEnabled={true}
       style={styles.tabBar}
       labelStyle={styles.label}
-      tabStyle={styles.tab}
+
       indicatorStyle={styles.indicator}
       activeColor={'#000000'}
       inactiveColor={'#9d9d9d'}
-      gap={20}
     />
   );
-
   return (
     <TabView
       navigationState={{ index, routes }}
@@ -53,7 +39,6 @@ export default function PostManagementTabNavigator() {
     />
   );
 }
-
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#ffffff',

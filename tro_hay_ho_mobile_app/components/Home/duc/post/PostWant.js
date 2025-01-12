@@ -26,8 +26,7 @@ const PostWant = () => {
         em muoons thue nha cuc chang da, nha dep thi cang tot heheh
       </Text>
 
-      {/* Price */}
-      <Text style={styles.price}>12.000.000 đ / tháng</Text>
+
 
 
 
@@ -79,7 +78,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   location: {
-    color: '#666',
+    color: '#000000',
   },
   description: {
     marginBottom: 10,
