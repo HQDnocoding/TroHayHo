@@ -77,7 +77,13 @@ class Post(Base):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='posts', related_query_name='post')
     address = models.ForeignKey('Address', on_delete=models.SET_NULL, related_name='posts', related_query_name='post',null=models.SET_NULL)
 
+
+    class Meta:
+        abstract = True
+        ordering = ['-id']
+
     def __str__(self):
+        
         return self.title
 
 
@@ -94,6 +100,8 @@ class PostForRent(Post):
     phone_contact = models.CharField(max_length=15, null=False)
     name_agent = models.CharField(max_length=100, null=False)
     verified = models.BooleanField(default=True, null=False)
+
+
 
 
 class PostImage(models.Model):

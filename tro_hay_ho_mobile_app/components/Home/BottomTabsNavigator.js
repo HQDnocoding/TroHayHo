@@ -17,11 +17,12 @@ const BottomTabsNavigator = () => {
     return (
       <Tab.Navigator screenOptions={({ route }) => ({
         tabBarStyle: {
+          
           backgroundColor: '#FFBA00',
           display:route.name==='login'?'none':'flex',
         },
-        tabBarActiveTintColor: '#FFFFFF', // Màu icon và text khi được chọn
-        tabBarInactiveTintColor: '#000000', // Màu icon và text khi không được chọn
+        tabBarActiveTintColor: '#FFFFFF', 
+        tabBarInactiveTintColor: '#000000', 
         tabBarIcon: ({ color, size }) => {
           let iconName;
           switch (route.name) {

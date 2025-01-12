@@ -1,8 +1,8 @@
-import {Stack} from "../../general/General";
-import {IconButton,Searchbar} from "react-native-paper";
+import { Stack } from "../../general/General";
+import { IconButton, Searchbar } from "react-native-paper";
 
 
-import {View,StyleSheet,TouchableOpacity} from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 import Home from "./Home";
 import NotificationScreen from "../Home/duc/NotificationScreen";
@@ -18,13 +18,13 @@ const HomeStackNavigator = () => {
                 headerLeft: () => {
                     if (route.name === "HomeTab") {
                         return (
-                            <TouchableOpacity onPress={()=>navigation.navigate("search")}>
+                            <TouchableOpacity onPress={() => navigation.navigate("search")}>
                                 <Searchbar
-                                placeholder={"Tìm kiếm"}
-                                style={styles.searchBar}
-                                inputStyle={styles.searchInput}
-                                onFocus={()=>navigation.navigate('search')}
-                            />
+                                    placeholder={"Tìm kiếm"}
+                                    style={styles.searchBar}
+                                    inputStyle={styles.searchInput}
+                                    onFocus={() => navigation.navigate('search')}
+                                />
                             </TouchableOpacity>
 
                         );
@@ -32,24 +32,24 @@ const HomeStackNavigator = () => {
                     return null;
                 },
                 headerRight: () => {
-                  if(route.name === "HomeTab"){
-                    return (
-                      <View style={{flexDirection: 'row'}}>
+                    if (route.name === "HomeTab") {
+                        return (
+                            <View style={{ flexDirection: 'row' }}>
 
-                      <IconButton
-                          icon="bell"
-                          size={24}
-                          onPress={() => navigation.navigate('notification')}
-                      />
-                      <IconButton
-                          icon="message"
-                          size={24}
-                          onPress={() => navigation.navigate('message')}
-                      />
-                  </View>
-                    )
-                  }
-                  return null
+                                <IconButton
+                                    icon="bell"
+                                    size={24}
+                                    onPress={() => navigation.navigate('notification')}
+                                />
+                                <IconButton
+                                    icon="message"
+                                    size={24}
+                                    onPress={() => navigation.navigate('message')}
+                                />
+                            </View>
+                        )
+                    }
+                    return null
 
                 },
                 headerStyle: {
@@ -61,7 +61,7 @@ const HomeStackNavigator = () => {
             <Stack.Screen
                 name='HomeTab'
                 component={HomeTabNavigator}
-                options={{title: null}}
+                options={{ title: null }}
             />
             <Stack.Screen
                 name='notification'
@@ -74,8 +74,9 @@ const HomeStackNavigator = () => {
                 options={{ title: 'Tin nhắn' }}
             />
             <Stack.Screen name={"search"}
-                          component={SearchScreen}
-                          options={{title:null}}/>
+                component={SearchScreen}
+                options={{ title: null }} />
+
         </Stack.Navigator>
     );
 }
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     searchBar: {
         width: 220,
         height: 40,
-        padding:0,
+        padding: 0,
         marginLeft: 10,
         backgroundColor: '#fff',
         elevation: 0,

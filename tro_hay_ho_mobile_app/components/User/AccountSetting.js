@@ -7,10 +7,9 @@ import { useContext } from "react";
 import { MyUserContext } from "../../configs/UserContexts";
 import { useNavigation } from "@react-navigation/native";
 
-const AccountSetting = () => {
+const AccountSetting = ({ navigation }) => {
 
     const user = useContext(MyUserContext);
-    const nav=useNavigation();
     console.log('user value:', user);
 
     return (
@@ -24,12 +23,12 @@ const AccountSetting = () => {
                                 style={AccountUserStyle.avatar}
                             />
                             <View style={AccountUserStyle.loginRegister}>
-                                <TouchableOpacity  onPress={()=>nav.navigate('login')}>
-                                    <Text style={{fontWeight:800}}>Đăng nhập</Text>
+                                <TouchableOpacity onPress={() => navigation.navigate('login')}>
+                                    <Text style={{ fontWeight: 800 }}>Đăng nhập</Text>
                                 </TouchableOpacity>
-                                <Text style={{fontWeight:800}}> / </Text>
-                                <TouchableOpacity onPress={()=>nav.navigate('register')}>
-                                    <Text style={{fontWeight:800}}>Đăng ký</Text>
+                                <Text style={{ fontWeight: 800 }}> / </Text>
+                                <TouchableOpacity onPress={() => navigation.navigate('register')}>
+                                    <Text style={{ fontWeight: 800 }}>Đăng ký</Text>
                                 </TouchableOpacity>
                             </View>
                         </>
@@ -59,12 +58,26 @@ const AccountSetting = () => {
             </View>
             <View style={AccountUserStyle.section}>
                 <Text style={{ marginStart: 10, fontWeight: 700, marginTop: 20 }}>Tiện ích</Text>
-                <ItemSetting iconName={"heart-circle"} optionSetting={"Các tin đã lưu"} colorIcon={'red'} />
+                <TouchableOpacity>
+                    <ItemSetting iconName={"heart-circle"} optionSetting={"Các tin đã lưu"} colorIcon={'red'} />
+
+                </TouchableOpacity>
             </View>
-             <View style={AccountUserStyle.section}>
+            <View style={AccountUserStyle.section}>
                 <Text style={{ marginStart: 10, fontWeight: 700, marginTop: 20 }}>Khác</Text>
-                <ItemSetting iconName={'cog'} optionSetting={'Cài đặt tài khoản'} colorIcon={'grey'} />
-                {user === null ? (<></>) :<> <ItemSetting iconName={'logout'} optionSetting={'Đăng xuất'} colorIcon={'grey'} /></>}
+                <TouchableOpacity onPress={() => {
+                    if (user === null) {
+                        navigation.navigate('login');
+
+                    } else {
+
+                    }
+                }}>
+                    <ItemSetting iconName={'cog'} optionSetting={'Cài đặt tài khoản'} colorIcon={'grey'} />
+                </TouchableOpacity>
+                {user === null ? (<></>) : <><TouchableOpacity>
+                    <ItemSetting iconName={'logout'} optionSetting={'Đăng xuất'} colorIcon={'grey'} />
+                </TouchableOpacity></>}
             </View>
 
 

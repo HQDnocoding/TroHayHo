@@ -38,12 +38,11 @@ const AccountStackNavigator = () => {
       },
       headerTintColor: '#fff',
 
-      
+      presentation:'modal',
 
     })}>
       <Stack.Screen name='account-setting' component={AccountSetting} options={{title:'Tài khoản'}} />
-      <Stack.Screen name='login' component={Login} />
-      <Stack.Screen name='register' component={Register} />
+     
     </Stack.Navigator>
   );
 }
