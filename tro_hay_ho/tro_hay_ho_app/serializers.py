@@ -2,7 +2,7 @@ from zoneinfo import available_timezones
 
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from .models import User
+from .models import User,Role
 
 
 class UserSerializer(ModelSerializer):
@@ -17,10 +17,16 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'avatar', 'password']
+        fields = ['id', 'username', 'first_name', 'last_name', 'avatar', 'password','role']
 
         extra_kwargs = {
             'password': {
                 'write_only': True
             }
         }
+
+
+class RoleSerializer(ModelSerializer):
+    class Meta:
+        model= Role
+        fields='__all__'
