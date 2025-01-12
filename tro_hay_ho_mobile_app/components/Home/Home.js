@@ -1,74 +1,78 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { Card, Title, Paragraph } from 'react-native-paper';
+import {View, Text, ScrollView, StyleSheet} from 'react-native';
+import {Card, Title, Paragraph} from 'react-native-paper';
+import PostForRent from "./duc/post/PostForRent";
+import PostWant from "./duc/post/PostWant";
+import WantPlace from "./duc/explore/WantPlace";
+import Banner from "./duc/explore/Banner";
+import React from "react";
+import AddressDialog from "./duc/explore/AddressDialog";
+
 
 const Home = () => {
-  // Data mẫu - sau này có thể fetch từ API
-  const posts = [
-    {
-      id: 1,
-      title: 'Phòng trọ Quận 1',
-      price: '3.500.000đ',
-      address: '123 Nguyễn Huệ, Quận 1, TP.HCM',
-      description: 'Phòng trọ rộng rãi, đầy đủ tiện nghi...'
-    },
-    {
-      id: 2,
-      title: 'Phòng trọ Quận Bình Thạnh',
-      price: '2.800.000đ',
-      address: '456 Xô Viết Nghệ Tĩnh, Bình Thạnh, TP.HCM',
-      description: 'Phòng mới xây, an ninh tốt...'
-    },
-    // Thêm data mẫu khác...
-  ];
+     const[visibleModelAddress,setVisibleModelAddress] = React.useState(false)
+    const showModel=()=>{setVisibleModelAddress(true)}
+    const hideModel=()=>{setVisibleModelAddress(false)}
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Các phòng trọ mới nhất</Text>
-      </View>
+    const posts = [
+        {
+            id: 1,
 
-      {posts.map(post => (
-        <Card key={post.id} style={styles.card}>
-          <Card.Content>
-            <Title>{post.title}</Title>
-            <Text style={styles.price}>{post.price}</Text>
-            <Text style={styles.address}>{post.address}</Text>
-            <Paragraph>{post.description}</Paragraph>
-          </Card.Content>
-        </Card>
-      ))}
-    </ScrollView>
-  );
+        },
+        {
+            id: 2,
+
+        },
+    ];
+
+    return (
+        <View style={styles.container}>
+
+            <ScrollView >
+           <Banner/>
+            <WantPlace openDialog={showModel}/>
+
+            {posts.map(post => (
+                <PostForRent key={post.id}/>
+            ))}
+            {posts.map(post => (
+                <PostWant key={post.id}/>
+            ))}
+        </ScrollView>
+                <AddressDialog visible={visibleModelAddress} onClose={hideModel}/>
+
+        </View>
+
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    padding: 15,
-    backgroundColor: '#fff',
-    marginBottom: 10,
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  card: {
-    margin: 10,
-    elevation: 4,
-  },
-  price: {
-    color: '#FFBA00',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginVertical: 5,
-  },
-  address: {
-    color: '#666',
-    marginBottom: 5,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    header: {
+        padding: 15,
+        backgroundColor: '#fff',
+        marginBottom: 10,
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    card: {
+        margin: 10,
+        elevation: 4,
+    },
+    price: {
+        color: '#FFBA00',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginVertical: 5,
+    },
+    address: {
+        color: '#666',
+        marginBottom: 5,
+    },
 });
 
 export default Home;
