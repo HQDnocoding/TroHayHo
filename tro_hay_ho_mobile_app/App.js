@@ -9,6 +9,8 @@ import BottomTabsNavigator from './components/Home/BottomTabsNavigator';
 
 export default function App() {
   const [user, dispatch] = useReducer(MyUserReducer, null);
+
+
   return (
 
     <NavigationContainer>

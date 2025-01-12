@@ -5,15 +5,20 @@ import PostCreatingStackNavigator from "../PostCreating/PostStackNavigator";
 import PostManagementStackNavigator from "../PostManagement/PostManagementStackNavigator";
 import { Tab } from "../../general/General";
 import HomeStackNavigator from "./HomeStackNavigator";
+import { useNavigation } from "@react-navigation/native";
 
 
 
 const BottomTabsNavigator = () => {
+    const navigate=useNavigation()
 
+
+    
     return (
       <Tab.Navigator screenOptions={({ route }) => ({
         tabBarStyle: {
-          backgroundColor: '#FFBA00', // Màu nền của Tab Navigator
+          backgroundColor: '#FFBA00',
+          display:route.name==='login'?'none':'flex',
         },
         tabBarActiveTintColor: '#FFFFFF', // Màu icon và text khi được chọn
         tabBarInactiveTintColor: '#000000', // Màu icon và text khi không được chọn
@@ -42,7 +47,7 @@ const BottomTabsNavigator = () => {
         <Tab.Screen name="home" component={HomeStackNavigator} options={{headerShown:false, title: 'Trang chủ' }} />
         <Tab.Screen name="post-management" component={PostManagementStackNavigator} options={{ title: 'Quản lý tin' }} />
         <Tab.Screen name="post-creating" component={PostCreatingStackNavigator} options={{ title: 'Đăng tin' }} />
-        <Tab.Screen name="account" component={AccountStackNavigator} options={{ title: 'Tài khoản' }} />
+        <Tab.Screen name="account" component={AccountStackNavigator} options={{headerShown:false ,title:'Tài khoản'}} />
   
       </Tab.Navigator>
     )
