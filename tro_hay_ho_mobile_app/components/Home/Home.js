@@ -1,4 +1,4 @@
-import {View, Text, ScrollView, StyleSheet, ActivityIndicator} from 'react-native';
+import {View, Text, ScrollView, StyleSheet, ActivityIndicator,FlatList} from 'react-native';
 import {Card, Title, Paragraph} from 'react-native-paper';
 import PostForRent from "./duc/post/PostForRent";
 import PostWant from "./duc/post/PostWant";
@@ -11,12 +11,18 @@ import APIs, {endpoints} from "../../configs/APIs";
 
 const Home = () => {
     const [visibleModelAddress, setVisibleModelAddress] = React.useState(false)
-    const [address,setAddress]=React.useState(null)
+    const [postWant,setPostWant]=React.useState(null)
+    const [postForRent,setPostForRent]=React.useState(null)
 
-    const loadAddress=async ()=>{
-        let res =await APIs.get(endpoints['address'])
-        setAddress(res.data)
-        console.info(res.data)
+    const loadPostWant=async ()=>{
+        let res = await APIs.get(endpoints['getListPostWant'])
+        // console.info(res.data)
+        setPostWant(res.data)
+    }
+      const loadPostForRent=async ()=>{
+        let res = await APIs.get(endpoints['getListPostForRent'])
+        // console.info(res.data)
+        setPostForRent(res.data)
     }
     const showModel = () => {
         setVisibleModelAddress(true)
@@ -25,39 +31,42 @@ const Home = () => {
         setVisibleModelAddress(false)
     }
 
+
     React.useEffect(()=>{
-        loadAddress()
+        loadPostWant()
     },[])
-    const posts = [
-        {
-            id: 1,
-
-        },
-        {
-            id: 2,
-
-        },
-    ];
-
+       React.useEffect(()=>{
+        loadPostForRent()
+    },[])
+    const renderItemPost=({item})=>{
+        
+        return (
+            <PostForRent item={item} routeName={''} params={{}} />
+        )
+    }
+    const flatListHeader=()=>{
+        return(
+            <>
+            <Banner/>
+            <WantPlace openDialog={showModel}/>
+            
+            </>
+        )
+    }
+    if(postForRent===null){
+        return (
+            <ActivityIndicator/>
+        )
+    }
     return (
         <View style={styles.container}>
 
-            <ScrollView>
-                {address===null?<ActivityIndicator/>:<>
-                    <View>
-                        <Text style={styles.headerText}>{JSON.stringify(address)}</Text>
-                    </View>
-                </>}
-                <Banner/>
-                <WantPlace openDialog={showModel}/>
-
-                {posts.map(post => (
-                    <PostForRent key={post.id}/>
-                ))}
-                {posts.map(post => (
-                    <PostWant key={post.id}/>
-                ))}
-            </ScrollView>
+            <FlatList 
+            data={postForRent} 
+            renderItem={renderItemPost}
+            ListHeaderComponent={flatListHeader}
+            keyExtractor={item=>item.id.toString()}
+            />
             <AddressDialog visible={visibleModelAddress} onClose={hideModel}/>
 
         </View>

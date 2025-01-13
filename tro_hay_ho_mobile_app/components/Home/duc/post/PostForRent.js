@@ -1,33 +1,40 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Avatar } from 'react-native-paper';
 import { Icon } from 'react-native-paper';
-
-const PostForRent = () => {
+import {formatTimeAgo} from '../../../../utils/TimeFormat';
+import { formatPrice } from '../../../../utils/Formatter';
+import { sampleAvatar } from '../../../../utils/MyValues';
+const PostForRent = ({item,routeName,params}) => {
   return (
     <Card style={styles.card}>
       <View style={styles.header}>
         <Avatar.Image
           size={40}
-          source={{uri:"https://img.freepik.com/free-vector/night-landscape-with-lake-mountains-trees-coast-vector-cartoon-illustration-nature-scene-with-coniferous-forest-river-shore-rocks-moon-stars-dark-sky_107791-8253.jpg"}}
+          source={{uri:item.user.avatar ?item.user.avatar : "https://drive.usercontent.google.com/download?id=1fPVkJqspSh0IQsQ_8teVapd5qf_q1ppV&authuser=0"}}
         />
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>Trần Thái Uy</Text>
-          <Text style={styles.timestamp}>12:34 01-03-2024</Text>
+          <Text style={styles.userName} numberOfLines={1}>{item.user.first_name +" "+ item.user.last_name}</Text>
+          <Text style={styles.timestamp }  numberOfLines={1}>{formatTimeAgo(item.created_date)}</Text>
         </View>
       </View>
 
       {/* Location */}
       <View style={styles.locationContainer}>
-        <Text style={styles.location}>số 12 , xã A,huyện B , tỉnh C</Text>
+        <Text style={styles.location} numberOfLines={2}>{
+        item.address.specified_address+', '+
+        item.address.ward.full_name+', '+
+        item.address.district.full_name+', '+
+        item.address.province.full_name
+        }</Text>
       </View>
 
       {/* Description */}
-      <Text style={styles.description}>
-        Em có căn nhà cần cho thuê, tiện nghi đầy du rkhoong thiếu cái gì. ai có nhu cầu thì liên hệ em
+      <Text style={styles.description} numberOfLines={5}>
+        {item.description}
       </Text>
 
       {/* Price */}
-      <Text style={styles.price}>12.000.000 đ / tháng</Text>
+      <Text style={styles.price}>{formatPrice(item.price)+ ' đ/ tháng'}</Text>
 
       {/* Images */}
       <View style={styles.imagesContainer}>
@@ -83,6 +90,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   userName: {
+    width:'200',
     fontWeight: 'bold',
     fontSize: 16,
   },

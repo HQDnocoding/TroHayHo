@@ -49,10 +49,10 @@ class RoleViewSet(ViewSet,RetrieveAPIView,):
         return Response(self.serializer_class(query).data)
 
 class PostWantViewSet(ModelViewSet):
-    queryset = PostWant.objects.all()
+    queryset = PostWant.objects.filter(active=True)
     serializer_class = PostWantSerializer
 class PostForRentViewSet(ModelViewSet):
-    queryset = PostForRent.objects.all()
+    queryset = PostForRent.objects.filter(active=True)
     serializer_class = PostForRentSerializer
 class AddressViewSet(ModelViewSet):
     queryset = Address.objects.all()

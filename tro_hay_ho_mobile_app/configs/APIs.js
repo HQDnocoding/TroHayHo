@@ -10,7 +10,9 @@ export const endpoints={
     'current-user': '/users/current-user/',
     'register':'/users/',
     'role':'/roles/',
-    'address':'/addresses/'
+    'address':'/addresses/',
+    'getListPostWant':'/post-wants',
+    'getListPostForRent':'/post-for-rents',
 
 }
 
