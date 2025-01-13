@@ -9,7 +9,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.viewsets import ModelViewSet
 
 from .models import User,Role
-from .serializers import UserSerializer,RoleSerializer
+from .serializers import *
 
 
 class UserViewSet(ViewSet,CreateAPIView):
@@ -48,5 +48,14 @@ class RoleViewSet(ViewSet,RetrieveAPIView,):
 
         return Response(self.serializer_class(query).data)
 
+class PostWantViewSet(ModelViewSet):
+    queryset = PostWant.objects.all()
+    serializer_class = PostWantSerializer
+class PostForRentViewSet(ModelViewSet):
+    queryset = PostForRent.objects.all()
+    serializer_class = PostForRentSerializer
+class AddressViewSet(ModelViewSet):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
     
 

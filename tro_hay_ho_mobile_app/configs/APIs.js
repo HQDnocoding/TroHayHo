@@ -2,14 +2,16 @@ import axios from "axios";
 
 
 
-
-const BASE_URL="http://192.168.1.10:8000/"
+// ip cua Duc:http://192.168.129.238:8000/
+const BASE_URL="http://192.168.129.238:8000/"
 
 export const endpoints={
     'login': '/o/token/',
     'current-user': '/users/current-user/',
     'register':'/users/',
-    'role':'/roles/'
+    'role':'/roles/',
+    'address':'/addresses/'
+
 }
 
 
