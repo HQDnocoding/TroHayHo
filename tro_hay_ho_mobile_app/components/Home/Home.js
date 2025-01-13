@@ -7,6 +7,7 @@ import Banner from "./duc/explore/Banner";
 import React from "react";
 import AddressDialog from "./duc/explore/AddressDialog";
 import APIs, {endpoints} from "../../configs/APIs";
+import { shuffleArray } from '../../utils/Formatter';
 
 
 const Home = () => {
@@ -39,10 +40,17 @@ const Home = () => {
         loadPostForRent()
     },[])
     const renderItemPost=({item})=>{
-        
-        return (
-            <PostForRent item={item} routeName={''} params={{}} />
-        )
+        if(item.max_number_of_people!=null){
+            return (
+                <PostForRent item={item} routeName={''} params={{}} />
+            )
+        }
+        else{
+            return (
+                <PostWant item={item} routeName={''} params={{}} />
+            )
+        }
+       
     }
     const flatListHeader=()=>{
         return(
@@ -53,16 +61,22 @@ const Home = () => {
             </>
         )
     }
-    if(postForRent===null){
+    if(postForRent===null || postWant===null){
         return (
             <ActivityIndicator/>
         )
     }
+
+
+
+    const allPost=shuffleArray([...postForRent,...postWant])
+
+    console.info(allPost)
     return (
         <View style={styles.container}>
 
             <FlatList 
-            data={postForRent} 
+            data={allPost} 
             renderItem={renderItemPost}
             ListHeaderComponent={flatListHeader}
             keyExtractor={item=>item.id.toString()}
