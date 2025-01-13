@@ -72,7 +72,6 @@ const Register = ({ navigation }) => {
                 console.log('role', "dddd"+role.data['id']+"oooo")
                 form.append('avatar', "")
                 form.append("role", role.data['id'])
-                await AsyncStorage.setItem('roleName', role.data['role_name']);
 
                 setLoading(true);
                 try {
