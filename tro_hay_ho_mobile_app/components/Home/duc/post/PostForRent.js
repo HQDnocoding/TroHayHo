@@ -5,12 +5,13 @@ import {formatTimeAgo} from '../../../../utils/TimeFormat';
 import { formatPrice } from '../../../../utils/Formatter';
 import { sampleAvatar } from '../../../../utils/MyValues';
 const PostForRent = ({item,routeName,params}) => {
+  console.info(item.post_image[0].image)
   return (
     <Card style={styles.card}>
       <View style={styles.header}>
         <Avatar.Image
           size={40}
-          source={{uri:item.user.avatar ?item.user.avatar : "https://drive.usercontent.google.com/download?id=1fPVkJqspSh0IQsQ_8teVapd5qf_q1ppV&authuser=0"}}
+          source={{uri:item.user.avatar ?item.user.avatar : sampleAvatar}}
         />
         <View style={styles.userInfo}>
           <Text style={styles.userName} numberOfLines={1}>{item.user.first_name +" "+ item.user.last_name}</Text>
@@ -39,7 +40,7 @@ const PostForRent = ({item,routeName,params}) => {
       {/* Images */}
       <View style={styles.imagesContainer}>
         <Image
-              source={{uri:"https://img.freepik.com/free-vector/night-landscape-with-lake-mountains-trees-coast-vector-cartoon-illustration-nature-scene-with-coniferous-forest-river-shore-rocks-moon-stars-dark-sky_107791-8253.jpg"}}
+              source={{uri:item.post_image[0].image}}
 
           style={styles.mainImage}
         />
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   location: {
-    color: '#666',
+    color: '#000000',
   },
   description: {
     marginBottom: 10,
