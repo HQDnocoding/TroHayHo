@@ -5,17 +5,18 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class Base(models.Model):
+class BaseModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-
+    active = models.BooleanField(default=True) 
+    
     class Meta:
     
         abstract = True
         ordering = ['-id']
 
 
-class Role(models.Model):
+class Role(BaseModel):
     """Vai trò"""
     role_name = models.CharField(max_length=100)
 
@@ -43,20 +44,20 @@ class User(AbstractUser):
         return self.username
 
 
-class Following(models.Model):
+class Following(BaseModel):
     """Thông tin follwing"""
     follower = models.ForeignKey('User', on_delete=models.CASCADE, related_name='following_relations')
     followed = models.ForeignKey('User', on_delete=models.CASCADE, related_name='follower_relations')
     followed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table='fllowing'
+        db_table='following'
 
     def __str__(self):
         return self.followed_at
 
 
-class Conversation(models.Model):
+class Conversation(BaseModel):
     """Cuộc trao đổi"""
     user1 = models.ForeignKey('User', on_delete=models.SET_NULL,null=True, related_name='conversation_user1')
     user2 = models.ForeignKey('User', on_delete=models.SET_NULL,null=True, related_name='conversation_user2')
@@ -69,7 +70,7 @@ class Conversation(models.Model):
         return self.date_start
 
 
-class Message(models.Model):
+class Message(BaseModel):
     content = models.TextField(null=False)
     date_sending = models.DateTimeField(auto_now_add=True)
 
@@ -84,7 +85,7 @@ class Message(models.Model):
         return self.content
 
 
-class Post(Base):
+class Post(BaseModel):
     title = models.TextField(null=False)
     description = models.TextField(null=True, blank=True)
     price = models.FloatField(null=True, blank=True, default=0)
@@ -116,7 +117,7 @@ class PostForRent(Post):
         db_table='post_for_rent'
 
 
-class PostImage(models.Model):
+class PostImage(BaseModel):
     image = CloudinaryField('image',null=True)
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='images', related_query_name='image')
 
@@ -124,7 +125,7 @@ class PostImage(models.Model):
         db_table='post_image'
 
 
-class Comment(models.Model):
+class Comment(BaseModel):
     content = models.TextField(null=False)
     date_at = models.DateTimeField(auto_now_add=True)
 
@@ -140,7 +141,7 @@ class Comment(models.Model):
         db_table='comment'
 
 
-class Address(models.Model):
+class Address(BaseModel):
     specified_address = models.TextField(null=False, blank=False)
     coordinates = models.TextField(null=False, blank=False)
     province = models.ForeignKey('Province', on_delete=models.SET_NULL, null=True, related_name='provinces')
@@ -153,7 +154,7 @@ class Address(models.Model):
     class Meta:
         db_table='address'
 
-class TypeLocation(models.Model):
+class TypeLocation(BaseModel):
     type = models.CharField(max_length=20, null=False)
 
     def __str__(self):
@@ -163,7 +164,7 @@ class TypeLocation(models.Model):
         db_table='type_loacation'
 
 
-class Location(models.Model):
+class Location(BaseModel):
     name = models.TextField(max_length=100, null=False, blank=False)
     type = models.ForeignKey('TypeLocation', on_delete=models.SET_NULL, related_name='addresses',
                              related_query_name='address',null=True)
@@ -175,7 +176,7 @@ class Location(models.Model):
         db_table='location'
 
 
-class Notification(models.Model):
+class Notification(BaseModel):
     title = models.TextField(null=False)
     content = models.TextField(null=False)
     receiver = models.ForeignKey('User', on_delete=models.CASCADE, related_name='sent_notifications')
@@ -191,7 +192,7 @@ class Notification(models.Model):
         db_table='notification'
 
 
-class AdministrativeRegion(models.Model):
+class AdministrativeRegion(BaseModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     name_en = models.CharField(max_length=255)
@@ -204,7 +205,7 @@ class AdministrativeRegion(models.Model):
     def __str__(self):
         return self.name
 
-class AdministrativeUnit(models.Model):
+class AdministrativeUnit(BaseModel):
     id = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=255, null=True, blank=True)
     full_name_en = models.CharField(max_length=255, null=True, blank=True)
@@ -219,7 +220,7 @@ class AdministrativeUnit(models.Model):
     def __str__(self):
         return self.full_name or "Unnamed Administrative Unit"
 
-class Province(models.Model):
+class Province(BaseModel):
     code = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255)
     name_en = models.CharField(max_length=255, null=True, blank=True)
@@ -235,7 +236,7 @@ class Province(models.Model):
     def __str__(self):
         return self.name
 
-class District(models.Model):
+class District(BaseModel):
     code = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255)
     name_en = models.CharField(max_length=255, null=True, blank=True)
@@ -251,7 +252,7 @@ class District(models.Model):
     def __str__(self):
         return self.name
 
-class Ward(models.Model):
+class Ward(BaseModel):
     code = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255)
     name_en = models.CharField(max_length=255, null=True, blank=True)

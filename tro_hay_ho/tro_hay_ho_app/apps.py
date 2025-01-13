@@ -9,10 +9,13 @@ class TroHayHoAppConfig(AppConfig):
         from .models import Role
 
         default_roles = ['Admin', 'chu_tro', 'nguoi_thue_tro']
-
-        for role_name in default_roles:
-            if not Role.objects.filter(role_name=role_name).exists():
-                Role.objects.create(role_name=role_name)
+        try:
+            for role_name in default_roles:
+                if not Role.objects.filter(role_name=role_name).exists():
+                    Role.objects.create(role_name=role_name)
+        except:
+            pass
+        
 
 
 
