@@ -8,6 +8,8 @@ import { Stack } from './general/General';
 import Login from './components/User/Login';
 import Register from './components/User/Register';
 import LoginStyles from './styles/dat/LoginStyles';
+import AccountSettingDetail from './components/User/AccountSettingDetail';
+import SavePosts from './components/User/SavedPosts';
 
 
 
@@ -29,6 +31,20 @@ export default function App() {
         <Stack.Screen name='register' component={Register} options={{
           tabBarVisible: true,
           headerTitle: '',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
+        <Stack.Screen name='account_setting_detail' component={AccountSettingDetail} options={{
+          tabBarVisible: true,
+          headerTitle: 'Cài đặt tài khoản',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
+         <Stack.Screen name='saved_posts' component={SavePosts} options={{
+          tabBarVisible: true,
+          headerTitle: 'Các tin đã lưu',
           headerStyle: {
             backgroundColor: '#FFBA00',
           }

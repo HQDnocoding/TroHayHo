@@ -72,7 +72,7 @@ const AccountSetting = ({ navigation }) => {
             </View>
             <View style={AccountUserStyle.section}>
                 <Text style={{ marginStart: 10, fontWeight: 700, marginTop: 20 }}>Tiện ích</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>navigation.navigate('saved_posts')}>
                     <ItemSetting iconName={"heart-circle"} optionSetting={"Các tin đã lưu"} colorIcon={'red'} />
 
                 </TouchableOpacity>
@@ -84,7 +84,7 @@ const AccountSetting = ({ navigation }) => {
                         navigation.navigate('login');
 
                     } else {
-
+                        navigation.navigate('account_setting_detail')
                     }
                 }}>
                     <ItemSetting iconName={'cog'} optionSetting={'Cài đặt tài khoản'} colorIcon={'grey'} />

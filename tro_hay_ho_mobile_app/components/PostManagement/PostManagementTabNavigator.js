@@ -12,6 +12,7 @@ const Approval = () => (<PostManagementPendingApproval/>);
 const Hidden = () => (<PostManagementHidden/>);
 
 const renderScene = SceneMap({
+  
   first: Showing,
   second: Approval,
   three: Hidden,
