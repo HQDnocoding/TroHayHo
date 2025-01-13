@@ -10,6 +10,8 @@ import Register from './components/User/Register';
 import LoginStyles from './styles/dat/LoginStyles';
 import AccountSettingDetail from './components/User/AccountSettingDetail';
 import SavePosts from './components/User/SavedPosts';
+import PostImage from './components/PostDetail/PostImages';
+import PostForRentDetail from './components/PostDetail/PostForRentDetail';
 
 
 
@@ -42,7 +44,7 @@ export default function App() {
             backgroundColor: '#FFBA00',
           }
         }} />
-         <Stack.Screen name='saved_posts' component={SavePosts} options={{
+        <Stack.Screen name='saved_posts' component={SavePosts} options={{
           tabBarVisible: true,
           headerTitle: 'Các tin đã lưu',
           headerStyle: {
@@ -61,7 +63,9 @@ export default function App() {
           <MyAppNavigator />
         </MyDispatchContext.Provider>
       </MyUserContext.Provider>
+      {/* <PostForRentDetail /> */}
     </NavigationContainer>
+
   );
 }
 

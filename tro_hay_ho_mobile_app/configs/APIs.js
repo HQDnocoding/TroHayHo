@@ -13,8 +13,8 @@ export const endpoints={
     'current-user': '/users/current-user/',
     'register':'/users/',
     'role':'/roles/',
-    'address':'/addresses/'
-
+    'address':'/addresses/',
+    
 }
 
 
