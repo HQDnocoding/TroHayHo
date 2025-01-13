@@ -125,6 +125,12 @@ class PostImage(BaseModel):
     class Meta:
         db_table = 'post_image'
 
+    @property
+    def get_url(self):
+        if self.image:
+            return self.image.url
+        return None
+
 
 class Comment(BaseModel):
     content = models.TextField(null=False)

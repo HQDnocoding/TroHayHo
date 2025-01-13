@@ -2,7 +2,7 @@ from zoneinfo import available_timezones
 
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from .models import User,Role,PostWant,PostForRent,Address
+from .models import User,Role,PostWant,PostForRent,Address,Ward,District,Province,PostImage
 
 
 class UserSerializer(ModelSerializer):
@@ -32,17 +32,50 @@ class RoleSerializer(ModelSerializer):
         fields='__all__'
 
 
+class WardSerializer(ModelSerializer):
+    class Meta:
+        model = Ward
+        fields=['code','name','full_name']
+class DistrictSerializer(ModelSerializer):
+    class Meta:
+        model = District
+        fields = ['code', 'name', 'full_name']
+
+class ProvinceSerializer(ModelSerializer):
+    class Meta:
+        model = Province
+        fields = ['code', 'name', 'full_name']
+class AddressSerializer(ModelSerializer):
+    province=ProvinceSerializer()
+    district=DistrictSerializer()
+    ward=WardSerializer()
+    class Meta:
+        model = Address
+        fields='__all__'
+class PostImageSerializer(ModelSerializer):
+
+
+    class Meta:
+        model = PostImage
+        fields = ['id', 'image', 'post']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['image'] = instance.image.url if instance.image else None
+        return representation
+
 class PostForRentSerializer(ModelSerializer):
+    user = UserSerializer(read_only=True)
+    address = AddressSerializer(read_only=True)
+    post_image=PostImageSerializer(many=True, source='images', read_only=True)
     class Meta:
         model = PostForRent
         fields='__all__'
 
 class PostWantSerializer(ModelSerializer):
+    user=UserSerializer(read_only=True)
+    address=AddressSerializer(read_only=True)
     class Meta:
         model = PostWant
         fields='__all__'
 
-class AddressSerializer(ModelSerializer):
-    class Meta:
-        model = Address
-        fields='__all__'

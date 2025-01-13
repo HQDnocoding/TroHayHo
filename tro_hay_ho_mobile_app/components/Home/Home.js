@@ -1,22 +1,29 @@
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
-import { Card, Title, Paragraph } from 'react-native-paper';
+import {View, Text, ScrollView, StyleSheet, ActivityIndicator,FlatList} from 'react-native';
+import {Card, Title, Paragraph} from 'react-native-paper';
 import PostForRent from "./duc/post/PostForRent";
 import PostWant from "./duc/post/PostWant";
 import WantPlace from "./duc/explore/WantPlace";
 import Banner from "./duc/explore/Banner";
 import React from "react";
 import AddressDialog from "./duc/explore/AddressDialog";
-import APIs, { endpoints } from "../../configs/APIs";
+import APIs, {endpoints} from "../../configs/APIs";
+import { shuffleArray } from '../../utils/Formatter';
 
 
 const Home = () => {
     const [visibleModelAddress, setVisibleModelAddress] = React.useState(false)
-    const [address, setAddress] = React.useState(null)
+    const [postWant,setPostWant]=React.useState(null)
+    const [postForRent,setPostForRent]=React.useState(null)
 
-    const loadAddress = async () => {
-        let res = await APIs.get(endpoints['address'])
-        setAddress(res.data)
-        console.info(res.data)
+    const loadPostWant=async ()=>{
+        let res = await APIs.get(endpoints['getListPostWant'])
+        // console.info(res.data)
+        setPostWant(res.data)
+    }
+      const loadPostForRent=async ()=>{
+        let res = await APIs.get(endpoints['getListPostForRent'])
+        // console.info(res.data)
+        setPostForRent(res.data)
     }
     const showModel = () => {
         setVisibleModelAddress(true)
@@ -25,40 +32,56 @@ const Home = () => {
         setVisibleModelAddress(false)
     }
 
-    React.useEffect(() => {
-        loadAddress()
-    }, [])
-    const posts = [
-        {
-            id: 1,
 
-        },
-        {
-            id: 2,
+    React.useEffect(()=>{
+        loadPostWant()
+    },[])
+       React.useEffect(()=>{
+        loadPostForRent()
+    },[])
+    const renderItemPost=({item})=>{
+        if(item.max_number_of_people!=null){
+            return (
+                <PostForRent item={item} routeName={''} params={{}} />
+            )
+        }
+        else{
+            return (
+                <PostWant item={item} routeName={''} params={{}} />
+            )
+        }
+       
+    }
+    const flatListHeader=()=>{
+        return(
+            <>
+            <Banner/>
+            <WantPlace openDialog={showModel}/>
+            
+            </>
+        )
+    }
+    if(postForRent===null || postWant===null){
+        return (
+            <ActivityIndicator/>
+        )
+    }
 
-        },
-    ];
 
+
+    const allPost=shuffleArray([...postForRent,...postWant])
+
+    console.info(allPost)
     return (
         <View style={styles.container}>
 
-            <ScrollView>
-                {address === null ? <ActivityIndicator /> : <>
-                    <View>
-                        <Text style={styles.headerText}>{JSON.stringify(address)}</Text>
-                    </View>
-                </>}
-                <Banner />
-                <WantPlace openDialog={showModel} />
-
-                {posts.map(post => (
-                    <PostForRent key={post.id} />
-                ))}
-                {posts.map(post => (
-                    <PostWant key={post.id} />
-                ))}
-            </ScrollView>
-            <AddressDialog visible={visibleModelAddress} onClose={hideModel} />
+            <FlatList 
+            data={allPost} 
+            renderItem={renderItemPost}
+            ListHeaderComponent={flatListHeader}
+            keyExtractor={item=>item.id.toString()}
+            />
+            <AddressDialog visible={visibleModelAddress} onClose={hideModel}/>
 
         </View>
 

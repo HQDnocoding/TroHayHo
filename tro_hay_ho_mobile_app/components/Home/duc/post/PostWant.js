@@ -1,32 +1,44 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Avatar } from 'react-native-paper';
 import { Icon } from 'react-native-paper';
+import {formatTimeAgo} from '../../../../utils/TimeFormat';
+import {formatPrice,shuffleArray} from '../../../../utils/Formatter';
+import {sampleAvatar} from '../../../../utils/MyValues';
 
-const PostWant = () => {
+const PostWant = ({item, routeName, params}) => {
   return (
     <Card style={styles.card}>
-      <View style={styles.header}>
-        <Avatar.Image
-          size={40}
-          source={{uri:"https://img.freepik.com/free-vector/night-landscape-with-lake-mountains-trees-coast-vector-cartoon-illustration-nature-scene-with-coniferous-forest-river-shore-rocks-moon-stars-dark-sky_107791-8253.jpg"}}
-        />
-        <View style={styles.userInfo}>
-          <Text style={styles.userName}>Trần Thái Uy</Text>
-          <Text style={styles.timestamp}>12:34 01-03-2024</Text>
-        </View>
-      </View>
+        <View style={styles.header}>
+                     <Avatar.Image
+                         size={40}
+                         source={{uri: item.user.avatar ? item.user.avatar : sampleAvatar}}
+                     />
+                     <View style={styles.userInfo}>
+                         <Text style={styles.userName}
+                               numberOfLines={1}>{item.user.first_name + " " + item.user.last_name}</Text>
+                         <Text style={styles.timestamp} numberOfLines={1}>{formatTimeAgo(item.created_date)}</Text>
+                     </View>
+                 </View>
 
-      {/* Location */}
-      <View style={styles.locationContainer}>
-        <Text style={styles.location}>số 12 , xã A,huyện B , tỉnh C</Text>
-      </View>
+     {/* Location */}
+                 <View style={styles.locationContainer}>
+                     <Text style={styles.location} numberOfLines={2}>{
+                         item.address.specified_address + ', ' +
+                         item.address.ward.full_name + ', ' +
+                         item.address.district.full_name + ', ' +
+                         item.address.province.full_name
+                     }</Text>
+                 </View>
 
-      {/* Description */}
-      <Text style={styles.description}>
-        em muoons thue nha cuc chang da, nha dep thi cang tot heheh
-      </Text>
+       {/* title */}
+                 <Text style={styles.description} numberOfLines={5}>
+                     {item.title}
+                 </Text>
 
 
+ <Text style={styles.price} numberOfLines={1}>
+                    Từ {item.price_range_min} đ/ tháng đến {item.price_range_max} đ/ tháng
+                 </Text>
 
 
 
@@ -85,7 +97,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   price: {
-    color: '#FF0000',
+    color: '#3eaf00',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,

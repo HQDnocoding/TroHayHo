@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import mark_safe
-from .models import User,PostWant,PostForRent,District,Province,Ward,Role,Address
+from .models import User,PostWant,PostForRent,District,Province,Ward,Role,Address,PostImage
 # Register your models here.
 
 
@@ -27,5 +27,6 @@ admin.site.register(Province)
 admin.site.register(District)
 admin.site.register(Ward)
 admin.site.register(Address)
+admin.site.register(PostImage)
 
 

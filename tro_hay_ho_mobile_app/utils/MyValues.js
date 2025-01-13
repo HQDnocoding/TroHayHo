@@ -1,0 +1,1 @@
+export const sampleAvatar= "https://drive.usercontent.google.com/download?id=1fPVkJqspSh0IQsQ_8teVapd5qf_q1ppV&authuser=0"
