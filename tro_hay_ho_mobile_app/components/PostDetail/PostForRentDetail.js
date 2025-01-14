@@ -23,7 +23,6 @@ const PostForRentDetail = ({ route }) => {
         longitude: 0,
     });
 
-
     const loadPost = async () => {
         try {
             let res = await APIs.get(endpoints["post-for-rent-detail"](id));
@@ -46,113 +45,122 @@ const PostForRentDetail = ({ route }) => {
 
     useEffect(() => {
         if (post?.address?.coordinates) {
-            // console.log('post.coordinates', post?.address?.coordinates)
-            // console.log('post.coordinates2', post?.address?.coordinates.split(", ").map(Number))
             const [latitude, longitude] = post?.address?.coordinates.split(", ").map(Number);
             setCenterCoordinates({ latitude, longitude });
-            // console.log('post.coordinates3', centerCoordinates)
-            // console.log('post.coordinates3', centerCoordinates)
         }
     }, [post])
+
     return (
-        <ScrollView >
-            {post === null ? <ActivityIndicator /> :
-                <>
-                    {/* <Image source={require('../../assets/test_post_imgs/tro1.png')} /> */}
-
-                    <PostImage imgs={post.post_image} />
-
-                    <View style={styles.containerTitle} >
-                        <Text style={styles.title}>{post.title}</Text>
-                        <View style={styles.containerHeader}>
-                            <Text style={styles.price}>{post.price}/tháng</Text>
-                            <Text style={styles.text}>• {post.acreage}m²</Text>
-                            <Text style={styles.text}>• Tối đa {post.max_number_of_people} người</Text>
-
-                        </View>
-
-                        <View style={{ marginTop: 20 }}>
+        <View style={styles.mainContainer}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                {post === null ? <ActivityIndicator /> :
+                    <>
+                        <PostImage imgs={post.post_image} />
+                        <View style={styles.containerTitle}>
+                            <Text style={styles.title}>{post.title}</Text>
                             <View style={styles.containerHeader}>
-
-                                <Icon style={styles.addressIcon} source={'map-marker'} size={23} />
-                                <Text style={styles.address}>
-                                    {post.address.specified_address}
-                                </Text>
+                                <Text style={styles.price}>{post.price}/tháng</Text>
+                                <Text style={styles.text}>• {post.acreage}m²</Text>
+                                <Text style={styles.text}>• Tối đa {post.max_number_of_people} người</Text>
                             </View>
-                            <View style={styles.containerHeader}>
 
-                                <Icon style={styles.addressIcon} source={'clock-time-four-outline'} size={23} />
-                                <Text style={styles.address}>
-                                    Cập nhật {moment(post.updated_date).fromNow()}
-                                </Text>
-                            </View>
-                        </View>
-                        <Divider />
-                        <View>
-                            <Text style={{ fontWeight: 500, paddingVertical: 10 }}>Mô tả chi tiết</Text>
-                            <View style={styles.containPhone}>
+                            <View style={{ marginTop: 20 }}>
                                 <View style={styles.containerHeader}>
-                                    <Text style={styles.text}>SĐT liên lạc:</Text>
-                                    <TouchableOpacity style={styles.text}>
-                                        <Text style={{ color: 'blue' }}>{post.user.phone}</Text>
+                                    <Icon style={styles.addressIcon} source={'map-marker'} size={23} />
+                                    <Text style={styles.address}>
+                                        {post.address.specified_address}
+                                    </Text>
+                                </View>
+                                <View style={styles.containerHeader}>
+                                    <Icon style={styles.addressIcon} source={'clock-time-four-outline'} size={23} />
+                                    <Text style={styles.address}>
+                                        Cập nhật {moment(post.updated_date).fromNow()}
+                                    </Text>
+                                </View>
+                            </View>
+                            <Divider />
+                            <View>
+                                <Text style={{ fontWeight: 500, paddingVertical: 10 }}>Mô tả chi tiết</Text>
+                                <View style={styles.containPhone}>
+                                    <View style={styles.containerHeader}>
+                                        <Text style={styles.text}>SĐT liên lạc:</Text>
+                                        <TouchableOpacity style={styles.text}>
+                                            <Text style={{ color: 'blue' }}>{post.user.phone}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <TouchableOpacity style={{ marginRight: 10, }}>
+                                        <Text style={{ color: 'blue' }}>Gọi ngay</Text>
                                     </TouchableOpacity>
                                 </View>
-                                <TouchableOpacity style={{ marginRight: 10, }}>
-                                    <Text style={{ color: 'blue' }}>Gọi ngay</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{ paddingVertical: 50, paddingHorizontal: 5 }}>
-                                <Text style={{ fontSize: 15, }}>{post.description}</Text>
-                            </View>
-                        </View>
-                        <Divider />
-                        <View style={{ marginVertical: 20 }}>
-                            <Text style={{ fontWeight: 500, paddingVertical: 10 }}>Bản đồ</Text>
-                            {centerCoordinates.latitude === null ? <ActivityIndicator /> : <><View style={styles.container}>
-                                <MapView
-                                    style={styles.map}
-                                    initialRegion={{
-                                        ...centerCoordinates,
-                                        latitudeDelta: 0.0001, // Độ zoom
-                                        longitudeDelta: 0.01,
-                                    }}
-                                >
-                                    {/* Marker ở tâm */}
-                                    <Marker coordinate={centerCoordinates} title="Địa điểm" />
-
-                                    {/* Circle xung quanh tâm */}
-                                    <Circle
-                                        center={centerCoordinates}
-                                        radius={500} // Bán kính vòng tròn tính bằng mét
-                                        strokeColor="rgba(0, 0, 255, 0.5)"
-                                        fillColor="rgba(0, 0, 255, 0.2)"
-                                    />
-                                </MapView>
-                            </View></>}
-
-                        </View>
-                        <Divider />
-                        <View>
-                            <Text style={{ fontWeight: 500, paddingVertical: 10 }}>Thông tin người dùng</Text>
-                            <View style={{padding:10,backgroundColor:'#F8F4F4', borderRadius:20, borderWidth:1,borderColor:'#D2D0D7'}} >
-                                <View style={{flexDirection:'row'}}>
-                                    <Image style={{ height: 60, width: 60, marginHorizontal: 5 }} source={require('../../assets/google-logo.png')} resizeMode="contain" />
-
-                                    <Text style={{ fontSize:15,marginTop:10 }}>{post.user.last_name} {post.user.first_name}</Text>
-                                    <Button style={{ marginLeft:70,justifyContent:'center' }} textColor="#FFBA00">Theo dõi</Button>
-
+                                <View style={{ paddingVertical: 50, paddingHorizontal: 5 }}>
+                                    <Text style={{ fontSize: 15, }}>{post.description}</Text>
                                 </View>
-                                <Text style={{margin:10}}>Đã tham gia {moment(post.user.date_joined).fromNow()}</Text>
                             </View>
-
+                            <Divider />
+                            <View style={{ marginVertical: 20 }}>
+                                <Text style={{ fontWeight: 500, paddingVertical: 10 }}>Bản đồ</Text>
+                                {centerCoordinates.latitude === null ? <ActivityIndicator /> :
+                                    <View style={styles.container}>
+                                        <MapView
+                                            style={styles.map}
+                                            initialRegion={{
+                                                ...centerCoordinates,
+                                                latitudeDelta: 0.0001,
+                                                longitudeDelta: 0.01,
+                                            }}
+                                        >
+                                            <Marker coordinate={centerCoordinates} title="Địa điểm" />
+                                            <Circle
+                                                center={centerCoordinates}
+                                                radius={500}
+                                                strokeColor="rgba(0, 0, 255, 0.5)"
+                                                fillColor="rgba(0, 0, 255, 0.2)"
+                                            />
+                                        </MapView>
+                                    </View>
+                                }
+                            </View>
+                            <Divider />
+                            <View>
+                                <Text style={{ fontWeight: 500, paddingVertical: 10 }}>Thông tin người dùng</Text>
+                                <View style={{ padding: 10, backgroundColor: '#F8F4F4', borderRadius: 20, borderWidth: 1, borderColor: '#D2D0D7' }} >
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Image style={{ height: 60, width: 60, marginHorizontal: 5 }} source={require('../../assets/google-logo.png')} resizeMode="contain" />
+                                        <Text style={{ fontSize: 15, marginTop: 10 }}>{post.user.last_name} {post.user.first_name}</Text>
+                                        <Button onPress={() => { }} style={{ marginLeft: 70, justifyContent: 'center' }} textColor="#FFBA00">Theo dõi</Button>
+                                    </View>
+                                    <Text style={{ margin: 10 }}>Đã tham gia {moment(post.user.date_joined).fromNow()}</Text>
+                                </View>
+                            </View>
                         </View>
-                    </View>
-                </>}
-        </ScrollView>
+                    </>
+                }
+            </ScrollView>
+            <View style={styles.footBarContainer}>
+                <IconButton icon={'chat-outline'} size={30} onPress={() => { }} />
+                <TouchableOpacity style={{ borderRadius: 10, borderWidth: 1, borderColor: 'black', paddingHorizontal: 20, paddingVertical: 10 }} onPress={() => { }}>
+                    <Text style={styles.text}>Bình luận</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{
+                    flexDirection: 'row', alignItems: 'center',
+                    backgroundColor: '#0BD138', padding: 3, borderRadius: 10, marginLeft: 'auto',
+                }}>
+                    <Icon color="white" source={'phone-in-talk-outline'} size={20} style={{ padding: 10, color: 'white' }} />
+                    <Text style={{ padding: 10, color: 'white', fontSize: 18 }}>{post.user.phone}</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     )
 };
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        position: 'relative', // Đảm bảo footer luôn ở cuối màn hình
+    },
+    scrollContainer: {
+        paddingBottom: 80, // Khoảng cách để không bị che khuất bởi footer
+    },
     containerTitle: {
         display: 'flex',
         padding: 10,
@@ -191,9 +199,9 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     header: {
-        flexDirection: 'row', // Đảm bảo các phần tử nằm trên cùng một dòng
-        alignItems: 'center', // Căn giữa các phần tử theo chiều dọc
-        marginVertical: 10,  // Đảm bảo không quá chật
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
     },
     address: {
         fontSize: 14,
@@ -201,18 +209,28 @@ const styles = StyleSheet.create({
     },
     addressIcon: { marginRight: 10, },
     container: {
-        borderColor:'#D2D0D7',
-        padding:10,
-        borderWidth:1,
-        borderRadius:10
+        borderColor: '#D2D0D7',
+        padding: 10,
+        borderWidth: 1,
+        borderRadius: 10
     },
     map: {
-        
         height: 300,
-        borderRadius:10
+        borderRadius: 10
     },
-
+    footBarContainer: {
+        flexDirection: 'row',
+        padding: 5,
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        height: 60,
+        backgroundColor: '#fff',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#D2D0D7',
+    },
 })
-
 
 export default PostForRentDetail;
