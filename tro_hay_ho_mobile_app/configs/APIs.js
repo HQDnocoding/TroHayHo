@@ -3,8 +3,8 @@ import axios from "axios";
 
 
 // ip cua Duc:http://192.168.129.238:8000/
- const BASE_URL="http://192.168.1.253:8000/"
-//const BASE_URL="http://192.168.1.10:8000/"
+//  const BASE_URL="http://192.168.1.253:8000/"
+const BASE_URL="http://192.168.1.10:8000/"
 
 
 
@@ -15,7 +15,8 @@ export const endpoints={
     'role':'/roles/',
     'address':'/addresses/',
     'getListPostWant':'/post-wants',
-    'getListPostForRent':'/post-for-rents',
+    'getListPostForRent':'/post-for-rents/',
+    'post-for-rent-detail':(postId)=>`/post-for-rents/${postId}/`,
 
 }
 

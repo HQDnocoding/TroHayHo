@@ -51,6 +51,13 @@ export default function App() {
             backgroundColor: '#FFBA00',
           }
         }} />
+        <Stack.Screen name='post_for_rent' component={PostForRentDetail} options={{
+          tabBarVisible: true,
+          headerTitle: 'Bài đăng',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
       </Stack.Navigator>
     )
   }
@@ -63,7 +70,6 @@ export default function App() {
           <MyAppNavigator />
         </MyDispatchContext.Provider>
       </MyUserContext.Provider>
-      {/* <PostForRentDetail /> */}
     </NavigationContainer>
 
   );

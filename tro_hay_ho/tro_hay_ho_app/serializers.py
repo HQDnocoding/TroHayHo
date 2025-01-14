@@ -7,6 +7,7 @@ from .models import User,Role,PostWant,PostForRent,Address,Ward,District,Provinc
 
 class UserSerializer(ModelSerializer):
     avatar = serializers.ImageField(required=False)
+    phone=serializers.CharField(required=False)
     def create(self, validated_data):
         user = User(**validated_data)
         user.set_password(user.password)
@@ -17,7 +18,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'avatar', 'password','role']
+        fields = ['id', 'username', 'first_name', 'last_name', 'avatar', 'password','role','phone','date_joined']
 
         extra_kwargs = {
             'password': {

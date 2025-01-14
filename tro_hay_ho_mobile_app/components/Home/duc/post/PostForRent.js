@@ -4,11 +4,15 @@ import {Icon} from 'react-native-paper';
 import {formatTimeAgo} from '../../../../utils/TimeFormat';
 import {formatPrice} from '../../../../utils/Formatter';
 import {sampleAvatar} from '../../../../utils/MyValues';
+import PostForRentDetail from '../../../PostDetail/PostForRentDetail';
+import { useNavigation } from '@react-navigation/native';
 
 const PostForRent = ({item, routeName, params}) => {
     console.info(item.post_image.length)
+    const nav=useNavigation()
     return (
-        <Card style={styles.card}>
+        <TouchableOpacity onPress={()=>nav.navigate(routeName,params)}>
+            <Card style={styles.card}>
             <View style={styles.header}>
                 <Avatar.Image
                     size={40}
@@ -89,6 +93,8 @@ const PostForRent = ({item, routeName, params}) => {
                 </TouchableOpacity>
             </View>
         </Card>
+        </TouchableOpacity>
+        
     );
 };
 

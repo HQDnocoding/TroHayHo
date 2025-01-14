@@ -42,12 +42,12 @@ const Home = () => {
     const renderItemPost=({item})=>{
         if(item.max_number_of_people!=null){
             return (
-                <PostForRent item={item} routeName={''} params={{}} />
+                <PostForRent item={item} routeName={'post_for_rent'} params={{'postId':item.id}} />
             )
         }
         else{
             return (
-                <PostWant item={item} routeName={''} params={{}} />
+                <PostWant item={item} routeName={''} params={{'postId':item.id}} />
             )
         }
        
