@@ -2,7 +2,7 @@ from zoneinfo import available_timezones
 
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from .models import User,Role,PostWant,PostForRent,Address,Ward,District,Province,PostImage
+from .models import User,Role,PostWant,PostForRent,Address,Ward,District,Province,PostImage,Notification
 
 
 class UserSerializer(ModelSerializer):
@@ -78,5 +78,11 @@ class PostWantSerializer(ModelSerializer):
     address=AddressSerializer(read_only=True)
     class Meta:
         model = PostWant
+        fields='__all__'
+
+class NotificationSerializer(ModelSerializer):
+    sender=UserSerializer(read_only=True)
+    class Meta:
+        model = Notification
         fields='__all__'
 

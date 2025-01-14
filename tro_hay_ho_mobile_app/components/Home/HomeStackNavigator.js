@@ -66,7 +66,7 @@ const HomeStackNavigator = () => {
             />
             <Stack.Screen
                 name='notification'
-                component={NotificationTabNaviagtor}
+                component={NotificationScreen}
                 options={{ title: 'Thông báo' }}
             />
             <Stack.Screen
