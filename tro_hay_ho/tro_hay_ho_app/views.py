@@ -7,7 +7,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.viewsets import ModelViewSet
-
+from .paginator import ItemPaginator
 from .models import User,Role
 from .serializers import *
 
@@ -51,9 +51,13 @@ class RoleViewSet(ViewSet,RetrieveAPIView,):
 class PostWantViewSet(ModelViewSet):
     queryset = PostWant.objects.filter(active=True)
     serializer_class = PostWantSerializer
+    pagination_class = ItemPaginator
+
 class PostForRentViewSet(ModelViewSet):
 
     serializer_class = PostForRentSerializer
+    pagination_class = ItemPaginator
+
     def get_queryset(self):
         return PostForRent.objects.filter(active=True)\
             .select_related('user','address')\

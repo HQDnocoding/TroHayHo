@@ -1,4 +1,4 @@
-import {View, Text, ScrollView, StyleSheet, ActivityIndicator,FlatList} from 'react-native';
+import {View, Text, ScrollView, StyleSheet, ActivityIndicator, FlatList, RefreshControl} from 'react-native';
 import {Card, Title, Paragraph} from 'react-native-paper';
 import PostForRent from "./duc/post/PostForRent";
 import PostWant from "./duc/post/PostWant";
@@ -7,23 +7,91 @@ import Banner from "./duc/explore/Banner";
 import React from "react";
 import AddressDialog from "./duc/explore/AddressDialog";
 import APIs, {endpoints} from "../../configs/APIs";
-import { shuffleArray } from '../../utils/Formatter';
+import {shuffleArray} from '../../utils/Formatter';
 
 
 const Home = () => {
     const [visibleModelAddress, setVisibleModelAddress] = React.useState(false)
-    const [postWant,setPostWant]=React.useState(null)
-    const [postForRent,setPostForRent]=React.useState(null)
+    const [postWant, setPostWant] = React.useState([])
+    const [postForRent, setPostForRent] = React.useState([])
+    const [loading, setLoading] = React.useState(false);
+    const [pageWant, setPageWant] = React.useState(1);
+    const [pageForRent, setPageForRent] = React.useState(1);
+    const [allPosts, setAllPosts] = React.useState([]);
 
-    const loadPostWant=async ()=>{
-        let res = await APIs.get(endpoints['getListPostWant'])
-        // console.info(res.data)
-        setPostWant(res.data)
+
+    const loadPostWant = async () => {
+
+        if (pageWant > 0) {
+            setLoading(true)
+            try {
+                let url = `${endpoints['getListPostWant']}?page=${pageWant}`
+                let res = await APIs.get(url)
+
+                // if(pageWant > 1){
+                //     setPostWant(prevPosts => [...prevPosts, ...res.data.results])
+
+
+                // } else {
+                //     setPostWant(res.data.results)
+
+                // }
+                const newPosts = res.data.results.map(post => ({...post, type: 'PostWant'}));
+                setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
+
+                if (res.data.next === null) {
+                    setPageWant(0)
+                }
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    // Xử lý lỗi 404: Dừng việc tăng giá trị pageWant
+                    setPageWant(0);
+                } else {
+                    console.error("Error loading posts want:", error, " == at page: ", pageWant);
+                }
+
+            } finally {
+                setLoading(false)
+
+            }
+        }
+
     }
-      const loadPostForRent=async ()=>{
-        let res = await APIs.get(endpoints['getListPostForRent'])
-        // console.info(res.data)
-        setPostForRent(res.data)
+    const loadPostForRent = async () => {
+
+
+        if (pageForRent > 0) {
+            setLoading(true)
+
+            try {
+                let url = `${endpoints['getListPostForRent']}?page=${pageForRent}`
+                let res = await APIs.get(url)
+
+                // if(pageForRent === 1){
+                //     setPostForRent(res.data.results)
+
+                // } else {
+                //     setPostForRent(prevPosts => [...prevPosts, ...res.data.results])
+
+                // }
+                const newPosts = res.data.results.map(post => ({...post, type: 'PostForRent'}));
+                setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
+
+                if (res.data.next === null) {
+                    setPageForRent(0)
+                }
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    // Xử lý lỗi 404: Dừng việc tăng giá trị pageForRent
+                    setPageForRent(0);
+                } else {
+                    console.error("Error loading posts for rent:", error, " == at page: ", pageForRent);
+                }
+            } finally {
+                setLoading(false)
+
+            }
+        }
     }
     const showModel = () => {
         setVisibleModelAddress(true)
@@ -32,54 +100,66 @@ const Home = () => {
         setVisibleModelAddress(false)
     }
 
-
-    React.useEffect(()=>{
-        loadPostWant()
-    },[])
-       React.useEffect(()=>{
-        loadPostForRent()
-    },[])
-    const renderItemPost=({item})=>{
-        if(item.max_number_of_people!=null){
-            return (
-                <PostForRent item={item} routeName={''} params={{}} />
-            )
+    const loadMore = () => {
+        if (pageWant > 0) {
+            setPageWant(pageWant + 1)
         }
-        else{
-            return (
-                <PostWant item={item} routeName={''} params={{}} />
-            )
+        if (pageForRent > 0) {
+            setPageForRent(pageForRent + 1)
         }
-       
     }
-    const flatListHeader=()=>{
-        return(
+
+    const refresh = () => {
+        setAllPosts([])
+        setPageForRent(1)
+        setPageWant(1)
+
+    }
+    React.useEffect(() => {
+
+        loadPostForRent()
+    }, [pageForRent])
+
+    React.useEffect(() => {
+        loadPostWant()
+    }, [pageWant])
+
+    const renderItemPost = ({item}) => {
+        if (item.type === 'PostForRent') {
+            return <PostForRent item={item} routeName={''} params={{}}/>;
+        } else if (item.type === 'PostWant') {
+            return <PostWant item={item} routeName={''} params={{}}/>;
+        }
+
+    }
+    const flatListHeader = () => {
+        return (
             <>
-            <Banner/>
-            <WantPlace openDialog={showModel}/>
-            
+                <Banner/>
+                <WantPlace openDialog={showModel}/>
+
             </>
         )
     }
-    if(postForRent===null || postWant===null){
+
+    if (postForRent === null && postWant === null) {
         return (
             <ActivityIndicator/>
         )
     }
 
 
-
-    const allPost=shuffleArray([...postForRent,...postWant])
-
-    console.info(allPost)
     return (
         <View style={styles.container}>
 
-            <FlatList 
-            data={allPost} 
-            renderItem={renderItemPost}
-            ListHeaderComponent={flatListHeader}
-            keyExtractor={item=>item.id.toString()}
+            <FlatList
+                refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh}/>}
+                data={allPosts}
+                renderItem={renderItemPost}
+                ListHeaderComponent={flatListHeader}
+                keyExtractor={item => item.id.toString()}
+                onEndReached={loadMore}
+                ListFooterComponent={() => loading ? <ActivityIndicator/> : null}
             />
             <AddressDialog visible={visibleModelAddress} onClose={hideModel}/>
 
@@ -99,7 +179,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     headerText: {
-        color:'red',
+        color: 'red',
         fontSize: 18,
         fontWeight: 'bold',
     },

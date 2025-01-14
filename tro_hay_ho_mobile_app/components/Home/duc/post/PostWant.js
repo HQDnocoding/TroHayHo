@@ -37,9 +37,10 @@ const PostWant = ({item, routeName, params}) => {
 
 
  <Text style={styles.price} numberOfLines={1}>
-                    Từ {item.price_range_min} đ/ tháng đến {item.price_range_max} đ/ tháng
+                    Từ {formatPrice( item.price_range_min)} đ/ tháng </Text>
+                 <Text style={styles.price} numberOfLines={1}>
+                    Đến {formatPrice(item.price_range_max)} đ/ tháng
                  </Text>
-
 
 
 
