@@ -1,46 +1,46 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Avatar } from 'react-native-paper';
 import { Icon } from 'react-native-paper';
-import {formatTimeAgo} from '../../../../utils/TimeFormat';
-import {formatPrice,shuffleArray} from '../../../../utils/Formatter';
-import {sampleAvatar} from '../../../../utils/MyValues';
+import { formatTimeAgo } from '../../../../utils/TimeFormat';
+import { formatPrice, shuffleArray } from '../../../../utils/Formatter';
+import { sampleAvatar } from '../../../../utils/MyValues';
 
-const PostWant = ({item, routeName, params}) => {
+const PostWant = ({ item, routeName, params }) => {
   return (
     <Card style={styles.card}>
-        <View style={styles.header}>
-                     <Avatar.Image
-                         size={40}
-                         source={{uri: item.user.avatar ? item.user.avatar : sampleAvatar}}
-                     />
-                     <View style={styles.userInfo}>
-                         <Text style={styles.userName}
-                               numberOfLines={1}>{item.user.first_name + " " + item.user.last_name}</Text>
-                         <Text style={styles.timestamp} numberOfLines={1}>{formatTimeAgo(item.created_date)}</Text>
-                     </View>
-                 </View>
+      <View style={styles.header}>
+        <Avatar.Image
+          size={40}
+          source={{ uri: item.user.avatar ? item.user.avatar : sampleAvatar }}
+        />
+        <View style={styles.userInfo}>
+          <Text style={styles.userName}
+            numberOfLines={1}>{item.user.first_name + " " + item.user.last_name}</Text>
+          <Text style={styles.timestamp} numberOfLines={1}>{formatTimeAgo(item.created_date)}</Text>
+        </View>
+      </View>
 
-     {/* Location */}
-                 <View style={styles.locationContainer}>
-                     <Text style={styles.location} numberOfLines={2}>{
-                         item.address.specified_address + ', ' +
-                         item.address.ward.full_name + ', ' +
-                         item.address.district.full_name + ', ' +
-                         item.address.province.full_name
-                     }</Text>
-                 </View>
+      {/* Location */}
+      <View style={styles.locationContainer}>
+        <Text style={styles.location} numberOfLines={2}>{
+          item.address.specified_address + ', ' +
+          item.address.ward.full_name + ', ' +
+          item.address.district.full_name + ', ' +
+          item.address.province.full_name
+        }</Text>
+      </View>
 
-       {/* title */}
-                 <Text style={styles.description} numberOfLines={5}>
-                     {item.title}
-                 </Text>
+      {/* title */}
+      <Text style={styles.description} numberOfLines={5}>
+        {item.title}
+      </Text>
 
 
- <Text style={styles.price} numberOfLines={1}>
-                    Từ {formatPrice( item.price_range_min)} đ/ tháng </Text>
-                 <Text style={styles.price} numberOfLines={1}>
-                    Đến {formatPrice(item.price_range_max)} đ/ tháng
-                 </Text>
+      <Text style={styles.price} numberOfLines={1}>
+        Từ {formatPrice(item.price_range_min)} đ/ tháng </Text>
+      <Text style={styles.price} numberOfLines={1}>
+        Đến {formatPrice(item.price_range_max)} đ/ tháng
+      </Text>
 
 
 

@@ -142,11 +142,11 @@ const Home = () => {
         )
     }
 
-    if (postForRent === null && postWant === null) {
-        return (
-            <ActivityIndicator/>
-        )
-    }
+    // if (postForRent === null && postWant === null) {
+    //     return (
+    //         <ActivityIndicator/>
+    //     )
+    // }
 
 
     return (

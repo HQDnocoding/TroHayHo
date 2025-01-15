@@ -8,7 +8,7 @@ import PostForRentDetail from '../../../PostDetail/PostForRentDetail';
 import { useNavigation } from '@react-navigation/native';
 
 const PostForRent = ({item, routeName, params}) => {
-    console.info(item.post_image.length)
+   
     const nav=useNavigation()
     return (
         <TouchableOpacity onPress={()=>nav.navigate(routeName,params)}>

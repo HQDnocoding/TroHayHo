@@ -68,7 +68,7 @@ class Conversation(BaseModel):
         db_table = 'conversation'
 
     def __str__(self):
-        return self.date_start
+        return f"tro chuyen giua {self.user1} va {self.user2} trong {self.date_start}"
 
 
 class Message(BaseModel):
