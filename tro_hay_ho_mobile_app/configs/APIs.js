@@ -21,11 +21,11 @@ export const endpoints={
     'post-want-detail': (postId) => `/post-wants/${postId}/`,
     'pw-comment': (postId) => `/post-wants/${postId}/comments/`
 }
-
 export const endpointsDuc={
     'getListNotification':'/notifications',
+    'getListConversationByUserId':(userId)=>`/user-conversations/user/${userId}/`,
+    'getListMessageByConversationId':(conversationId)=>`/conversation-messages/conversation/${conversationId}/`,
 }
-
 
 export const authAPIs=(token)=>{
     console.info("Authenticate");

@@ -6,13 +6,13 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 import Home from "./Home";
 import NotificationScreen from "./notification/NotificationScreen";
-import MessageScreen from "./message/MessageScreen";
+import ConversationScreen from "./conversation/ConversationScreen";
 import HomeTabNavigator from "./HomeTabNavigator"
 import SearchScreen from "./SearchScreen";
 import NotificationTabNaviagtor from "./notification/NotificationTabNaviagtor";
 
 const HomeStackNavigator = () => {
-    return (
+    return  (
         <Stack.Navigator
             screenOptions={({ navigation, route }) => ({
                 headerShown: true,
@@ -45,7 +45,7 @@ const HomeStackNavigator = () => {
                                 <IconButton
                                     icon="message"
                                     size={24}
-                                    onPress={() => navigation.navigate('message')}
+                                    onPress={() => navigation.navigate('conversation')}
                                 />
                             </View>
                         )
@@ -70,8 +70,8 @@ const HomeStackNavigator = () => {
                 options={{ title: 'Thông báo' }}
             />
             <Stack.Screen
-                name='message'
-                component={MessageScreen}
+                name='conversation'
+                component={ConversationScreen}
                 options={{ title: 'Tin nhắn' }}
             />
             <Stack.Screen name={"search"}

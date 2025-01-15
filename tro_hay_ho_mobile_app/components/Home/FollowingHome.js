@@ -1,8 +1,10 @@
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
-
+import {MyDispatchContext,MyUserContext} from '../../configs/UserContexts'
+import React from 'react';
 const FollowingHome = () => {
-  // Data mẫu cho các phòng trọ đang theo dõi
+  const user = React.useContext(MyUserContext)
+  
   const followedPosts = [
     {
       id: 1,
@@ -20,13 +22,18 @@ const FollowingHome = () => {
       status: 'Đã cho thuê',
       followedDate: '18/01/2025'
     },
-    // Thêm data mẫu khác...
+
   ];
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Phòng trọ đang theo dõi</Text>
+        {(user !==null)?
+    <Text>{JSON.stringify(user)}</Text>
+  :
+    <Text>chua dang nhap</Text>
+  }
       </View>
 
       {followedPosts.map(post => (
