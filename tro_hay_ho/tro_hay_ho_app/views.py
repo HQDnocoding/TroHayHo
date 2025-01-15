@@ -50,7 +50,6 @@ class RoleViewSet(ViewSet, RetrieveAPIView, ):
 
         return Response(self.serializer_class(query).data)
 
-
 class PostWantViewSet(ModelViewSet):
     queryset = PostWant.objects.filter(active=True)
     serializer_class = PostWantSerializer
@@ -79,12 +78,11 @@ class PostForRentViewSet(ModelViewSet):
         return PostForRent.objects.filter(active=True) \
             .select_related('user', 'address') \
             .prefetch_related('images')
-
-
 class AddressViewSet(ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
     
+
 
 class CommentViewSet(ModelViewSet):
     queryset=Comment.objects.all()
@@ -94,6 +92,11 @@ class CommentViewSet(ModelViewSet):
 class NotificationViewSet(ModelViewSet):
     serializer_class = NotificationSerializer
     pagination_class = ItemSmallPaginator
+
+    def get_queryset(self):
+        return Notification.objects.filter(active=True) \
+            .select_related('sender')
+
 
     def get_queryset(self):
         return Notification.objects.filter(active=True) \

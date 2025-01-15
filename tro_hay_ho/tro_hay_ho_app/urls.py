@@ -17,6 +17,10 @@ r.register('comments',CommentViewSet,basename='comment')
 # duc
 r.register('conversations',duc_views.ConversationViewSet,basename='conversation')
 r.register('messages',duc_views.MessageViewSet,basename='message')
+r.register('notifications',NotificationViewSet,basename='notifications')
+
+
+
 urlpatterns = [
     path('',include(r.urls))
 ]
