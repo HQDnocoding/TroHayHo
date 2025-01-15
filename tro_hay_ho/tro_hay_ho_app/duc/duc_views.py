@@ -42,7 +42,7 @@ class UserConversationViewSet(ModelViewSet):
         Q(user1_id=user_id) |  Q(user2_id=user_id),
 
         active=True,
-        ).select_related('user1', 'user2').order_by('-updated_date')
+        ).select_related('user1', 'user2').prefetch_related('messages').order_by('-updated_date')
 
         # serializer = self.get_serializer(conversations, many=True)
         # phan trang

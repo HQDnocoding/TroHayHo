@@ -33,7 +33,12 @@ const ConversationCard = ({item,params,routeName}) => {
                 <View style={styles.header}>
                     <TouchableOpacity>
                     <Text style={styles.title} numberOfLines={1}>{partner.last_name} {partner.first_name}</Text>
-                        <Text>Hello , đã có chuyện gì xảy ra vây</Text>
+                        {item.latest_message ?(
+                            <Text numberOfLines={1}>{item.latest_message.content}</Text>
+                        ):(
+                            <Text>Chưa có tin nhắn</Text>
+                        )}
+                        
 
                     </TouchableOpacity>
                     <Text style={styles.dateTime}>{formatTimeAgo(item.updated_date)}</Text>
