@@ -1,11 +1,14 @@
 import {View, Text, StyleSheet, ScrollView,FlatList,RefreshControl} from "react-native";
 import React from "react";
 import {Searchbar} from "react-native-paper";
-import MessageCard from "./MessageCard";
 import APIs, { endpointsDuc } from "../../../configs/APIs";
 import { ActivityIndicator } from "react-native-paper";
-const MessageScreen = () => {
-  const [conversation, setConversation] = React.useState([])
+import ConversationCard from "./ConversationCard";
+
+const ConversationScreen = () => {
+    const [conversation, setConversation] = React.useState([])
+    const [firstMessage, setFirstMessage] = React.useState([])
+
     const [loading, setLoading] = React.useState(false);
     const [page, setPage] = React.useState(1);
 
@@ -53,7 +56,7 @@ const MessageScreen = () => {
         }
         const renderItemConversation=({item})=>{
             return(
-                <MessageCard key={item.id} item={item} params={{}} routeName={''}/>
+                <ConversationCard key={item.id} item={item} params={{}} routeName={''}/>
             )
         }
     
@@ -100,5 +103,5 @@ const styles= StyleSheet.create({
         marginBottom:10,
     }
 })
-export default MessageScreen;
+export default ConversationScreen;
 

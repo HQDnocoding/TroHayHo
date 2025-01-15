@@ -2,9 +2,9 @@ import axios from "axios";
 
 
 
-//  const BASE_URL="http://10.30.192.79:8000/"
+ const BASE_URL="http://10.100.60.24:8000/"
 //  const BASE_URL="http://192.168.1.253:8000/"
- const BASE_URL="http://192.168.129.238:8000/"
+//  const BASE_URL="http://192.168.129.238:8000/"
 //const BASE_URL="http://192.168.1.10:8000/"
 
 
@@ -22,6 +22,8 @@ export const endpoints={
 }
 export const endpointsDuc={
     'getListNotification':'/notifications',
+    'getListConversationByUserId':(userId)=>`/user-conversations/user/${userId}/`,
+    'getListMessageByConversationId':(conversationId)=>`/conversation-messages/conversation/${conversationId}/`,
 }
 
 export const authAPIs=(token)=>{

@@ -17,8 +17,8 @@ r.register('notifications',NotificationViewSet,basename='notifications')
 
 
 # duc
-r.register('conversations',duc_views.ConversationViewSet,basename='conversation')
-r.register('messages',duc_views.MessageViewSet,basename='message')
+r.register('user-conversations', duc_views.UserConversationViewSet, basename='user-conversations')
+r.register('conversation-messages',duc_views.ConversationMessageViewSet,basename='conversation-messages')
 urlpatterns = [
     path('',include(r.urls))
 ]
