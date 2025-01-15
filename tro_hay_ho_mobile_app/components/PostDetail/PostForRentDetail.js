@@ -146,7 +146,7 @@ const PostForRentDetail = ({ route }) => {
                     backgroundColor: '#0BD138', padding: 3, borderRadius: 10, marginLeft: 'auto',
                 }}>
                     <Icon color="white" source={'phone-in-talk-outline'} size={20} style={{ padding: 10, color: 'white' }} />
-                    <Text style={{ padding: 10, color: 'white', fontSize: 18 }}>{post.user.phone}</Text>
+                    <Text style={{ padding: 10, color: 'white', fontSize: 18 }}>{post?.user.phone}</Text>
                 </TouchableOpacity>
             </View>
         </View>

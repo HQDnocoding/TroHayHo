@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.viewsets import ModelViewSet
 from .paginator import ItemPaginator
-from .models import User,Role
+from .models import User,Role,Comment
 from .serializers import *
 
 
@@ -52,6 +52,19 @@ class PostWantViewSet(ModelViewSet):
     queryset = PostWant.objects.filter(active=True)
     serializer_class = PostWantSerializer
     pagination_class = ItemPaginator
+    
+    @action(methods=['get','post'],url_path='comments',detail=True)
+    def get_comments(self,request,pk):
+        if request.method.__eq__('POST'):
+            content=request.data.get('content')
+            c=Comment.objects.create(content=content,user=request.user,lesson=self.get_object())
+        
+            return Response(CommentSerializer(c).data)
+        
+        else:
+            comments=self.get_object().comments.select_related('user').filter(active=True)
+
+            return Response(CommentSerializer(comments,many=True).data)
 
 class PostForRentViewSet(ModelViewSet):
 
@@ -67,3 +80,8 @@ class AddressViewSet(ModelViewSet):
     serializer_class = AddressSerializer
     
 
+class CommentViewSet(ModelViewSet):
+    queryset=Comment.objects.all()
+    serializer_class=CommentSerializer
+    
+    
