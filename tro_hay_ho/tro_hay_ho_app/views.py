@@ -7,7 +7,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.viewsets import ModelViewSet
-from .paginator import ItemPaginator,NotificationPaginator
+from .paginator import ItemPaginator,ItemSmallPaginator
 from .models import User, Role
 from .serializers import *
 
@@ -72,7 +72,7 @@ class AddressViewSet(ModelViewSet):
 
 class NotificationViewSet(ModelViewSet):
     serializer_class = NotificationSerializer
-    pagination_class = NotificationPaginator
+    pagination_class = ItemSmallPaginator
 
     def get_queryset(self):
         return Notification.objects.filter(active=True) \
