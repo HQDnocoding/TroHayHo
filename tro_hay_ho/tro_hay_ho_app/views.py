@@ -12,6 +12,7 @@ from .models import User,Role,Comment
 from .paginator import ItemPaginator,ItemSmallPaginator
 from .models import User, Role
 from .serializers import *
+from .paginator import *
 
 
 class UserViewSet(ViewSet,CreateAPIView):
@@ -59,13 +60,18 @@ class PostWantViewSet(ModelViewSet):
     def get_comments(self,request,pk):
         if request.method.__eq__('POST'):
             content=request.data.get('content')
-            c=Comment.objects.create(content=content,user=request.user,lesson=self.get_object())
+            c=Comment.objects.create(content=content,user=request.user,post=self.get_object())
 
             return Response(CommentSerializer(c).data)
 
         else:
-            comments=self.get_object().comments.select_related('user').filter(active=True)
-
+            comments=self.get_object().comments.select_related('user').filter(active=True,replied_comment=None)
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(comments, self.request)
+            
+            if page is not None:
+                return paginator.get_paginated_response(CommentSerializer(page, many=True).data)
+            
             return Response(CommentSerializer(comments,many=True).data)
 
 
@@ -78,6 +84,8 @@ class PostForRentViewSet(ModelViewSet):
         return PostForRent.objects.filter(active=True) \
             .select_related('user', 'address') \
             .prefetch_related('images')
+            
+            
 class AddressViewSet(ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
@@ -87,6 +95,7 @@ class AddressViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     queryset=Comment.objects.all()
     serializer_class=CommentSerializer
+    pagination_class = ItemSmallPaginator
 
 
 class NotificationViewSet(ModelViewSet):

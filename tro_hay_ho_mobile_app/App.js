@@ -12,6 +12,7 @@ import AccountSettingDetail from './components/User/AccountSettingDetail';
 import SavePosts from './components/User/SavedPosts';
 import PostImage from './components/PostDetail/PostImages';
 import PostForRentDetail from './components/PostDetail/PostForRentDetail';
+import PostWantDetail from './components/PostDetail/PostWantDetail';
 
 
 
@@ -51,7 +52,15 @@ export default function App() {
             backgroundColor: '#FFBA00',
           }
         }} />
+        
         <Stack.Screen name='post_for_rent' component={PostForRentDetail} options={{
+          tabBarVisible: true,
+          headerTitle: 'Bài đăng',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
+        <Stack.Screen name='post_want' component={PostWantDetail} options={{
           tabBarVisible: true,
           headerTitle: 'Bài đăng',
           headerStyle: {

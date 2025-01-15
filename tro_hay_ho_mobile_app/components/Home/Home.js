@@ -128,7 +128,7 @@ const Home = () => {
         if (item.type === 'PostForRent') {
             return <PostForRent item={item} routeName={'post_for_rent'} params={{postId:item.id}}/>;
         } else if (item.type === 'PostWant') {
-            return <PostWant item={item} routeName={''} params={{}}/>;
+            return <PostWant item={item} routeName={'post_want'} params={{postId:item.id}}/>;
         }
 
     }
