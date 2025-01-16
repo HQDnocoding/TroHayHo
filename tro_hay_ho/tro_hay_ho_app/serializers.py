@@ -73,6 +73,7 @@ class PostForRentSerializer(ModelSerializer):
     user = UserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
     post_image=PostImageSerializer(many=True, source='images', read_only=True)
+    
     class Meta:
         model = PostForRent
         fields='__all__'
@@ -80,12 +81,14 @@ class PostForRentSerializer(ModelSerializer):
 class PostWantSerializer(ModelSerializer):
     user=UserSerializer(read_only=True)
     address=AddressSerializer(read_only=True)
+    
     class Meta:
         model = PostWant
         fields='__all__'
 
 class NotificationSerializer(ModelSerializer):
     sender=UserSerializer(read_only=True)
+    
     class Meta:
         model = Notification
         fields='__all__'
@@ -94,6 +97,7 @@ class NotificationSerializer(ModelSerializer):
 class CommentSerializer(ModelSerializer):
     user=UserSerializer(read_only=True)
     replies=serializers.SerializerMethodField()
+    
     class Meta:
         model=Comment
         fields='__all__'
@@ -102,3 +106,14 @@ class CommentSerializer(ModelSerializer):
     def get_replies(self,obj):
         replies=obj.comments.all()
         return CommentSerializer(replies,many=True).data
+
+
+
+class FavouritePostSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
+    saved_at = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = FavoritePost
+        fields = '__all__'

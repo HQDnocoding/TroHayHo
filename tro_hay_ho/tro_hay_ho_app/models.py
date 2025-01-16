@@ -97,6 +97,17 @@ class Post(BaseModel):
 
     def __str__(self):
         return self.title
+    
+    
+class FavoritePost(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_posts')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='saved_by_users')
+
+    class Meta:
+        db_table = 'favourite_post'
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.post.title} at {self.saved_at}"
 
 
 class PostWant(Post):

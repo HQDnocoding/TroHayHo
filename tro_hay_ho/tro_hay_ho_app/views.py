@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import permissions
 from rest_framework.decorators import action
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView ,DestroyAPIView
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -30,10 +30,25 @@ class UserViewSet(ViewSet,CreateAPIView):
     def get_current_user(self, request):
         return Response(UserSerializer(request.user).data)
     
+    
+    
+    # @action(methods=['post','delete'], url_path='',detail=True)
+    
+    
+    
+    # @action(methods=['get','post'],url_path='',detail=True)
+    
+    
+    
+
+    
+    
 
 class RoleViewSet(ViewSet, RetrieveAPIView, ):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
+    
+    
 
     def list(self, request):
 
@@ -55,6 +70,9 @@ class PostWantViewSet(ModelViewSet):
     queryset = PostWant.objects.filter(active=True)
     serializer_class = PostWantSerializer
     pagination_class = ItemPaginator
+    
+    
+    
 
     @action(methods=['get','post'],url_path='comments',detail=True)
     def get_comments(self,request,pk):
@@ -113,7 +131,7 @@ class AddressViewSet(ModelViewSet):
 
 
 class CommentViewSet(ModelViewSet):
-    queryset=Comment.objects.all()
+    queryset=Comment.objects.filter(active=True)
     serializer_class=CommentSerializer
     pagination_class = ItemSmallPaginator
 
@@ -127,7 +145,13 @@ class NotificationViewSet(ModelViewSet):
             .select_related('sender')
 
 
-    def get_queryset(self):
-        return Notification.objects.filter(active=True) \
-            .select_related('sender')
 
+
+class FavouritePostViewSet(ModelViewSet):
+    queryset=FavoritePost.objects.filter(active=True)
+    serializer_class=FavouritePostSerializer
+    pagination_class=ItemSmallPaginator
+    
+    
+    
+    
