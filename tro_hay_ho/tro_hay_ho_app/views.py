@@ -86,6 +86,26 @@ class PostForRentViewSet(ModelViewSet):
             .prefetch_related('images')
             
             
+            
+    @action(methods=['get','post'],url_path='comments',detail=True)
+    def get_comments(self,request,pk):
+        if request.method.__eq__('POST'):
+            content=request.data.get('content')
+            c=Comment.objects.create(content=content,user=request.user,post=self.get_object())
+
+            return Response(CommentSerializer(c).data)
+
+        else:
+            comments=self.get_object().comments.select_related('user').filter(active=True,replied_comment=None)
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(comments, self.request)
+            
+            if page is not None:
+                return paginator.get_paginated_response(CommentSerializer(page, many=True).data)
+            
+            return Response(CommentSerializer(comments,many=True).data)
+
+            
 class AddressViewSet(ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer

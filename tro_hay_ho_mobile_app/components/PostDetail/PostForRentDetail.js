@@ -6,6 +6,7 @@ import { ActivityIndicator, Avatar, Button, Card, Divider, Icon, IconButton } fr
 import moment from "moment";
 import 'moment/locale/vi';
 import MapView, { Circle, Marker } from 'react-native-maps';
+import CommentScreen from "./CommentPostWant";
 
 moment.locale('vi');
 
@@ -127,9 +128,11 @@ const PostForRentDetail = ({ route }) => {
                                 </View>
                             </View>
                         </View>
+                        <CommentScreen postId={id} />
                     </>
                 }
             </ScrollView>
+            
             <View style={styles.footBarContainer}>
                 <IconButton icon={'chat-outline'} size={30} onPress={() => { }} />
                 <TouchableOpacity style={{ borderRadius: 10, borderWidth: 1, borderColor: 'black', paddingHorizontal: 20, paddingVertical: 10 }} onPress={() => { }}>

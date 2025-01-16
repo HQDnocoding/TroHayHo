@@ -19,7 +19,8 @@ export const endpoints={
     'getListPostForRent': '/post-for-rents/',
     'post-for-rent-detail': (postId) => `/post-for-rents/${postId}/`,
     'post-want-detail': (postId) => `/post-wants/${postId}/`,
-    'pw-comment': (postId) => `/post-wants/${postId}/comments/`
+    'pw-comment': (postId) => `/post-wants/${postId}/comments/`,
+    'pfr-comment': (postId) => `/post-for-rents/${postId}/comments/`
 }
 export const endpointsDuc={
     'getListNotification':'/notifications',

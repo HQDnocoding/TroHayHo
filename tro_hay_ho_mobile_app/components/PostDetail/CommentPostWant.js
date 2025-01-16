@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {  Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import APIs, { endpoints } from "../../configs/APIs";
 import moment from "moment";
 import { ActivityIndicator, TextInput } from "react-native-paper";
@@ -8,7 +8,7 @@ import { FlatList } from "react-native";
 
 
 
-const CommentScreen = ({ postId = 2 }) => {
+const CommentScreen = ({ postId  }) => {
 
 
     const [page, setPage] = useState(1);
@@ -30,7 +30,7 @@ const CommentScreen = ({ postId = 2 }) => {
             setLoading(true);
 
             try {
-                let url = `${endpoints['pw-comment'](postId)}?page=${page}&page_size=4`;
+                let url = `${endpoints['pfr-comment'](postId)}?page=${page}&page_size=4`;
 
                 let res = await APIs.get(url);
 
@@ -93,7 +93,7 @@ const CommentScreen = ({ postId = 2 }) => {
                 {/* Hiển thị trả lời con */}
                 {expandedComments[item.id] && (
                     <FlatList
-                    scrollEnabled={false}
+                        scrollEnabled={false}
                         data={item.replies}
                         renderItem={renderComment}
                         keyExtractor={(reply) => reply.id.toString()}
@@ -115,7 +115,7 @@ const CommentScreen = ({ postId = 2 }) => {
 
             {/* Comment List */}
             <FlatList
-                                scrollEnabled={false}
+                scrollEnabled={false}
 
                 nestedScrollEnabled={true}
                 data={comments}
