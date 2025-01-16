@@ -72,14 +72,14 @@ export default function App() {
   }
 
   return (
-
-    <NavigationContainer>
+<NavigationContainer>
       <MyUserContext.Provider value={user}>
         <MyDispatchContext.Provider value={dispatch}>
           <MyAppNavigator />
         </MyDispatchContext.Provider>
       </MyUserContext.Provider>
     </NavigationContainer>
+   
 
   );
 }

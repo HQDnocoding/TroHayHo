@@ -12,7 +12,6 @@ r.register('roles',RoleViewSet,basename='role')
 r.register('addresses',AddressViewSet,basename='address')
 r.register('post-wants',PostWantViewSet,basename='post_wants')
 r.register('post-for-rents',PostForRentViewSet,basename='post_for_rents')
-r.register('notifications',NotificationViewSet,basename='notifications')
 
 
 

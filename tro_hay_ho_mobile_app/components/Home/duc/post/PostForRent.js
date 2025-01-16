@@ -1,100 +1,105 @@
-import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
-import {Card, Avatar} from 'react-native-paper';
-import {Icon} from 'react-native-paper';
-import {formatTimeAgo} from '../../../../utils/TimeFormat';
-import {formatPrice} from '../../../../utils/Formatter';
-import {sampleAvatar} from '../../../../utils/MyValues';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Card, Avatar } from 'react-native-paper';
+import { Icon } from 'react-native-paper';
+import { formatTimeAgo } from '../../../../utils/TimeFormat';
+import { formatPrice } from '../../../../utils/Formatter';
+import { sampleAvatar } from '../../../../utils/MyValues';
 import PostForRentDetail from '../../../PostDetail/PostForRentDetail';
 import { useNavigation } from '@react-navigation/native';
 
-const PostForRent = ({item, routeName, params}) => {
+const PostForRent = ({ item, routeName, params }) => {
     console.info(item.post_image.length)
-    const nav=useNavigation()
+    const nav = useNavigation()
     return (
-        <TouchableOpacity onPress={()=>nav.navigate(routeName,params)}>
-            <Card style={styles.card}>
-            <View style={styles.header}>
-                <Avatar.Image
-                    size={40}
-                    source={{uri: item.user.avatar ? item.user.avatar : sampleAvatar}}
-                />
-                <View style={styles.userInfo}>
-                    <Text style={styles.userName}
-                          numberOfLines={1}>{item.user.first_name + " " + item.user.last_name}</Text>
-                    <Text style={styles.timestamp} numberOfLines={1}>{formatTimeAgo(item.created_date)}</Text>
+
+        <Card style={styles.card}>
+            <View>
+                <TouchableOpacity activeOpacity={1} onPress={() => nav.navigate(routeName, params)}>
+                    <View style={styles.header}>
+                        <Avatar.Image
+                            size={40}
+                            source={{ uri: item.user.avatar ? item.user.avatar : sampleAvatar }}
+                        />
+                        <View style={styles.userInfo}>
+                            <Text style={styles.userName}
+                                numberOfLines={1}>{item.user.first_name + " " + item.user.last_name}</Text>
+                            <Text style={styles.timestamp} numberOfLines={1}>{formatTimeAgo(item.created_date)}</Text>
+                        </View>
+                    </View>
+
+                    {/* Location */}
+                    <View style={styles.locationContainer}>
+                        <Text style={styles.location} numberOfLines={2}>{
+                            item.address.specified_address + ', ' +
+                            item.address.ward.full_name + ', ' +
+                            item.address.district.full_name + ', ' +
+                            item.address.province.full_name
+                        }</Text>
+                    </View>
+
+                    {/* title */}
+                    <Text style={styles.description} numberOfLines={5}>
+                        {item.title}
+                    </Text>
+
+                    {/* Price */}
+                    <Text style={styles.price}>{formatPrice(item.price) + ' đ/ tháng'}</Text>
+                    {item.post_image.length >= 1 && (
+                        <View style={styles.imagesContainer}>
+                            <Image
+                                source={{ uri: item.post_image[0].image }}
+
+                                style={styles.mainImage}
+                            />
+                            {item.post_image.length === 2 && (
+                                <View style={styles.smallImagesContainer}>
+                                    <Image
+                                        source={{ uri: item.post_image[1].image }}
+
+                                        style={styles.smallImageV2}
+                                    />
+
+                                </View>
+                            )}
+                            {item.post_image.length >= 3 && (
+                                <View style={styles.smallImagesContainer}>
+                                    <Image
+                                        source={{ uri: item.post_image[1].image }}
+
+                                        style={styles.smallImage}
+                                    />
+                                    <Image
+                                        source={{ uri: item.post_image[2].image }}
+
+                                        style={styles.smallImage}
+                                    />
+                                </View>
+                            )}
+                        </View>
+                    )}
+
+                </TouchableOpacity>
+                {/* Actions */}
+                <View style={styles.actions}>
+                    <TouchableOpacity style={styles.actionButton}>
+                        <Icon source="comment-outline" size={20} />
+                        <Text style={styles.actionText}>23 Bình luận</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton}>
+                        <Icon source="heart-outline" size={20} />
+                        <Text style={styles.actionText}>Lưu</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton}>
+                        <Icon source="share-variant-outline" size={20} />
+                        <Text style={styles.actionText}>Chia sẻ</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
 
-            {/* Location */}
-            <View style={styles.locationContainer}>
-                <Text style={styles.location} numberOfLines={2}>{
-                    item.address.specified_address + ', ' +
-                    item.address.ward.full_name + ', ' +
-                    item.address.district.full_name + ', ' +
-                    item.address.province.full_name
-                }</Text>
-            </View>
 
-            {/* title */}
-            <Text style={styles.description} numberOfLines={5}>
-                {item.title}
-            </Text>
-
-            {/* Price */}
-            <Text style={styles.price}>{formatPrice(item.price) + ' đ/ tháng'}</Text>
-            {item.post_image.length >= 1 && (
-                <View style={styles.imagesContainer}>
-                    <Image
-                        source={{uri: item.post_image[0].image}}
-
-                        style={styles.mainImage}
-                    />
-                    {item.post_image.length === 2 && (
-                        <View style={styles.smallImagesContainer}>
-                            <Image
-                                source={{uri: item.post_image[1].image}}
-
-                                style={styles.smallImageV2}
-                            />
-
-                        </View>
-                    )}
-                    {item.post_image.length >= 3 && (
-                        <View style={styles.smallImagesContainer}>
-                            <Image
-                                source={{uri: item.post_image[1].image}}
-
-                                style={styles.smallImage}
-                            />
-                            <Image
-                                source={{uri: item.post_image[2].image}}
-
-                                style={styles.smallImage}
-                            />
-                        </View>
-                    )}
-                </View>
-            )}
-
-
-            {/* Actions */}
-            <View style={styles.actions}>
-                <TouchableOpacity style={styles.actionButton}>
-                    <Icon source="comment-outline" size={20}/>
-                    <Text style={styles.actionText}>23 Bình luận</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton}>
-                    <Icon source="heart-outline" size={20}/>
-                    <Text style={styles.actionText}>Lưu</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton}>
-                    <Icon source="share-variant-outline" size={20}/>
-                    <Text style={styles.actionText}>Chia sẻ</Text>
-                </TouchableOpacity>
-            </View>
         </Card>
-        </TouchableOpacity>
-        
+
+
     );
 };
 

@@ -14,13 +14,10 @@ const PostForRentDetail = ({ route }) => {
     const [post, setPost] = useState(null);
     const [comment, setComment] = useState(null);
 
-    const [coordinates, setCoordinates] = useState(null)
-
-    const [arr, setArr] = useState([])
 
     const [centerCoordinates, setCenterCoordinates] = useState({
-        latitude: 0,
-        longitude: 0,
+        latitude: null,
+        longitude: null,
     });
 
     const loadPost = async () => {
@@ -28,9 +25,6 @@ const PostForRentDetail = ({ route }) => {
             let res = await APIs.get(endpoints["post-for-rent-detail"](id));
             if (res && res.data) {
                 setPost(res.data);
-                if (res.data.coordinates) {
-                    setCoordinates(res.data.coordinates.split(", ").map(Number));
-                }
             } else {
                 console.error("API did not return data");
             }

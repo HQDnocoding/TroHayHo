@@ -1,126 +1,11 @@
 import { useEffect, useState } from "react";
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import {  Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import APIs, { endpoints } from "../../configs/APIs";
 import moment from "moment";
-import { TextInput } from "react-native-paper";
+import { ActivityIndicator, TextInput } from "react-native-paper";
+import { FlatList } from "react-native";
 
-const comment = {
-    "count": 4,
-    "next": "http://192.168.1.10:8000/post-wants/2/comments/?page=2&page_size=1",
-    "previous": null,
-    "results": [
-        {
-            "id": 1,
-            "user": {
-                "id": 2,
-                "username": "dat",
-                "first_name": "Đạt",
-                "last_name": "Hứa Quang",
-                "avatar": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1736863424/Adolf-Hitler-1933_xazf05",
-                "role": {
-                    "id": 3,
-                    "created_date": "2025-01-13T12:06:48.006729+07:00",
-                    "updated_date": "2025-01-13T12:06:48.006729+07:00",
-                    "active": true,
-                    "role_name": "nguoi_thue_tro"
-                },
-                "phone": "0913092445",
-                "date_joined": "2025-01-13T12:38:51.877948+07:00"
-            },
-            "replies": [
-                {
-                    "id": 11,
-                    "user": {
-                        "id": 2,
-                        "username": "dat",
-                        "first_name": "Đạt",
-                        "last_name": "Hứa Quang",
-                        "avatar": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1736863424/Adolf-Hitler-1933_xazf05",
-                        "role": {
-                            "id": 3,
-                            "created_date": "2025-01-13T12:06:48.006729+07:00",
-                            "updated_date": "2025-01-13T12:06:48.006729+07:00",
-                            "active": true,
-                            "role_name": "nguoi_thue_tro"
-                        },
-                        "phone": "0913092445",
-                        "date_joined": "2025-01-13T12:38:51.877948+07:00"
-                    },
-                    "replies": [],
-                    "created_date": "2025-01-14T23:04:24.036848+07:00",
-                    "updated_date": "2025-01-14T23:04:24.036848+07:00",
-                    "active": true,
-                    "content": "Đây là bình luận số {i}",
-                    "date_at": "2025-01-14T23:04:24.036848+07:00",
-                    "post": 2,
-                    "replied_comment": 1
-                }
-            ],
-            "created_date": "2025-01-14T21:01:11.519444+07:00",
-            "updated_date": "2025-01-14T21:01:11.519444+07:00",
-            "active": true,
-            "content": "Đây là bình luận số 1",
-            "date_at": "2025-01-14T21:01:11.519444+07:00",
-            "post": 2,
-            "replied_comment": null
-        },
-        {
-            "id": 2,
-            "user": {
-                "id": 2,
-                "username": "dat",
-                "first_name": "Đạt",
-                "last_name": "Hứa Quang",
-                "avatar": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1736863424/Adolf-Hitler-1933_xazf05",
-                "role": {
-                    "id": 3,
-                    "created_date": "2025-01-13T12:06:48.006729+07:00",
-                    "updated_date": "2025-01-13T12:06:48.006729+07:00",
-                    "active": true,
-                    "role_name": "nguoi_thue_tro"
-                },
-                "phone": "0913092445",
-                "date_joined": "2025-01-13T12:38:51.877948+07:00"
-            },
-            "replies": [
-                {
-                    "id": 13,
-                    "user": {
-                        "id": 2,
-                        "username": "dat",
-                        "first_name": "Đạt",
-                        "last_name": "Hứa Quang",
-                        "avatar": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1736863424/Adolf-Hitler-1933_xazf05",
-                        "role": {
-                            "id": 3,
-                            "created_date": "2025-01-13T12:06:48.006729+07:00",
-                            "updated_date": "2025-01-13T12:06:48.006729+07:00",
-                            "active": true,
-                            "role_name": "nguoi_thue_tro"
-                        },
-                        "phone": "0913092445",
-                        "date_joined": "2025-01-13T12:38:51.877948+07:00"
-                    },
-                    "replies": [],
-                    "created_date": "2025-01-14T23:04:24.036848+07:00",
-                    "updated_date": "2025-01-14T23:04:24.036848+07:00",
-                    "active": true,
-                    "content": "Đây là bình luận số {i}",
-                    "date_at": "2025-01-14T23:04:24.036848+07:00",
-                    "post": 2,
-                    "replied_comment": 1
-                }
-            ],
-            "created_date": "2025-01-14T21:01:11.519444+07:00",
-            "updated_date": "2025-01-14T21:01:11.519444+07:00",
-            "active": true,
-            "content": "Đây là bình luận số 1",
-            "date_at": "2025-01-14T21:01:11.519444+07:00",
-            "post": 2,
-            "replied_comment": null
-        }
-    ]
-}
+
 
 
 const CommentScreen = ({ postId = 2 }) => {
@@ -130,6 +15,7 @@ const CommentScreen = ({ postId = 2 }) => {
     const [loading, setLoading] = useState(false);
     const [comments, setComments] = useState([]);
     const [expandedComments, setExpandedComments] = useState({});
+    const [commentText, setCommentText] = useState()
 
     const toggleReplies = (commentId) => {
         setExpandedComments((prev) => ({
@@ -144,7 +30,7 @@ const CommentScreen = ({ postId = 2 }) => {
             setLoading(true);
 
             try {
-                let url = `${endpoints['pw-comment'](postId)}?page=${page}&page_size=5`;
+                let url = `${endpoints['pw-comment'](postId)}?page=${page}&page_size=4`;
 
                 let res = await APIs.get(url);
 
@@ -185,15 +71,17 @@ const CommentScreen = ({ postId = 2 }) => {
     }
 
 
-
-
-
     const renderComment = ({ item }) => (
         <View style={styles.commentContainer}>
+            {/* Avatar */}
             <Image source={{ uri: item.user.avatar }} style={styles.avatar} />
             <View style={styles.commentContent}>
-                <Text style={styles.username}>{item.user.username}</Text>
-                <Text style={styles.content}>{item.content}</Text>
+                {/* Tên người dùng và nội dung bình luận */}
+                <Text>
+                    <Text style={styles.username}>{item.user.username} </Text>
+                    <Text style={styles.content}>{item.content}</Text>
+                </Text>
+                {/* Thời gian và nút trả lời */}
                 <View style={styles.commentFooter}>
                     <Text style={styles.time}>{moment(item.updated_date).fromNow()}</Text>
                     <TouchableOpacity onPress={() => toggleReplies(item.id)}>
@@ -202,12 +90,15 @@ const CommentScreen = ({ postId = 2 }) => {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                {/* Replies */}
+                {/* Hiển thị trả lời con */}
                 {expandedComments[item.id] && (
                     <FlatList
+                    scrollEnabled={false}
                         data={item.replies}
                         renderItem={renderComment}
                         keyExtractor={(reply) => reply.id.toString()}
+                        nestedScrollEnabled={true}
+                        contentContainerStyle={{ marginLeft: 40 }}
                     />
                 )}
             </View>
@@ -215,15 +106,6 @@ const CommentScreen = ({ postId = 2 }) => {
     );
 
 
-    const renderReply = ({ item }) => (
-        <View style={styles.replyContainer}>
-            <Image source={{ uri: item.user.avatar }} style={styles.avatarSmall} />
-            <View style={styles.commentContent}>
-                <Text style={styles.username}>{item.user.username}</Text>
-                <Text style={styles.content}>{item.content}</Text>
-            </View>
-        </View>
-    );
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -233,33 +115,43 @@ const CommentScreen = ({ postId = 2 }) => {
 
             {/* Comment List */}
             <FlatList
+                                scrollEnabled={false}
+
+                nestedScrollEnabled={true}
                 data={comments}
                 renderItem={renderComment}
                 keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.commentList}
-                style={{maxHeight:300}}
+                showsVerticalScrollIndicator={false} // Ẩn thanh cuộn
+                onEndReached={loadMore} // Tải thêm khi cuộn đến cuối
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={loading && <ActivityIndicator />} // Hiển thị khi đang tải
             />
 
             {/* Input Section */}
-            {/* <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Thêm bình luận..."
-            value={}
-            onChangeText={()=>{}}
-          />
-          <TouchableOpacity
-            style={styles.sendButton}
-            onPress={() => {
-              if (commentText.trim()) {
-                onSendComment(commentText);
-                setCommentText('');
-              }
-            }}
-          >
-            <Text style={styles.sendText}>Gửi</Text>
-          </TouchableOpacity>
-        </View> */}
+            <KeyboardAvoidingView style={styles.inputContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
+
+
+                <TextInput
+                    mode="flat"
+                    style={styles.input}
+                    placeholder="Thêm bình luận..."
+                    placeholderTextColor="#888"
+                    value={commentText}
+                    onChangeText={setCommentText}
+                />
+                <TouchableOpacity
+                    style={styles.sendButton}
+                    onPress={() => {
+                        // if (commentText.trim()) {
+                        //     onSendComment(commentText);
+                        //     setCommentText('');
+                        // }
+                    }}
+                >
+                    <Text style={styles.sendText}>Gửi</Text>
+                </TouchableOpacity>
+            </KeyboardAvoidingView>
         </View>
 
     );
@@ -268,54 +160,57 @@ const CommentScreen = ({ postId = 2 }) => {
 
 const styles = StyleSheet.create({
     container: {
-        display:'flex',
         backgroundColor: '#fff',
     },
     header: {
         height: 50,
-        backgroundColor: '#f9f9f9',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: 'white',
         borderBottomWidth: 1,
         borderBottomColor: '#e0e0e0',
+        justifyContent: 'center'
     },
     headerText: {
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: 500,
+
     },
     commentList: {
+        paddingVertical: 15,
         paddingHorizontal: 10,
     },
     commentContainer: {
         flexDirection: 'row',
         marginBottom: 10,
+        paddingTop: 10,
+        paddingHorizontal: 10,
     },
     avatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 35,
+        height: 35,
+        borderRadius: 17.5,
         marginRight: 10,
     },
     commentContent: {
         flex: 1,
     },
     username: {
-        fontWeight: 'bold',
+        fontWeight: '600',
         fontSize: 14,
-        marginBottom: 2,
+        color: '#000',
     },
     content: {
         fontSize: 14,
-        marginBottom: 5,
+        color: '#333',
     },
     commentFooter: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginTop: 3,
     },
     time: {
         fontSize: 12,
-        color: '#777',
-        marginRight: 10,
+        color: '#888',
+        marginRight: 15,
     },
     replyButton: {
         fontSize: 12,
@@ -344,7 +239,10 @@ const styles = StyleSheet.create({
         height: 40,
         borderWidth: 1,
         borderColor: '#e0e0e0',
-        borderRadius: 20,
+        borderBottomStartRadius: 30,
+        borderTopStartRadius: 30,
+        borderTopEndRadius: 30,
+        borderBottomEndRadius: 30,
         paddingHorizontal: 15,
         backgroundColor: '#f9f9f9',
     },
