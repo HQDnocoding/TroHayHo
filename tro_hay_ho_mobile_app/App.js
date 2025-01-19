@@ -13,6 +13,10 @@ import SavePosts from './components/User/SavedPosts';
 import PostImage from './components/PostDetail/PostImages';
 import PostForRentDetail from './components/PostDetail/PostForRentDetail';
 import PostWantDetail from './components/PostDetail/PostWantDetail';
+import NotificationScreen from "./components/Home/notification/NotificationScreen";
+import ConversationScreen from "./components/Home/conversation/ConversationScreen";
+import MessageScreen from './components/Home/message/MessageScreen';
+import MessageStackNavigator from "./components/Home/message/MessageStackNavigator";
 
 
 
@@ -63,6 +67,24 @@ export default function App() {
         <Stack.Screen name='post_want' component={PostWantDetail} options={{
           tabBarVisible: true,
           headerTitle: 'Bài đăng',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
+         <Stack.Screen name='notification' component={NotificationScreen } options={{
+          headerTitle: 'Thông báo',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
+         <Stack.Screen name='conversation' component={ConversationScreen} options={{
+          headerTitle: 'Trò chuyện',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
+         <Stack.Screen name='message' component={MessageStackNavigator} options={{
+          headerShown:false,
           headerStyle: {
             backgroundColor: '#FFBA00',
           }

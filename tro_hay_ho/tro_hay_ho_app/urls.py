@@ -19,6 +19,7 @@ r.register('post-for-rents',PostForRentViewSet,basename='post_for_rents')
 r.register('user-conversations', duc_views.UserConversationViewSet, basename='user-conversations')
 r.register('conversation-messages',duc_views.ConversationMessageViewSet,basename='conversation-messages')
 r.register('user-post-wants',duc_views.UserPostWantViewSet,basename='user-post-wants')
+r.register('user-post-for-rents',duc_views.UserPostForRentViewSet,basename='user-post-for-rents')
 
 # =============================================
 r.register('notifications',NotificationViewSet,basename='notifications')
