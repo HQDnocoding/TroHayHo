@@ -15,9 +15,12 @@ r.register('post-for-rents',PostForRentViewSet,basename='post_for_rents')
 
 
 
-# duc
-r.register('conversations',duc_views.ConversationViewSet,basename='conversation')
-r.register('messages',duc_views.MessageViewSet,basename='message')
+#================== duc========================
+r.register('user-conversations', duc_views.UserConversationViewSet, basename='user-conversations')
+r.register('conversation-messages',duc_views.ConversationMessageViewSet,basename='conversation-messages')
+r.register('user-post-wants',duc_views.UserPostWantViewSet,basename='user-post-wants')
+
+# =============================================
 r.register('notifications',NotificationViewSet,basename='notifications')
 
 

@@ -20,7 +20,7 @@ class ConversationViewSet(ModelViewSet):
 
     def get_queryset(self):
         return Conversation.objects.filter(active=True) \
-            .select_related('user1')
+            .select_related('user1','user2')
 
 
 class MessageViewSet(ModelViewSet):
@@ -75,3 +75,22 @@ class ConversationMessageViewSet(ModelViewSet):
 
         serializer = self.get_serializer(messages, many=True)
         return Response(serializer.data)
+
+class UserPostWantViewSet(ModelViewSet):
+    pagination_class = ItemSmallPaginator
+    serializer_class = PostWantSerializer
+    queryset = PostWant.objects.filter(active=True)
+    @action(detail=False,methods=['get'],url_path=r'user/(?P<user_id>\d+)')
+    def get_user_post_want(self,request,user_id=None):
+        post_want= PostWant.objects.filter(active=True,
+                                          user_id=user_id
+                                          ).order_by('-updated_date')
+        page= self.paginate_queryset(post_want)
+        if page is not None:
+            serializers=self.get_serializer(page,many=True)
+            return self.get_paginated_response(serializers.data)
+        serializers=self.get_serializer(post_want,many=True)
+        return Response(serializers.data)
+
+
+

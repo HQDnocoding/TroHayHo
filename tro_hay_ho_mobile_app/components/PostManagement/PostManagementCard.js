@@ -1,13 +1,17 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {Entypo} from '@expo/vector-icons'; // Đảm bảo bạn đã cài đặt expo/vector-icons
+import {sampleImage,CHU_TRO,NGUOI_THUE_TRO} from '../../utils/MyValues'
+import { formatTimeAgo } from '../../utils/TimeFormat';
+import { formatPrice} from '../../utils/Formatter';
 
-const PostManagementCard = ({data}) => {
+const PostManagementCard = ({item,params,routeName}) => {
+    
     return (
         <TouchableOpacity style={styles.card}>
             <View style={styles.imageContainer}>
                 <Image
-                    source={{uri: "https://img.freepik.com/free-vector/night-landscape-with-lake-mountains-trees-coast-vector-cartoon-illustration-nature-scene-with-coniferous-forest-river-shore-rocks-moon-stars-dark-sky_107791-8253.jpg"}}
+                    source={{uri:item.user.avatar?item.user.avatar: sampleImage}}
                     style={styles.image}
                     resizeMode="cover"
                 />
@@ -15,9 +19,15 @@ const PostManagementCard = ({data}) => {
 
             <View style={styles.contentContainer}>
                 <View style={styles.header}>
-                    <Text style={styles.title} numberOfLines={2}>Nhà cho thuê 30m2 sổ hồng chính chủ , 2 mặt tiền đường , cơ hội tahnwg tiến, cố hắng 1 thời gian</Text>
-                    <Text style={styles.price}>12.000.000 Đ</Text>
-                    <Text style={styles.dateTime}>17:25 01-12-2024</Text>
+                    <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+                    {item.user.role.role_name ===NGUOI_THUE_TRO?(
+      <Text style={styles.priceGreen}>{formatPrice(item.price_range_min)} đ -{formatPrice(item.price_range_max)} đ</Text>
+                    ):(
+                        <Text priceRed={styles.price}>{formatPrice(item.price)} đ</Text>
+
+                    )}
+              
+                    <Text style={styles.dateTime}>{formatTimeAgo(item.created_date)}</Text>
 
                 </View>
 
@@ -76,10 +86,15 @@ const styles = StyleSheet.create({
     },
     icon: {
     },
-    price: {
+    priceRed: {
         fontSize: 15,
         fontWeight: 'bold',
         color: '#FF0000',
+    },
+    priceGreen: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#38ab1e',
     },
     dateTime: {
         fontSize: 10,
