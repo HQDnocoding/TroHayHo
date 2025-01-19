@@ -8,7 +8,7 @@ import { FlatList } from "react-native";
 
 
 
-const CommentScreen = ({ postId  }) => {
+const CommentScreen = ({ postId ,routName }) => {
 
 
     const [page, setPage] = useState(1);
@@ -30,7 +30,7 @@ const CommentScreen = ({ postId  }) => {
             setLoading(true);
 
             try {
-                let url = `${endpoints['pfr-comment'](postId)}?page=${page}&page_size=4`;
+                let url = `${endpoints[routName](postId)}?page=${page}&page_size=4`;
 
                 let res = await APIs.get(url);
 

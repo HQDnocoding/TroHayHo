@@ -20,7 +20,9 @@ export const endpoints={
     'post-for-rent-detail': (postId) => `/post-for-rents/${postId}/`,
     'post-want-detail': (postId) => `/post-wants/${postId}/`,
     'pw-comment': (postId) => `/post-wants/${postId}/comments/`,
-    'pfr-comment': (postId) => `/post-for-rents/${postId}/comments/`
+    'pfr-comment': (postId) => `/post-for-rents/${postId}/comments/`,
+    // 'favourite-posts':`/favourite-posts/`,
+    // 'favourite-posts-specified':(postId)=>`/favourite-posts/${postId}`,
 }
 export const endpointsDuc={
     'getListNotification':'/notifications',
