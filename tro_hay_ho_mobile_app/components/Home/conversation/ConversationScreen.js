@@ -7,7 +7,6 @@ import ConversationCard from "./ConversationCard";
 
 const ConversationScreen = () => {
     const [conversation, setConversation] = React.useState([])
-    const [firstMessage, setFirstMessage] = React.useState([])
 
     const [loading, setLoading] = React.useState(false);
     const [page, setPage] = React.useState(1);

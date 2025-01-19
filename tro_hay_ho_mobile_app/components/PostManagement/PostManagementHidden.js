@@ -10,9 +10,9 @@ const PostManagementHidden=()=>{
 return(
     <View>
         <ScrollView>
+            {/* <PostManagementCard/>
             <PostManagementCard/>
-            <PostManagementCard/>
-            <PostManagementCard/>
+            <PostManagementCard/> */}
         </ScrollView>
     </View>
 )
