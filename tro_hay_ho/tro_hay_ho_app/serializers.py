@@ -15,7 +15,7 @@ class RoleSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     avatar = serializers.ImageField(required=False)
     phone=serializers.CharField(required=False)
-    role=RoleSerializer()
+    # role=RoleSerializer()
     def create(self, validated_data):
         user = User(**validated_data)
         user.set_password(user.password)

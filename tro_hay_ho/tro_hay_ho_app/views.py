@@ -20,6 +20,7 @@ class UserViewSet(ViewSet,CreateAPIView):
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
 
+    
     def get_permissions(self):
         if self.action in ['get_current_user']:
             return [permissions.IsAuthenticated()]
@@ -31,14 +32,11 @@ class UserViewSet(ViewSet,CreateAPIView):
         return Response(UserSerializer(request.user).data)
     
     
-    
-    # @action(methods=['post','delete'], url_path='',detail=True)
-    
-    
-    
-    # @action(methods=['get','post'],url_path='',detail=True)
-    
-    
+    # @action(methods=['get'],url_path='current-user/favourite-posts',detail=False)
+    # def get_fav_posts(self,request):
+    #     user=request.user
+    #     fav_posts=FavoritePost.objects.filter(user=user)
+    #     return Response(FavouritePostSerializer(fav_posts).data)
     
 
     

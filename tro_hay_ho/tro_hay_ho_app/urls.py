@@ -20,7 +20,8 @@ r.register('conversations',duc_views.ConversationViewSet,basename='conversation'
 r.register('messages',duc_views.MessageViewSet,basename='message')
 r.register('notifications',NotificationViewSet,basename='notifications')
 
-r.register('favourite-posts',FavouritePostViewSet,basename='favourite_post')
+
+# r.register('users/current-user/favourite-posts/',FavouritePostViewSet,basename='favourite_post')
 r.register('comments',CommentViewSet,basename='comment')
 
 urlpatterns = [
