@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-n_43$u^ws23_-lzo!&l(h13y3oqgb02f(s%q05(&_u%4u33!1p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.129.238","192.168.1.10","192.168.1.253","192.168.1.55"]
+ALLOWED_HOSTS = ["192.168.129.238","192.168.1.10","192.168.1.253","192.168.1.55","localhost"]
 # 192.168.129.238
 # Application definition
 
@@ -58,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'tro_hay_ho.urls'
@@ -150,4 +151,4 @@ client_id = '0R6hMr4Zhgl9LeXoWrxDNSTkLgpZymmtLJeINUFN'
 client_secret = 'AG1n41T3umckBclAVuc97nNwW0YJTqxpDUanvjS2yju0kxLpwSp88FtuOZesCxm2jmPhwREN2wpHHq8xdztMEsBDUYGWaMnDPDS6vLG7o851KmYvrESeBeI8sGvYzsgw'
 
 
-OAUTH2_PROVIDER = { 'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore' }
+OAUTH2_PROVIDER = { 'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore' ,   'ALLOWED_GRANT_TYPES': ['password', 'authorization_code', 'refresh_token'],}

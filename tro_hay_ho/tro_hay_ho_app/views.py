@@ -19,10 +19,10 @@ class UserViewSet(ViewSet,CreateAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
-
+    pagination_class = ItemPaginator
     
     def get_permissions(self):
-        if self.action in ['get_current_user']:
+        if self.action in ['get_current_user','get_favorites']:
             return [permissions.IsAuthenticated()]
 
         return [permissions.AllowAny()]
@@ -31,12 +31,19 @@ class UserViewSet(ViewSet,CreateAPIView):
     def get_current_user(self, request):
         return Response(UserSerializer(request.user).data)
     
-    
-    # @action(methods=['get'],url_path='current-user/favourite-posts',detail=False)
-    # def get_fav_posts(self,request):
-    #     user=request.user
-    #     fav_posts=FavoritePost.objects.filter(user=user)
-    #     return Response(FavouritePostSerializer(fav_posts).data)
+    @action(methods=['get'], url_path='favorites', detail=False)
+    def get_favorites(self, request):
+
+        user = request.user  
+        favorite_posts = user.saved_posts.all() 
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(favorite_posts, self.request)
+            
+        if page is not None:
+            return paginator.get_paginated_response(FavouritePostSerializer(page, many=True).data )
+        serializer = FavouritePostSerializer(favorite_posts, many=True) 
+        return Response(serializer.data)
+
     
 
     
@@ -69,9 +76,6 @@ class PostWantViewSet(ModelViewSet):
     serializer_class = PostWantSerializer
     pagination_class = ItemPaginator
     
-    
-    
-
     @action(methods=['get','post'],url_path='comments',detail=True)
     def get_comments(self,request,pk):
         if request.method.__eq__('POST'):

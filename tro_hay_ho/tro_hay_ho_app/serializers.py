@@ -110,9 +110,9 @@ class CommentSerializer(ModelSerializer):
 
 
 class FavouritePostSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
-    saved_at = serializers.DateTimeField(read_only=True)
+    # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    # post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
+    # saved_at = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = FavoritePost

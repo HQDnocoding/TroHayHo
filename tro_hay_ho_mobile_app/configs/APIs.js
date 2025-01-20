@@ -4,8 +4,8 @@ import axios from "axios";
 
 // ip cua Duc:http://192.168.129.238:8000/
 //  const BASE_URL="http://192.168.1.253:8000/"
-const BASE_URL="http://192.168.1.55:8000/"
-// const BASE_URL="http://192.168.1.10:8000/"
+// const BASE_URL="http://192.168.1.55:8000/"
+const BASE_URL="http://192.168.1.10:8000/"
 
 
 
@@ -13,6 +13,7 @@ export const endpoints={
     'login': '/o/token/',
     'current-user': '/users/current-user/',
     'register': '/users/',
+    'favourite-posts':'/user/favourites/',
     'role': '/roles/',
     'address': '/addresses/',
     'getListPostWant': '/post-wants/',
@@ -21,8 +22,7 @@ export const endpoints={
     'post-want-detail': (postId) => `/post-wants/${postId}/`,
     'pw-comment': (postId) => `/post-wants/${postId}/comments/`,
     'pfr-comment': (postId) => `/post-for-rents/${postId}/comments/`,
-    // 'favourite-posts':`/favourite-posts/`,
-    // 'favourite-posts-specified':(postId)=>`/favourite-posts/${postId}`,
+    
 }
 export const endpointsDuc={
     'getListNotification':'/notifications',
