@@ -85,6 +85,15 @@ class PostWantSerializer(ModelSerializer):
     class Meta:
         model = PostWant
         fields='__all__'
+        
+class PostSerializer(ModelSerializer):
+    user=UserSerializer(read_only=True)
+    post_image=PostImageSerializer(many=True, source='images', read_only=True)
+
+    class Meta:
+        model = PostWant
+        fields='__all__'     
+
 
 class NotificationSerializer(ModelSerializer):
     sender=UserSerializer(read_only=True)
@@ -110,10 +119,12 @@ class CommentSerializer(ModelSerializer):
 
 
 class FavouritePostSerializer(serializers.ModelSerializer):
-    # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    # post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
-    # saved_at = serializers.DateTimeField(read_only=True)
+
+
+    post = PostSerializer(read_only=True)
 
     class Meta:
         model = FavoritePost
-        fields = '__all__'
+        fields = ['id', 'created_date', 'updated_date', 'active', 'user', 'post']
+
+    

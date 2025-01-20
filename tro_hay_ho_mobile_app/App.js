@@ -13,6 +13,7 @@ import SavePosts from './components/User/SavedPosts';
 import PostImage from './components/PostDetail/PostImages';
 import PostForRentDetail from './components/PostDetail/PostForRentDetail';
 import PostWantDetail from './components/PostDetail/PostWantDetail';
+import FavouritePost from './components/User/FavouritePost';
 
 
 
@@ -45,7 +46,7 @@ export default function App() {
             backgroundColor: '#FFBA00',
           }
         }} />
-        <Stack.Screen name='saved_posts' component={SavePosts} options={{
+        <Stack.Screen name='saved_posts' component={FavouritePost} options={{
           tabBarVisible: true,
           headerTitle: 'Các tin đã lưu',
           headerStyle: {
@@ -76,6 +77,7 @@ export default function App() {
       <MyUserContext.Provider value={user}>
         <MyDispatchContext.Provider value={dispatch}>
           <MyAppNavigator />
+          {/* <FavouritePost/> */}
         </MyDispatchContext.Provider>
       </MyUserContext.Provider>
     </NavigationContainer>
