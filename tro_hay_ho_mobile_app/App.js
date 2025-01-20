@@ -13,6 +13,10 @@ import SavePosts from './components/User/SavedPosts';
 import PostImage from './components/PostDetail/PostImages';
 import PostForRentDetail from './components/PostDetail/PostForRentDetail';
 import PostWantDetail from './components/PostDetail/PostWantDetail';
+import NotificationScreen from "./components/Home/notification/NotificationScreen";
+import ConversationScreen from "./components/Home/conversation/ConversationScreen";
+import MessageScreen from './components/Home/message/MessageScreen';
+import MessageStackNavigator from "./components/Home/message/MessageStackNavigator";
 import FavouritePost from './components/User/FavouritePost';
 
 
@@ -68,6 +72,24 @@ export default function App() {
             backgroundColor: '#FFBA00',
           }
         }} />
+         <Stack.Screen name='notification' component={NotificationScreen } options={{
+          headerTitle: 'Thông báo',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
+         <Stack.Screen name='conversation' component={ConversationScreen} options={{
+          headerTitle: 'Trò chuyện',
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
+         <Stack.Screen name='message' component={MessageStackNavigator} options={{
+          headerShown:false,
+          headerStyle: {
+            backgroundColor: '#FFBA00',
+          }
+        }} />
       </Stack.Navigator>
     )
   }
@@ -77,7 +99,6 @@ export default function App() {
       <MyUserContext.Provider value={user}>
         <MyDispatchContext.Provider value={dispatch}>
           <MyAppNavigator />
-          {/* <FavouritePost/> */}
         </MyDispatchContext.Provider>
       </MyUserContext.Provider>
     </NavigationContainer>

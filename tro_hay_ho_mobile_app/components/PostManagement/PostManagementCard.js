@@ -23,7 +23,7 @@ const PostManagementCard = ({item,params,routeName}) => {
                     {item.user.role.role_name ===NGUOI_THUE_TRO?(
       <Text style={styles.priceGreen}>{formatPrice(item.price_range_min)} đ -{formatPrice(item.price_range_max)} đ</Text>
                     ):(
-                        <Text priceRed={styles.price}>{formatPrice(item.price)} đ</Text>
+                        <Text style={styles.priceRed}>{formatPrice(item.price)} đ</Text>
 
                     )}
               

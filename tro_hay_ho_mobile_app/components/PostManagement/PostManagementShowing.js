@@ -4,6 +4,7 @@ import React from "react";
 import PostManagementCard from "./PostManagementCard";
 import APIs, { endpointsDuc } from "../../configs/APIs"
 import { ActivityIndicator } from "react-native-paper";
+import { CHU_TRO } from '../../utils/MyValues';
 
 
 const PostManagementShowing=()=>{
@@ -12,7 +13,12 @@ const PostManagementShowing=()=>{
         const [loading, setLoading] = React.useState(false);
         const [page, setPage] = React.useState(1);
     // chinh user id o day hoho
-    let userId=3
+    let myUser={
+        'id':2,
+        'role':{
+            'role_name':CHU_TRO
+        }
+    }
       const loadPost=async ()=>{
                  if (page > 0) {
                     
@@ -20,7 +26,7 @@ const PostManagementShowing=()=>{
                 
                             try {
                                 
-                                let url = `${endpointsDuc['getListPostWantByUserId'](userId)}?page=${page}`
+                                let url = `${endpointsDuc['getListPostForRentByUserId'](myUser.id)}?page=${page}`
                                
                                 let res = await APIs.get(url)
                                 console.info(res.data.results)

@@ -10,6 +10,7 @@ import ConversationScreen from "./conversation/ConversationScreen";
 import HomeTabNavigator from "./HomeTabNavigator"
 import SearchScreen from "./SearchScreen";
 import NotificationTabNaviagtor from "./notification/NotificationTabNaviagtor";
+import MessageScreen from "./message/MessageScreen";
 
 const HomeStackNavigator = () => {
     return  (
@@ -64,19 +65,11 @@ const HomeStackNavigator = () => {
                 component={HomeTabNavigator}
                 options={{ title: null }}
             />
-            <Stack.Screen
-                name='notification'
-                component={NotificationScreen}
-                options={{ title: 'Thông báo' }}
-            />
-            <Stack.Screen
-                name='conversation'
-                component={ConversationScreen}
-                options={{ title: 'Tin nhắn' }}
-            />
+        
             <Stack.Screen name={"search"}
                 component={SearchScreen}
                 options={{ title: null }} />
+         
 
         </Stack.Navigator>
     );

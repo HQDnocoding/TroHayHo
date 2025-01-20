@@ -55,7 +55,7 @@ const ConversationScreen = () => {
         }
         const renderItemConversation=({item})=>{
             return(
-                <ConversationCard key={item.id} item={item} params={{}} routeName={''}/>
+                <ConversationCard key={item.id} item={item} params={{}} routeName={'message'}/>
             )
         }
     
