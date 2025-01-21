@@ -3,19 +3,15 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {Entypo} from '@expo/vector-icons'; // Đảm bảo bạn đã cài đặt expo/vector-icons
-import { sampleAvatar } from '../../../utils/MyValues';
+import { sampleAvatar,tempUser } from '../../../utils/MyValues';
 import { formatTimeAgo } from '../../../utils/TimeFormat';
 import {useNavigation} from "@react-navigation/native";
 const ConversationCard = ({item,params,routeName}) => {
     const nav= useNavigation()
     let partner;
-    let currentUser={
-        'id':2,
-        'role':2,
-        'username':'duc'
-    }
+    let currentUser=tempUser
     //phan loai dau la nguoi muon nhan
-    if(item.user1.username===currentUser.username){
+    if(item.user1.id===currentUser.id){
         partner=item.user2
     }else{
         partner=item.user1
@@ -33,7 +29,7 @@ const ConversationCard = ({item,params,routeName}) => {
 
             <View style={styles.contentContainer}>
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={()=>nav.navigate(routeName)}>
+                    <TouchableOpacity onPress={()=>nav.navigate(routeName,{item,currentUser})}>
                     <Text style={styles.title} numberOfLines={1}>{partner.last_name} {partner.first_name}</Text>
                         {item.latest_message ?(
                             <Text numberOfLines={1}>{item.latest_message.content}</Text>

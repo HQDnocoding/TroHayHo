@@ -4,22 +4,20 @@ import {Searchbar} from "react-native-paper";
 import APIs, { endpointsDuc } from "../../../configs/APIs";
 import { ActivityIndicator } from "react-native-paper";
 import ConversationCard from "./ConversationCard";
-
+import { tempUser } from "../../../utils/MyValues";
 const ConversationScreen = () => {
     const [conversation, setConversation] = React.useState([])
 
     const [loading, setLoading] = React.useState(false);
     const [page, setPage] = React.useState(1);
-
+    console.info("conversation screen")
      const loadConversation=async ()=>{
              if (page > 0) {
                 
                         setLoading(true)
             
                         try {
-                            // chinh user id o day hoho
-                            let userId=2
-                            let url = `${endpointsDuc['getListConversationByUserId'](userId)}?page=${page}`
+                            let url = `${endpointsDuc['getListConversationByUserId'](tempUser.id)}?page=${page}`
                             let res = await APIs.get(url)
             
                             if(page>1){
