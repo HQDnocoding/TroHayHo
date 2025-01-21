@@ -1,103 +1,72 @@
-import {View, Text, StyleSheet, ScrollView,FlatList,RefreshControl} from "react-native";
+import { View, Text, StyleSheet, ScrollView, FlatList, RefreshControl } from "react-native";
 import React from "react";
-import {Searchbar} from "react-native-paper";
+import { Searchbar } from "react-native-paper";
 import APIs, { endpointsDuc } from "../../../configs/APIs";
 import { ActivityIndicator } from "react-native-paper";
 import ConversationCard from "./ConversationCard";
 import { tempUser } from "../../../utils/MyValues";
+import { getMessages, getUserConversations } from "../../../utils/ChatFunction";
 const ConversationScreen = () => {
     const [conversation, setConversation] = React.useState([])
 
     const [loading, setLoading] = React.useState(false);
-    const [page, setPage] = React.useState(1);
     console.info("conversation screen")
-     const loadConversation=async ()=>{
-             if (page > 0) {
-                
-                        setLoading(true)
-            
-                        try {
-                            let url = `${endpointsDuc['getListConversationByUserId'](tempUser.id)}?page=${page}`
-                            let res = await APIs.get(url)
-            
-                            if(page>1){
-                                setConversation(prev=>[...prev,...res.data.results])
-                            }else{
-                                setConversation(res.data.results)
-    
-                            }
-                            if (res.data.next === null) {
-                                setPage(0)
-                            }
-                        } catch (error) {
-                            if (error.response?.status === 404) {
-                                setPage(0);
-                            } else {
-                                console.error("Error loading conversation:", error, " == at page: ", pageForRent);
-                            }
-                        } finally {
-                            setLoading(false)
-            
-                        }
-                    }
-        }
-        const loadMore = () => {
-            if (page > 0) {
-                setPage(page + 1)
-            }
-           
-        }
-        const refresh = () => {
-            setPage(1)
-    
-        }
-        const renderItemConversation=({item})=>{
-            return(
-                <ConversationCard key={item.id} item={item} params={{}} routeName={'message'}/>
-            )
-        }
-    
-       const flatListHearder=()=>{
+
+    const renderItemConversation = ({ item }) => {
         return (
-       
-        <View >
-        <Searchbar style={styles.searchBar}
-        placeholder={"Tìm kiếm"}
-        />
-        </View>
- 
+            <ConversationCard key={item.id} item={item} params={{}} routeName={'message'} />
         )
-       }
-        React.useEffect(()=>{
-                
-                loadConversation()
-            },[page])
-  return (
-    
-       <View >
-    
+    }
+
+    const flatListHearder = () => {
+        return (
+
+            <View >
+                <Searchbar style={styles.searchBar}
+                    placeholder={"Tìm kiếm"}
+                />
+            </View>
+
+        )
+    }
+    React.useEffect(() => {
+        const listenConversations= getUserConversations(tempUser.id,(conversation)=>{
+            if(conversation)
+            {
+                console.info("conversation screen",conversation)
+                setConversation(conversation)
+            }
+        })
+        return ()=>{
+            listenConversations()
+        }
+
+
+    }, [])
+    return (
+
+        <View >
+
             <FlatList
-                refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh}/>}
                 data={conversation}
                 renderItem={renderItemConversation}
                 ListHeaderComponent={flatListHearder}
-                onEndReached={loadMore}
-                ListFooterComponent={() => loading ? <ActivityIndicator/> : null}
+                ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
             />
-    
+
         </View>
-      
-  );
+
+    );
 }
-const styles= StyleSheet.create({
-    container:{
-      backgroundColor:'#fff'
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#fff'
     },
-    searchBar:{
-        marginHorizontal:20,
-        marginTop:20,
-        backgroundColor:'#bdbdbd',
-        marginBottom:10,
+    searchBar: {
+        marginHorizontal: 20,
+        marginTop: 20,
+        backgroundColor: '#bdbdbd',
+        marginBottom: 10,
     }
 })
 export default ConversationScreen;

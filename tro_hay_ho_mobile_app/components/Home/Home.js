@@ -126,17 +126,17 @@ const Home = () => {
 
     const renderItemPost = ({item}) => {
         if (item.type === 'PostForRent') {
-            return <PostForRent item={item} routeName={'post_for_rent'} params={{postId:item.id}}/>;
+            return <PostForRent key={item.id} item={item} routeName={'post_for_rent'} params={{postId:item.id}}/>;
         } else if (item.type === 'PostWant') {
-            return <PostWant item={item} routeName={'post_want'} params={{postId:item.id}}/>;
+            return <PostWant key={item.id} item={item} routeName={'post_want'} params={{postId:item.id}}/>;
         }
 
     }
     const flatListHeader = () => {
         return (
             <>
-                <Banner/>
-                <WantPlace openDialog={showModel}/>
+                {/* <Banner/>
+                <WantPlace openDialog={showModel}/> */}
 
             </>
         )

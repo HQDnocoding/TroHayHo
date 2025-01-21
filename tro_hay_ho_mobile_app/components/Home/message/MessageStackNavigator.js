@@ -6,8 +6,8 @@ import MessageScreen from "./MessageScreen";
 import { sampleImage,sampleAvatar } from "../../../utils/MyValues";
 const MessageStackNavigator = ({navigation,route}) => {
     const params = route.params || {};
-    const { item, currentUser } = params;
-    const partnerUser=item.user1.id===currentUser.id ?item.user2 :item.user1 
+    const { item, currentUser,partner } = params;
+    const partnerUser=partner
    
     return (
 

@@ -109,5 +109,8 @@ class UserPostForRentViewSet(ModelViewSet):
         serializers=self.get_serializer(post_for_rent,many=True)
         return Response(serializers.data)
 
-
+class BasicUserInfoViewSet(ModelViewSet):
+    pagination_class = ItemSmallPaginator
+    serializer_class = BasicUserInfoSerializer
+    queryset = User.objects.filter(is_active=True)
 

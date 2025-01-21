@@ -1,5 +1,5 @@
 import { db } from "../configs/FirebaseConfig"
-import { onValue, ref, set, push, off, update, get, serverTimestamp,orderByChild,limitToLast } from "firebase/database"
+import { onValue, ref, set, push, off, update, get, serverTimestamp,orderByChild,limitToLast,query } from "firebase/database"
 
 const createUser = async (user) => {
     const userRef = ref(db, "users/" + `${user.id}`);
@@ -71,9 +71,9 @@ const createTextMessage = async (conversationId, userIdsend, textMessage) => {
 const getMessages=(conversationId,callback)=>{
     const messagesRef = ref(db, `messages/${conversationId}`)
     //lay 50 tin nhan gan nhat
-    const query=orderByChild('created_at').limitToLast(50)
+    const messageQuery= query(messagesRef,orderByChild('created_at'),limitToLast(50))
     
-    const unsubscribe =onValue(query(messagesRef), (snapshot) => {
+    const unsubscribe =onValue(messageQuery, (snapshot) => {
         const messages=[]
         snapshot.forEach((child)=>{
             messages.push({

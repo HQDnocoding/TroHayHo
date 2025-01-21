@@ -2,15 +2,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TextInput ,TouchableNativeFeedback,TouchableOpacity} from 'react-native';
 import { sampleAvatar, sampleImage } from '../../../utils/MyValues';
+import { formatTimeAgo } from '../../../utils/TimeFormat';
 const ChatMessage = ({ message, isOutgoing }) => {
   return (
-    <View style={[styles.messageContainer, styles.outgoing]}>
-      <Text style={[styles.messageText, styles.outgoingText]}>
-        Cac ban khoe ko cha co viec gi thi laij noi nhang len
+    <View style={[styles.messageContainer,isOutgoing?styles.outgoing:styles.incoming ]}>
+      <Text style={[styles.messageText, isOutgoing?styles.outgoingText:styles.incomingText]}>
+       {message.text}
       </Text>
 
 
-      <Text style={styles.timestamp}>12:13</Text>
+      <Text style={styles.timestamp}>{formatTimeAgo( message.created_at)}</Text>
     </View>
   );
 };
@@ -24,7 +25,7 @@ const ChatImage = ({ message, isOutgoing }) => {
         style={styles.messageImage}
       />
 
-      <Text style={styles.timestamp}>12:13</Text>
+      <Text style={styles.timestamp}>{formatTimeAgo( message.created_at)}</Text>
     </View>
   );
 };
@@ -71,10 +72,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   incoming: {
+    marginStart:10,
     backgroundColor: '#e5e5e5',
     alignSelf: 'flex-start',
   },
   outgoing: {
+    marginEnd:10,
     backgroundColor: '#ffc107',
     alignSelf: 'flex-end',
   },
