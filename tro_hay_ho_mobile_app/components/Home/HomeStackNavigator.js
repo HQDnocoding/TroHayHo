@@ -63,7 +63,7 @@ const HomeStackNavigator = () => {
             <Stack.Screen
                 name='HomeTab'
                 component={HomeTabNavigator}
-                options={{ title: null }}
+                options={{ title: null,headerShown:false }}
             />
         
             <Stack.Screen name={"search"}

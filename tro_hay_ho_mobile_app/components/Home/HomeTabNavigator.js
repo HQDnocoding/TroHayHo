@@ -34,6 +34,7 @@ const HomeTabNavigator = () => {
             indicatorStyle={{ backgroundColor: '#FFBA00' }}
             style={{ backgroundColor: 'white' }}
             labelStyle={{ fontSize: 14, fontWeight: 'bold' }}
+        
         />
     );
 
@@ -44,6 +45,7 @@ const HomeTabNavigator = () => {
             onIndexChange={setIndex}
             initialLayout={myInitialLayout}
             renderTabBar={renderTabBar}
+            
         />
     );
 };
