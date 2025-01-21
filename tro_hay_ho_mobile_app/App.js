@@ -18,6 +18,7 @@ import ConversationScreen from "./components/Home/conversation/ConversationScree
 import MessageScreen from './components/Home/message/MessageScreen';
 import MessageStackNavigator from "./components/Home/message/MessageStackNavigator";
 import FavouritePost from './components/User/FavouritePost';
+import SearchScreen from './components/Home/SearchScreen';
 
 
 
@@ -90,6 +91,10 @@ export default function App() {
             backgroundColor: '#FFBA00',
           }
         }} />
+          <Stack.Screen name={"search"}
+                component={SearchScreen}
+                options={{ title: null }} />
+         
       </Stack.Navigator>
     )
   }

@@ -20,12 +20,12 @@ const HomeStackNavigator = () => {
                 headerLeft: () => {
                     if (route.name === "HomeTab") {
                         return (
-                            <TouchableOpacity onPress={() => navigation.navigate("search")}>
+                            <TouchableOpacity >
                                 <Searchbar
                                     placeholder={"Tìm kiếm"}
                                     style={styles.searchBar}
                                     inputStyle={styles.searchInput}
-                                    onFocus={() => navigation.navigate('search')}
+                                    // onFocus={() => navigation.navigate('search')}
                                 />
                             </TouchableOpacity>
 
@@ -63,7 +63,7 @@ const HomeStackNavigator = () => {
             <Stack.Screen
                 name='HomeTab'
                 component={HomeTabNavigator}
-                options={{ title: null,headerShown:false }}
+                options={{ title: null,headerShown:true }}
             />
         
             <Stack.Screen name={"search"}

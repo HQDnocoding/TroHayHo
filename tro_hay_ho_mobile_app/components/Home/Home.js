@@ -160,7 +160,7 @@ const Home = () => {
                 keyExtractor={item => item.id.toString()}
                 onEndReached={loadMore}
                 ListFooterComponent={() => loading ? <ActivityIndicator/> : null}
-            />z
+            />
             <AddressDialog visible={visibleModelAddress} onClose={hideModel}/>
 
         </View>

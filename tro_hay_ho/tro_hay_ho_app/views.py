@@ -111,7 +111,14 @@ class PostForRentViewSet(ModelViewSet):
     def get_comments(self,request,pk):
         if request.method.__eq__('POST'):
             content=request.data.get('content')
-            c=Comment.objects.create(content=content,user=request.user,post=self.get_object())
+            rpl=request.data.get('replied_comment')
+            if rpl:
+                try:
+                    rpl=Comment.objects.get(id=rpl)
+                except Comment.DoesNotExist:
+                    rpl=None
+            else: rpl=None
+            c=Comment.objects.create(content=content,user=request.user,post=self.get_object(),replied_comment=rpl)
 
             return Response(CommentSerializer(c).data)
 
