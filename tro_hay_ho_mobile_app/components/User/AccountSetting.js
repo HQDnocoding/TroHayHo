@@ -72,10 +72,15 @@ const AccountSetting = ({ navigation }) => {
             </View>
             <View style={AccountUserStyle.section}>
                 <Text style={{ marginStart: 10, fontWeight: 700, marginTop: 20 }}>Tiện ích</Text>
-                <TouchableOpacity onPress={()=>navigation.navigate('saved_posts')}>
+                <TouchableOpacity onPress={() => {
+                    if (user === null) {
+                        navigation.navigate('login');
+
+                    } else { navigation.navigate('saved_posts') }
+                }}>
                     <ItemSetting iconName={"heart-circle"} optionSetting={"Các tin đã lưu"} colorIcon={'red'} />
 
-                </TouchableOpacity> 
+                </TouchableOpacity>
             </View>
             <View style={AccountUserStyle.section}>
                 <Text style={{ marginStart: 10, fontWeight: 700, marginTop: 20 }}>Khác</Text>

@@ -24,7 +24,8 @@ r.register('user-post-for-rents',duc_views.UserPostForRentViewSet,basename='user
 # =============================================
 r.register('notifications',NotificationViewSet,basename='notifications')
 
-r.register('favourite-posts',FavouritePostViewSet,basename='favourite_post')
+
+# r.register('users/current-user/favourite-posts/',FavouritePostViewSet,basename='favourite_post')
 r.register('comments',CommentViewSet,basename='comment')
 
 urlpatterns = [

@@ -128,7 +128,7 @@ const PostWantDetail = ({ route }) => {
 
                     </View>
 
-                    <CommentScreen postId={postId} />
+                    <CommentScreen postId={postId} routName={'pw-comment'}/>
                 </View>
             }
 

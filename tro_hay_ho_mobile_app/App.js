@@ -17,6 +17,8 @@ import NotificationScreen from "./components/Home/notification/NotificationScree
 import ConversationScreen from "./components/Home/conversation/ConversationScreen";
 import MessageScreen from './components/Home/message/MessageScreen';
 import MessageStackNavigator from "./components/Home/message/MessageStackNavigator";
+import FavouritePost from './components/User/FavouritePost';
+import SearchScreen from './components/Home/SearchScreen';
 
 
 
@@ -49,7 +51,7 @@ export default function App() {
             backgroundColor: '#FFBA00',
           }
         }} />
-        <Stack.Screen name='saved_posts' component={SavePosts} options={{
+        <Stack.Screen name='saved_posts' component={FavouritePost} options={{
           tabBarVisible: true,
           headerTitle: 'Các tin đã lưu',
           headerStyle: {
@@ -89,6 +91,10 @@ export default function App() {
             backgroundColor: '#FFBA00',
           }
         }} />
+          <Stack.Screen name={"search"}
+                component={SearchScreen}
+                options={{ title: null }} />
+         
       </Stack.Navigator>
     )
   }

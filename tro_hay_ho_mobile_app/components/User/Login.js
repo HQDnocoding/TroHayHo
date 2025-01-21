@@ -56,21 +56,21 @@ const Login = () => {
             await AsyncStorage.setItem('token', res.data.access_token);
 
             setTimeout(async () => {
-                try{
+                try {
                     const token = await AsyncStorage.getItem("token");
                     console.info(token);
                     let user = await authAPIs(token).get(endpoints['current-user']);
-    
+
                     console.info(user.data);
-    
-                    dispatch({ "type": "login", "payload":user.data });
+
+                    dispatch({ "type": "login", "payload": user.data });
                     nav.navigate('bottom-tabs');
-                }catch(e){
+                } catch (e) {
                     console.error(e);
                 }
-                
+
             }, 100);
-            
+
 
 
         } catch (e) {

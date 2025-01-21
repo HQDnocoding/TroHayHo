@@ -128,7 +128,7 @@ const PostForRentDetail = ({ route }) => {
                                 </View>
                             </View>
                         </View>
-                        <CommentScreen postId={id} />
+                        <CommentScreen postId={id}routName={'pfr-comment'} />
                     </>
                 }
             </ScrollView>
