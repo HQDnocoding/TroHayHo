@@ -1,20 +1,22 @@
 import { View, Text, StyleSheet, ScrollView, FlatList, RefreshControl } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { Searchbar } from "react-native-paper";
 import APIs, { endpointsDuc } from "../../../configs/APIs";
 import { ActivityIndicator } from "react-native-paper";
 import ConversationCard from "./ConversationCard";
-import { tempUser } from "../../../utils/MyValues";
 import { getMessages, getUserConversations } from "../../../utils/ChatFunction";
+import { MyUserContext } from "../../../configs/UserContexts";
 const ConversationScreen = () => {
-    const [conversation, setConversation] = React.useState([])
+    const currentUser = useContext(MyUserContext)
 
+    const [conversation, setConversation] = React.useState([])
+    const [re, setRe] = React.useState(true);
     const [loading, setLoading] = React.useState(false);
-    console.info("conversation screen")
+    console.info("conversation screen", currentUser)
 
     const renderItemConversation = ({ item }) => {
         return (
-            <ConversationCard key={item.id} item={item} params={{}} routeName={'message'} />
+            <ConversationCard key={item.id} item={item} currentUser={currentUser} params={{}} routeName={'message'} />
         )
     }
 
@@ -29,29 +31,37 @@ const ConversationScreen = () => {
 
         )
     }
-    React.useEffect(() => {
-        const listenConversations= getUserConversations(tempUser.id,(conversation)=>{
-            if(conversation)
-            {
-                console.info("conversation screen",conversation)
+    const refresh = () => {
+        setRe(true)
+    }
+    const loadConversations = () => {
+        setLoading(true)
+        const listenConversations = getUserConversations(currentUser.id, (conversation) => {
+            if (conversation) {
                 setConversation(conversation)
             }
+            setRe(false)
+            setLoading(false)
         })
-        return ()=>{
+        return () => {
             listenConversations()
         }
-
-
-    }, [])
+    }
+    React.useEffect(() => {
+        if(re===true)
+            loadConversations()
+    },[re])
+ 
     return (
 
         <View >
 
             <FlatList
+                refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh}/>}
                 data={conversation}
                 renderItem={renderItemConversation}
                 ListHeaderComponent={flatListHearder}
-                ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
+               
             />
 
         </View>

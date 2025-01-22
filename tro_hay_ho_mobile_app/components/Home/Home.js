@@ -135,8 +135,8 @@ const Home = () => {
     const flatListHeader = () => {
         return (
             <>
-                {/* <Banner/>
-                <WantPlace openDialog={showModel}/> */}
+                {/* <Banner/> */}
+                <WantPlace openDialog={showModel}/>
 
             </>
         )

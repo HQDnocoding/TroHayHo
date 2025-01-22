@@ -3,15 +3,14 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; // Đảm bảo bạn đã cài đặt expo/vector-icons
-import { sampleAvatar, tempUser } from '../../../utils/MyValues';
+import { sampleAvatar } from '../../../utils/MyValues';
 import { formatTimeAgo } from '../../../utils/TimeFormat';
 import { useNavigation } from "@react-navigation/native";
 import APIs, { endpoints, endpointsDuc } from '../../../configs/APIs';
-const ConversationCard = ({ item, params, routeName }) => {
+const ConversationCard = ({ item,currentUser ,params, routeName }) => {
     const nav = useNavigation()
     const [partner, setPartner] = React.useState({})
     let partnerId;
-    let currentUser = tempUser
     //phan loai dau la nguoi muon nhan
     if (item["participants"]["user_1"] === currentUser.id) {
         partnerId = item["participants"]["user_2"]

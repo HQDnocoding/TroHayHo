@@ -1,11 +1,9 @@
 import { View, Text, StyleSheet, FlatList, RefreshControl } from "react-native";
 import React from "react";
-import { db } from "../../../configs/FirebaseConfig"
-import { onValue, ref, set, push, off, update, get } from "firebase/database"
 import { ChatMessage, ChatInput, ChatImage } from './ChatComponents';
 import { createConversation, createTextMessage, createUser, getMessages, getUserConversations } from "../../../utils/ChatFunction"
 import { Button } from "react-native-paper";
-import { tempUser, tempUser2 } from "../../../utils/MyValues";
+
 
 const MessageScreen = ({ navigation, route }) => {
   const params = route.params || {};
@@ -17,9 +15,14 @@ const MessageScreen = ({ navigation, route }) => {
     createTextMessage(item.id, currentUser.id, textMessage)
   }
   const ScrollFlatList=()=>{
-    if(flatListRef.current){
-      flatListRef.current.scrollToEnd({animated:true})
-    }
+    const timeoutId = setTimeout(() => {
+      if(flatListRef.current){
+        flatListRef.current.scrollToEnd({animated:true})
+      }
+    }, 100); 
+
+    return () => clearTimeout(timeoutId);
+    
   }
   React.useEffect(()=>{
     ScrollFlatList()
@@ -44,12 +47,24 @@ const MessageScreen = ({ navigation, route }) => {
       <ChatMessage message={item} isOutgoing={isOutgoing} />
     )
   }
+  const footFlatList=()=>{
+    return (
+      <View style={styles.footer}>
+
+      </View>
+    )
+  }
   return (
 
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, }}>
       <FlatList
+      style={{paddingVertical:10,}}
         ref={flatListRef}
         data={message}
+        ListFooterComponent={footFlatList}
+        //  keyboardShouldPersistTaps="handled"
+         onContentSizeChange={ScrollFlatList}
+         onLayout={ScrollFlatList}
         renderItem={renderItem} />
       <ChatInput onSend={SendMessage} />
     </View>
@@ -64,6 +79,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#bdbdbd',
     marginBottom: 10,
+  },footer:{
+    width:'100%',
+    height:20,
   }
 })
 export default MessageScreen;
