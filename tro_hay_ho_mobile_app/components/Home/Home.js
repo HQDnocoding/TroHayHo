@@ -1,13 +1,13 @@
-import {View, Text, ScrollView, StyleSheet, ActivityIndicator, FlatList, RefreshControl} from 'react-native';
-import {Card, Title, Paragraph} from 'react-native-paper';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
+import { Card, Title, Paragraph } from 'react-native-paper';
 import PostForRent from "./duc/post/PostForRent";
 import PostWant from "./duc/post/PostWant";
 import WantPlace from "./duc/explore/WantPlace";
 import Banner from "./duc/explore/Banner";
 import React from "react";
 import AddressDialog from "./duc/explore/AddressDialog";
-import APIs, {endpoints} from "../../configs/APIs";
-import {shuffleArray} from '../../utils/Formatter';
+import APIs, { endpoints } from "../../configs/APIs";
+import { shuffleArray } from '../../utils/Formatter';
 
 
 const Home = () => {
@@ -36,7 +36,7 @@ const Home = () => {
                 //     setPostWant(res.data.results)
 
                 // }
-                const newPosts = res.data.results.map(post => ({...post, type: 'PostWant'}));
+                const newPosts = res.data.results.map(post => ({ ...post, type: 'PostWant' }));
                 setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
 
                 if (res.data.next === null) {
@@ -74,7 +74,7 @@ const Home = () => {
                 //     setPostForRent(prevPosts => [...prevPosts, ...res.data.results])
 
                 // }
-                const newPosts = res.data.results.map(post => ({...post, type: 'PostForRent'}));
+                const newPosts = res.data.results.map(post => ({ ...post, type: 'PostForRent' }));
                 setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
 
                 if (res.data.next === null) {
@@ -124,19 +124,19 @@ const Home = () => {
         loadPostWant()
     }, [pageWant])
 
-    const renderItemPost = ({item}) => {
+    const renderItemPost = ({ item }) => {
         if (item.type === 'PostForRent') {
-            return <PostForRent key={item.id} item={item} routeName={'post_for_rent'} params={{postId:item.id}}/>;
+            return <PostForRent key={item.id} item={item} routeName={'post_for_rent'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
         } else if (item.type === 'PostWant') {
-            return <PostWant key={item.id} item={item} routeName={'post_want'} params={{postId:item.id}}/>;
+            return <PostWant key={item.id} item={item} routeName={'post_want'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
         }
 
     }
     const flatListHeader = () => {
         return (
             <>
-                {/* <Banner/> */}
-                <WantPlace openDialog={showModel}/>
+                {/* <Banner/>
+                <WantPlace openDialog={showModel}/> */}
 
             </>
         )
@@ -153,15 +153,15 @@ const Home = () => {
         <View style={styles.container}>
 
             <FlatList
-                refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh}/>}
+                refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
                 data={allPosts}
                 renderItem={renderItemPost}
                 ListHeaderComponent={flatListHeader}
                 keyExtractor={item => item.id.toString()}
                 onEndReached={loadMore}
-                ListFooterComponent={() => loading ? <ActivityIndicator/> : null}
+                ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
             />
-            <AddressDialog visible={visibleModelAddress} onClose={hideModel}/>
+            <AddressDialog visible={visibleModelAddress} onClose={hideModel} />
 
         </View>
 

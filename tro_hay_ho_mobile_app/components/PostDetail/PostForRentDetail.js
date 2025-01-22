@@ -10,15 +10,17 @@ import CommentScreen from "./CommentPostWant";
 
 moment.locale('vi');
 
+
 const PostForRentDetail = ({ route }) => {
     const id = route.params.postId;
     const [post, setPost] = useState(null);
-    const [comment, setComment] = useState(null);
 
 
+    console.log("lll", route.params.coordinates)
+    const [latitude, longitude] = route.params?.coordinates.split(", ").map(Number);
     const [centerCoordinates, setCenterCoordinates] = useState({
-        latitude: null,
-        longitude: null,
+        latitude: latitude,
+        longitude: longitude,
     });
 
     const loadPost = async () => {
@@ -38,12 +40,6 @@ const PostForRentDetail = ({ route }) => {
         loadPost();
     }, [id]);
 
-    useEffect(() => {
-        if (post?.address?.coordinates) {
-            const [latitude, longitude] = post?.address?.coordinates.split(", ").map(Number);
-            setCenterCoordinates({ latitude, longitude });
-        }
-    }, [post])
 
     return (
         <View style={styles.mainContainer}>
@@ -95,9 +91,18 @@ const PostForRentDetail = ({ route }) => {
                             <View style={{ marginVertical: 20 }}>
                                 <Text style={{ fontWeight: 500, paddingVertical: 10 }}>Bản đồ</Text>
                                 {centerCoordinates.latitude === null ? <ActivityIndicator /> :
-                                    <View style={styles.container}>
+                                    <View style={{
+                                        borderColor: '#D2D0D7',
+                                        padding: 10,
+                                        marginRight: 15,
+                                        borderWidth: 1,
+                                        borderRadius: 10
+                                    }}>
                                         <MapView
-                                            style={styles.map}
+                                            style={{
+                                                height: 300,
+                                                borderRadius: 10
+                                            }}
                                             initialRegion={{
                                                 ...centerCoordinates,
                                                 latitudeDelta: 0.0001,
@@ -128,11 +133,11 @@ const PostForRentDetail = ({ route }) => {
                                 </View>
                             </View>
                         </View>
-                        <CommentScreen postId={id}routName={'pfr-comment'} />
+                        <CommentScreen postId={id} routName={'pfr-comment'} />
                     </>
                 }
             </ScrollView>
-            
+
             <View style={styles.footBarContainer}>
                 <IconButton icon={'chat-outline'} size={30} onPress={() => { }} />
                 <TouchableOpacity style={{ borderRadius: 10, borderWidth: 1, borderColor: 'black', paddingHorizontal: 20, paddingVertical: 10 }} onPress={() => { }}>
