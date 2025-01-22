@@ -35,9 +35,8 @@ class User(AbstractUser):
                              null=True)
     following = models.ManyToManyField('User', symmetrical=False, related_name='followers', through='Following')
     conversation = models.ManyToManyField('self', symmetrical=True, through='Conversation')
-    notification = models.ManyToManyField('User', symmetrical=False, related_name='notifications',
-                                          through='Notification')
-
+    notification_details = models.ManyToManyField('User', symmetrical=False, related_name='notifications',
+                                                  through='DetailNotification')
     class Meta:
         db_table = 'user'
 
@@ -201,11 +200,8 @@ class Location(BaseModel):
 class Notification(BaseModel):
     title = models.TextField(null=False)
     content = models.TextField(null=False)
-    receiver = models.ForeignKey('User', on_delete=models.CASCADE, related_name='sent_notifications')
-    sender = models.ForeignKey('User', on_delete=models.CASCADE, related_name='received_notifications')
-    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='notifications',
-                             related_query_name='notification')
-    is_read = models.BooleanField(default=False, null=False)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='notifications', related_query_name='notification')
+    sender = models.ForeignKey('User', on_delete=models.CASCADE, related_name='sent_notifications')
 
     def __str__(self):
         return self.content
@@ -226,6 +222,17 @@ class AdministrativeRegion(models.Model):
 
     def __str__(self):
         return self.name
+
+class DetailNotification(BaseModel):
+    receiver = models.ForeignKey('User', on_delete=models.CASCADE, related_name='received_notifications')
+    notification = models.ForeignKey('Notification', on_delete=models.CASCADE, related_name='details')
+    is_read = models.BooleanField(default=False, null=False)
+
+    def __str__(self):
+        return f"Notification to {self.receiver.username}: {self.notification.title}"
+
+    class Meta:
+        db_table = 'detail_notification'
 
 
 class AdministrativeUnit(models.Model):

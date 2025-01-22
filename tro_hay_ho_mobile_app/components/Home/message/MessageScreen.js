@@ -62,7 +62,7 @@ const MessageScreen = ({ navigation, route }) => {
         ref={flatListRef}
         data={message}
         ListFooterComponent={footFlatList}
-        //  keyboardShouldPersistTaps="handled"
+        // khi ban phim an hoac hien thi se cuon ve cuoi
          onContentSizeChange={ScrollFlatList}
          onLayout={ScrollFlatList}
         renderItem={renderItem} />
