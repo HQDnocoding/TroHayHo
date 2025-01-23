@@ -29,7 +29,7 @@ class ConsersationSerializer(ModelSerializer):
 
 
 class MessageSerializer(ModelSerializer):
-    conversation = ConsersationSerializer
+    conversation = ConsersationSerializer()
 
     class Meta:
         model = Message
@@ -39,7 +39,8 @@ class MessageSerializer(ModelSerializer):
 class BasicUserInfoSerializer(ModelSerializer):
     avatar = serializers.ImageField(required=False)
     phone = serializers.CharField(required=False)
-    role=RoleSerializer
+    role = RoleSerializer
+
     def create(self, validated_data):
         user = User(**validated_data)
         user.set_password(user.password)
@@ -56,3 +57,12 @@ class BasicUserInfoSerializer(ModelSerializer):
                 'write_only': True
             }
         }
+
+
+class DetailNotificationSerializer(ModelSerializer):
+    receiver = BasicUserInfoSerializer()
+    notification = NotificationSerializer()
+    class Meta:
+        model=DetailNotification
+        fields='__all__'
+

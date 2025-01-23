@@ -24,7 +24,7 @@ const RequestLoginDialog = ({ visible, onClose }) => {
                     <Button mode="contained" onPress={()=>nav.navigate('login')} style={styles.loginButton} labelStyle={styles.font}>
                         Đăng nhập
                     </Button>
-                    <Button mode="contained" onPress={handleSave} style={styles.backButton} labelStyle={styles.font}>
+                    <Button mode="contained" onPress={handleSave} style={styles.backButton} labelStyle={[styles.font,{color:'#FFBA00'}]}>
                         Trở về
                     </Button>
                 </View>
@@ -61,13 +61,14 @@ const styles = StyleSheet.create({
         width: '100%', // Đảm bảo chiều rộng đầy đủ
     },
     loginButton: {
-        backgroundColor: 'red',
+        backgroundColor: '#FFBA00',
         marginHorizontal: 10, // Khoảng cách giữa các nút
         width: '40%', // Chiều rộng nút
     },
     backButton: {
-       
-        backgroundColor: 'green',
+       borderColor:'#FFBA00',
+       borderWidth:1,
+        backgroundColor: 'white',
         marginHorizontal: 10, // Khoảng cách giữa các nút
         width: '40%', // Chiều rộng nút
     },

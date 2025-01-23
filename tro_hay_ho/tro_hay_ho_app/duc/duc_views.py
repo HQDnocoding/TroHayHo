@@ -113,4 +113,17 @@ class BasicUserInfoViewSet(ModelViewSet):
     pagination_class = ItemSmallPaginator
     serializer_class = BasicUserInfoSerializer
     queryset = User.objects.filter(is_active=True)
+    @action(detail=True,methods=['get'],url_path='detail-notification')
+    def get_detail_notification(self,request,pk=None):
+    
+        detail_notification=DetailNotification.objects.filter(receiver_id=pk)\
+            .select_related('notification')\
+                .order_by('-created_date')
+        page= self.paginate_queryset(detail_notification)
+        if page is not None:
+            serializers=DetailNotificationSerializer(page,many=True)
+            return self.get_paginated_response(serializers.data)
+        serializers=self.get_serializer(detail_notification,many=True)
+        return Response(serializers.data)
+   
 

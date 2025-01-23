@@ -11,7 +11,7 @@ const NotificationCard = ({item, routeName, params}) => {
         <View style={styles.card}>
             <View style={styles.imageContainer}>
                 <Image
-                    source={{uri: item.sender.avatar ?item.sender.avatar:sampleAvatar}}
+                    source={{uri: item.notification.sender.avatar ?item.notification.sender.avatar:sampleAvatar}}
                     style={styles.image}
                     resizeMode="cover"
                 />
@@ -20,8 +20,8 @@ const NotificationCard = ({item, routeName, params}) => {
             <View style={styles.contentContainer}>
                 <View style={styles.header}>
                     <TouchableOpacity>
-                    <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
-                    <Text style={styles.content} numberOfLines={2}>{item.content}</Text>
+                    <Text style={styles.title} numberOfLines={2}>{item.notification.title}</Text>
+                    <Text style={styles.content} numberOfLines={2}>{item.notification.content}</Text>
                     </TouchableOpacity>
                     <Text style={styles.dateTime}>{formatTimeAgo(item.created_date)}</Text>
 
@@ -50,8 +50,7 @@ const styles = StyleSheet.create({
         margin:10,
         width: '50',
         height: '50',
-        borderColor:'black',
-        borderWidth:1,
+        
         borderRadius:100,
         overflow: 'hidden',
     },
