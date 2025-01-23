@@ -5,7 +5,7 @@ import APIs, { endpoints } from "../../configs/APIs";
 import { ActivityIndicator, Avatar, Button, Card, Divider, Icon, IconButton } from "react-native-paper";
 import moment from "moment";
 import 'moment/locale/vi';
-import MapView, { Circle, Marker } from 'react-native-maps';
+import MapView, { Circle, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import CommentScreen from "./CommentPostWant";
 
 moment.locale('vi');
@@ -99,6 +99,7 @@ const PostForRentDetail = ({ route }) => {
                                         borderRadius: 10
                                     }}>
                                         <MapView
+                                        provider={PROVIDER_GOOGLE}
                                             style={{
                                                 height: 300,
                                                 borderRadius: 10

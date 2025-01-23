@@ -5,7 +5,7 @@
     import { ActivityIndicator, Button, Divider, Icon } from "react-native-paper";
     import moment from "moment";
     import { formatPrice } from "../../utils/Formatter";
-    import MapView, { Circle, Marker } from "react-native-maps";
+    import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 
 
@@ -95,6 +95,7 @@
                                             borderRadius: 10
                                         }}>
                                             <MapView
+                                             provider={PROVIDER_GOOGLE}
                                                 style={{
                                                     height: 300,
                                                     borderRadius: 10

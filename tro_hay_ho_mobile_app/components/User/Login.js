@@ -8,11 +8,51 @@ import TextInputStyles from "../../styles/dat/TextInputStyles";
 import { styles } from "react-native-image-slider-banner/src/style";
 import LoginStyles from "../../styles/dat/LoginStyles";
 import { useNavigation } from "@react-navigation/native";
-
+import {
+    GoogleSignin,
+    statusCodes
+  } from '@react-native-google-signin/google-signin';
 
 
 
 const Login = () => {
+
+    const signIn = async () => {
+        try {
+            console.log("Sign In button pressed!");
+            try {
+                await GoogleSignin.hasPlayServices();
+            } catch (error) {
+                console.error("Google Play Services not available:", error.message);
+            }
+            try {
+                const userInfo = await GoogleSignin.signIn();
+                console.log("User Info:", userInfo);
+            } catch (error) {
+                console.error("Error during Google Sign-In:", error.message);
+            }
+            if (isSuccessResponse(response)) {
+                // setState({ userInfo: response.data });
+            } else {
+                // sign in was cancelled by user
+            }
+        } catch (error) {
+            if (isErrorWithCode(error)) {
+                switch (error.code) {
+                    case statusCodes.IN_PROGRESS:
+                        // operation (eg. sign in) already in progress
+                        break;
+                    case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+                        // Android only, play services not available or outdated
+                        break;
+                    default:
+                    // some other error happened
+                }
+            } else {
+                // an error that's not related to google sign in occurred
+            }
+        }
+    };
 
     const nav = useNavigation();
 
@@ -120,7 +160,7 @@ const Login = () => {
                     </TouchableOpacity>
                     <View style={LoginStyles.line} />
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={signIn}>
                     <Image style={{ width: 80, height: 80 }} source={require('../../assets/google-logo.png')} resizeMode="contain" />
                 </TouchableOpacity>
             </View>

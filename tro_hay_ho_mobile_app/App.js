@@ -19,10 +19,20 @@ import MessageScreen from './components/Home/message/MessageScreen';
 import MessageStackNavigator from "./components/Home/message/MessageStackNavigator";
 import FavouritePost from './components/User/FavouritePost';
 import SearchScreen from './components/Home/SearchScreen';
+import {
+  GoogleSignin
+} from '@react-native-google-signin/google-signin';
 
 
 
 export default function App() {
+  GoogleSignin.configure({
+    webClientId: '1094159227138-04u2vu85jblo2vemrqv68bmihh0jmlau.apps.googleusercontent.com', // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
+    scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
+    offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+    forceCodeForRefreshToken: false, // [Android] related to `serverAuthCode`, read the docs link below *.
+    iosClientId: '1094159227138-lvlg2n85bnu91f8vahfifbclhgiroqls.apps.googleusercontent.com', // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
+  });
   const [user, dispatch] = useReducer(MyUserReducer, null);
 
   const MyAppNavigator = () => {
