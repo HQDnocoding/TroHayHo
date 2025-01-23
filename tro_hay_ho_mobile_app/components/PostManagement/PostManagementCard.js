@@ -1,44 +1,72 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
-import {Entypo} from '@expo/vector-icons'; // Đảm bảo bạn đã cài đặt expo/vector-icons
-import {sampleImage,CHU_TRO,NGUOI_THUE_TRO} from '../../utils/MyValues'
+import { View, Text, Image, StyleSheet, TouchableOpacity, TouchableNativeFeedback } from 'react-native';
+import { Entypo } from '@expo/vector-icons'; // Đảm bảo bạn đã cài đặt expo/vector-icons
+import { sampleImage, CHU_TRO, NGUOI_THUE_TRO } from '../../utils/MyValues'
 import { formatTimeAgo } from '../../utils/TimeFormat';
-import { formatPrice} from '../../utils/Formatter';
+import { formatPrice } from '../../utils/Formatter';
 
-const PostManagementCard = ({item,params,routeName}) => {
-    
+const PostManagementCard = ({ item, params, routeName }) => {
+    console.log("post manager card",item)
+
     return (
-        <TouchableOpacity style={styles.card}>
-            <View style={styles.imageContainer}>
-                <Image
-                    source={{uri:item.user.avatar?item.user.avatar: sampleImage}}
-                    style={styles.image}
-                    resizeMode="cover"
-                />
-            </View>
+
+        <View style={styles.card} >
+            {item.isPostWant === true ? (
+                <View style={styles.imageContainer}>
+                    <Image
+                        source={{ uri: item.user.avatar ? item.user.avatar : sampleImage }}
+                        style={styles.image}
+                        resizeMode="cover"
+                    />
+                </View>
+            ) : (
+                <View style={styles.imageContainer}>
+                    <Image
+                        source={{ uri: item.post_image ? item.post_image[0].image : sampleImage }}
+                        style={styles.image}
+                        resizeMode="cover"
+                    />
+                </View>
+
+            )}
+
 
             <View style={styles.contentContainer}>
                 <View style={styles.header}>
-                    <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
-                    {item.user.role.role_name ===NGUOI_THUE_TRO?(
-      <Text style={styles.priceGreen}>{formatPrice(item.price_range_min)} đ -{formatPrice(item.price_range_max)} đ</Text>
-                    ):(
+                    <TouchableNativeFeedback >
+                        <View>
+                            <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+
+                        </View>
+                    </TouchableNativeFeedback>
+
+                    {item.isPostWant === true ? (
+                        <Text style={styles.priceGreen}>{formatPrice(item.price_range_min)} đ -{formatPrice(item.price_range_max)} đ</Text>
+                    ) : (
                         <Text style={styles.priceRed}>{formatPrice(item.price)} đ</Text>
 
                     )}
-              
+
                     <Text style={styles.dateTime}>{formatTimeAgo(item.created_date)}</Text>
 
                 </View>
+                <View style={{ flex: 1 }}>
+                    <TouchableOpacity style={styles.icon}>
+                        <View>
+                            <Entypo name="dots-three-vertical" size={18} color="#666" />
 
-                <TouchableOpacity style={styles.icon}>
-                    <Entypo name="dots-three-vertical" size={18} color="#666"/>
-                </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+
             </View>
-        </TouchableOpacity>
+        </View>
+
+
     );
 };
 const styles = StyleSheet.create({
+
     card: {
         height: 90,
         backgroundColor: '#fff',
@@ -68,15 +96,16 @@ const styles = StyleSheet.create({
         objectFit: 'cover'
     },
     contentContainer: {
-      paddingHorizontal:5,
-      width:'70%',
-      flexDirection: 'row',
+        paddingHorizontal: 5,
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        flex: 1,
     },
     header: {
-      flexDirection:'column',
-      justifyContent:'space-between'
+        flex: 8,
+        flexDirection: 'column',
+        justifyContent: 'space-between'
     },
     title: {
 

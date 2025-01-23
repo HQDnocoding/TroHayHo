@@ -3,9 +3,9 @@ import axios from "axios";
 
 
 // ip cua Duc:http://192.168.129.238:8000/
-//  const BASE_URL="http://192.168.1.253:8000/"
+ const BASE_URL="http://192.168.1.253:8000/"
 // const BASE_URL="http://192.168.1.55:8000/"
-const BASE_URL="http://192.168.1.12:8000/"
+// const BASE_URL="http://192.168.1.12:8000/"
 //const BASE_URL="http://192.168.103.238:8000/"
 // const BASE_URL="http://192.168.1.10:8000/"
 
@@ -27,7 +27,7 @@ export const endpoints={
 
 }
 export const endpointsDuc={
-    'getListNotification':'/notifications',
+    'getListNotification':(userId)=>`/basic-user-info/${userId}/detail-notification/`,
     'getListConversationByUserId':(userId)=>`/user-conversations/user/${userId}/`,
     'getListMessageByConversationId':(conversationId)=>`/conversation-messages/conversation/${conversationId}/`,
     'getListPostWantByUserId':(userId)=>`/user-post-wants/user/${userId}/`,

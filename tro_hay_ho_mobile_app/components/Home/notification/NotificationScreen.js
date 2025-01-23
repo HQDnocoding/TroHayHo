@@ -3,10 +3,12 @@ import {FlatList, RefreshControl, ScrollView, Text, View} from "react-native";
 import StylesNotificationScreen from "../../../styles/duc/StylesNotificationScreen";
 import NotificationCard from "./NotificationCard";
 import APIs, { endpointsDuc } from "../../../configs/APIs";
+import  { MyUserContext } from "../../../configs/UserContexts";
+
 import { ActivityIndicator } from "react-native-paper";
 
 const NotificationScreen = ()=>{
-
+    const currentUser= React.useContext(MyUserContext)
     const [notification, setNotification] = React.useState([])
     const [loading, setLoading] = React.useState(false);
     const [page, setPage] = React.useState(1);
@@ -15,9 +17,9 @@ const NotificationScreen = ()=>{
          if (page > 0) {
             
                     setLoading(true)
-        
+                    if(currentUser!==null)
                     try {
-                        let url = `${endpointsDuc['getListNotification']}?page=${page}`
+                        let url = `${endpointsDuc['getListNotification'](currentUser.id)}?page=${page}`
                         let res = await APIs.get(url)
         
                         if(page>1){
