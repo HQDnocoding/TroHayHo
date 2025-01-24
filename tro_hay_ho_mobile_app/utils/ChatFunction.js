@@ -113,8 +113,21 @@ const getUserConversations=(userId,callback)=>{
     }
 
 }
-
-export { createConversation, createTextMessage, createUser,getMessages,getUserConversations }
+const checkExistConversation=async (userId1,userId2)=>{
+    const idKey = [userId1, userId2].sort().join("_")
+    const conversationRef = ref(db, "conversations/" + idKey)
+    const conversation = await get(conversationRef)
+    if(conversation.exists()){
+        let conversationId = conversation.key
+        return ({
+            id:conversationId,
+            ...conversation
+        })
+    }else{
+        return null
+    }
+}
+export { createConversation, createTextMessage, createUser,getMessages,getUserConversations ,checkExistConversation}
 // const changes = {
 //     [`conversations/${idKey}`]: {
 //         "participants": {

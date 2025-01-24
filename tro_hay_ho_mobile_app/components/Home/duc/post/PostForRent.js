@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 const PostForRent = ({ item, routeName, params }) => {
     console.info(item.post_image.length)
     const nav = useNavigation()
+    const infoUser=item.user
     return (
 
         <Card style={styles.card}>
@@ -20,7 +21,7 @@ const PostForRent = ({ item, routeName, params }) => {
                         source={{ uri: item.user.avatar ? item.user.avatar : sampleAvatar }}
                     />
                     <View style={styles.userInfo}>
-                        <TouchableOpacity onPress={()=>nav.navigate('profile_user')}>
+                        <TouchableOpacity onPress={()=>nav.navigate('profile_user',{infoUser})}>
                             <View>
                                 <Text style={styles.userName}
                                     numberOfLines={1}>{item.user.first_name + " " + item.user.last_name}</Text>

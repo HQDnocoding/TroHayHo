@@ -4,7 +4,7 @@ import React from "react";
 import PostManagementCard from "./PostManagementCard";
 import APIs, { endpointsDuc } from "../../configs/APIs"
 import { ActivityIndicator } from "react-native-paper";
-import { CHU_TRO } from '../../utils/MyValues';
+import { CHU_TRO, role_id_chu_tro } from '../../utils/MyValues';
 import { MyUserContext } from '../../configs/UserContexts'
 
 const PostManagementShowing = () => {
@@ -23,7 +23,7 @@ const PostManagementShowing = () => {
                     let url;
                     let res;
                     let updatePostResults
-                    if (currentUser.role === 2)//chu tro
+                    if (currentUser.role === role_id_chu_tro)//chu tro
                     {
                         url = `${endpointsDuc['getListPostForRentByUserId'](currentUser.id)}?page=${page}`
                         res = await APIs.get(url)
@@ -55,66 +55,66 @@ const PostManagementShowing = () => {
                     //     }
                     // })
                     if (page > 1) {
-                            setPost(prev => [...prev, ...updatePostResults])
-                        } else {
-                            setPost(updatePostResults)
-
-                        }
-                        if (res.data.next === null) {
-                            setPage(0)
-                        }
-                    } catch (error) {
-                        if (error.response?.status === 404) {
-                            setPage(0);
-                        } else {
-                            console.error("Error loading post:", error, " == at page: ", pageForRent);
-                        }
-                    } finally {
-                        setLoading(false)
+                        setPost(prev => [...prev, ...updatePostResults])
+                    } else {
+                        setPost(updatePostResults)
 
                     }
+                    if (res.data.next === null) {
+                        setPage(0)
+                    }
+                } catch (error) {
+                    if (error.response?.status === 404) {
+                        setPage(0);
+                    } else {
+                        console.error("Error loading post:", error, " == at page: ", pageForRent);
+                    }
+                } finally {
+                    setLoading(false)
+
                 }
+        }
     }
-        const loadMore = () => {
-            if (page > 0) {
-                setPage(page + 1)
-            }
-
-        }
-        const refresh = () => {
-            setPage(1)
-
-        }
-        const renderItemPost = ({ item }) => {
-            return (
-                <PostManagementCard key={item.id} item={item} params={{}} routeName={''} />
-            )
+    const loadMore = () => {
+        if (page > 0) {
+            setPage(page + 1)
         }
 
-        React.useEffect(() => {
+    }
+    const refresh = () => {
+        setPage(1)
 
-            loadPost()
-        }, [page])
-
+    }
+    const renderItemPost = ({ item }) => {
         return (
-            <View >
-
-                <FlatList
-                    refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
-                    data={post}
-                    renderItem={renderItemPost}
-                    onEndReached={loadMore}
-                    ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
-                />
-
-            </View>
+            <PostManagementCard key={item.id} item={item} params={{}} routeName={''} />
         )
     }
 
-    const styles = StyleSheet.create({
-        container: {
-            backgroundColor: '#fff'
-        },
+    React.useEffect(() => {
 
-    })
-    export default PostManagementShowing;
+        loadPost()
+    }, [page])
+
+    return (
+        <View >
+
+            <FlatList
+                refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+                data={post}
+                renderItem={renderItemPost}
+                onEndReached={loadMore}
+                ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
+            />
+
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#fff'
+    },
+
+})
+export default PostManagementShowing;

@@ -17,3 +17,9 @@ export const formatTimeAgo = (dateString) => {
   
   return date.format('DD-MM-YYYY');
 };
+
+export const formatDate=(dateString)=>{
+  const date = dayjs(dateString);
+  const formattedDate = date.format('DD-MM-YYYY');
+  return formattedDate;
+}

@@ -8,7 +8,6 @@ const MessageStackNavigator = ({navigation,route}) => {
     const params = route.params || {};
     const { item, currentUser,partner } = params;
     const partnerUser=partner
-   
     return (
 
         <Stack.Navigator
