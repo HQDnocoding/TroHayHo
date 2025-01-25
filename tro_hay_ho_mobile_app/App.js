@@ -102,7 +102,7 @@ export default function App() {
                     }
                 }}/>
                  <Stack.Screen name='profile_user' component={ProfileUser} options={{
-                    headerShown: false,
+                    headerShown: true,
                      headerTitle: '',
                     headerStyle: {
                         backgroundColor: '#FFBA00',

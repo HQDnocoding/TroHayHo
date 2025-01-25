@@ -4,6 +4,8 @@ export const sampleAvatar = "https://drive.usercontent.google.com/download?id=1f
 export const sampleImage = "https://res.cloudinary.com/df5wj9kts/image/upload/v1732878598/cld-sample-4.jpg"
 export const NGUOI_THUE_TRO = 'nguoi_thue_tro'
 export const CHU_TRO = 'chu_tro'
+export const role_id_chu_tro = 2
+export const role_id_nguoi_thue = 3
 export const tempUser = {
     "id": 2,
     "username": "duc",

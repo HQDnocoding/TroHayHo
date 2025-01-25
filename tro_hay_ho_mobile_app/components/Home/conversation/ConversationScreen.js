@@ -12,7 +12,6 @@ const ConversationScreen = () => {
     const [conversation, setConversation] = React.useState([])
     const [re, setRe] = React.useState(true);
     const [loading, setLoading] = React.useState(false);
-    console.info("conversation screen", currentUser)
 
     const renderItemConversation = ({ item }) => {
         return (
@@ -40,6 +39,7 @@ const ConversationScreen = () => {
             if (conversation) {
                 setConversation(conversation)
             }
+            console.info("conversation screen",conversation)
             setRe(false)
             setLoading(false)
         })

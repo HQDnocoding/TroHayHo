@@ -28,6 +28,7 @@ const MessageScreen = ({ navigation, route }) => {
     ScrollFlatList()
   },[message])
   React.useEffect(() => {
+    console.log("message",item)
     const listenMessage = getMessages(item.id, (message) => {
       setMessage(message)
       ScrollFlatList()

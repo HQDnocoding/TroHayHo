@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 const PostWant = ({ item, routeName, params }) => {
 
     const nav = useNavigation()
-
+    const infoUser=item.user
     return (
 
         <Card style={styles.card}>
@@ -20,7 +20,7 @@ const PostWant = ({ item, routeName, params }) => {
                         source={{ uri: item.user.avatar ? item.user.avatar : sampleAvatar }}
                     />
                     <View style={styles.userInfo}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={()=>nav.navigate('profile_user',{infoUser})}>
                             <View>
                                 <Text style={styles.userName}
                                     numberOfLines={1}>{item.user.first_name + " " + item.user.last_name}</Text>
