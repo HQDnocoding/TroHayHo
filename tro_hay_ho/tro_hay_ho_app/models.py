@@ -54,7 +54,7 @@ class Following(BaseModel):
         db_table = 'following'
 
     def __str__(self):
-        return self.followed_at
+        return f"{self.follower.username} follows {self.followed.username}"
 
 
 class Conversation(BaseModel):

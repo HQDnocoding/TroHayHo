@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import mark_safe
 from .models import User,PostWant,PostForRent,District,Province,Ward,Role,Address,PostImage,Notification\
-    ,Conversation,Message,DetailNotification,Comment
+    ,Conversation,Message,DetailNotification,Comment,Following
 # Register your models here.
 
 
@@ -34,5 +34,6 @@ admin.site.register(Conversation)
 admin.site.register(Message)
 admin.site.register(DetailNotification)
 admin.site.register(Comment)
+admin.site.register(Following)
 
 
