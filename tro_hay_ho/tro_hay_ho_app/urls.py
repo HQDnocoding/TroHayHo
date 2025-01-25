@@ -29,5 +29,6 @@ r.register('notifications',NotificationViewSet,basename='notifications')
 r.register('comments',CommentViewSet,basename='comment')
 
 urlpatterns = [
-    path('',include(r.urls))
+    path('',include(r.urls)),
+     path('google-login/', GoogleLoginView.as_view(), name='google-login'),
 ]

@@ -5,6 +5,7 @@ import React, { useContext, useState } from "react";
 import { MyDispatchContext, MyUserContext } from "../../configs/UserContexts";
 import APIs, { endpoints } from "../../configs/APIs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 const AccountSetting = ({ navigation }) => {
 
@@ -14,11 +15,22 @@ const AccountSetting = ({ navigation }) => {
 
     console.log('user value:', user);
 
+
+const signOut = async () => {
+        try {
+          await GoogleSignin.signOut();
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+
     const logout = async () => {
         await AsyncStorage.removeItem("token");
         dispatch({
             "type": "logout"
         });
+        signOut();
         navigation.navigate('login');
     }
 

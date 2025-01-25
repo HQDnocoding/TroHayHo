@@ -1,12 +1,23 @@
+from datetime import timedelta
+import secrets
 from django.http import HttpResponse
 from django.shortcuts import render
-from rest_framework import permissions
+from django.utils.timezone import now
+from firebase_admin import auth
+from google.auth.transport import requests
+from google.oauth2 import id_token
+from oauth2_provider.models import Application, AccessToken
+from rest_framework import permissions, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView ,DestroyAPIView
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from .paginator import ItemPaginator
 from .models import User,Role,Comment
 from .paginator import ItemPaginator,ItemSmallPaginator
@@ -164,3 +175,93 @@ class FavouritePostViewSet(ModelViewSet):
     
     
     
+class GoogleLoginView(APIView):
+    def post(self, request):
+        try:
+            # Lấy token từ request
+            google_token = request.data.get("token")
+            if not google_token:
+                return Response({"error": "Token is required"}, status=status.HTTP_400_BAD_REQUEST)
+            print(google_token)
+            # Xác minh token với Google
+            idinfo = id_token.verify_oauth2_token(
+                google_token,
+                requests.Request()
+            )
+            print(1)
+            # Lấy thông tin từ Google
+            email = idinfo.get("email")
+            name = idinfo.get("name")
+            if not email:
+                return Response({"error": "Invalid Google token"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Tìm hoặc tạo người dùng
+            user, created = User.objects.get_or_create(username=email, defaults={"first_name": name})
+
+            # Tạo OAuth2 Token
+            application = Application.objects.get(client_id="0R6hMr4Zhgl9LeXoWrxDNSTkLgpZymmtLJeINUFN")  # Ứng dụng của bạn
+            access_token = AccessToken.objects.create(
+                user=user,
+                application=application,
+                token=secrets.token_urlsafe(),
+                expires=now() + timedelta(seconds=3600),
+                scope='read write'
+            )
+            # refresh_token = RefreshToken.objects.create(
+            #     user=user,
+            #     application=application,
+            #     token=secrets.token_urlsafe(),
+            #     access_token=access_token
+            # )
+
+            return Response({
+                "access_token": access_token.token,
+                "expires_in": 3600,
+                "user": {
+                    "id": user.id,
+                    "email": user.username,
+                    "name": user.first_name,
+                }
+            }, status=status.HTTP_200_OK)
+        
+        except ValueError:
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+
+class VerifyTokenView(APIView):
+    def post(self, request):
+        id_token = request.data.get("token")
+
+        if not id_token:
+            raise AuthenticationFailed("Missing idToken")
+
+        try:
+            # Xác minh idToken với Firebase
+            print(id_token)
+            decoded_token = auth.verify_id_token(id_token)
+        
+            uid = decoded_token.get("uid")
+        except Exception as e:
+            raise AuthenticationFailed("Invalid idToken")
+
+        user, created = User.objects.get_or_create(username=uid, defaults={
+            'email': decoded_token.get("email", ""),
+        })
+
+
+
+        access_token = AccessToken.objects.create(
+            user=user,
+            token=str(user.id),  # Token có thể được tùy chỉnh
+            expires=now() + timedelta(days=1)
+        )
+
+        return Response({
+            "access_token": str(access_token.token),
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+            },
+        })

@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-n_43$u^ws23_-lzo!&l(h13y3oqgb02f(s%q05(&_u4u33!1p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.129.238", "192.168.1.12", "192.168.1.253", "10.100.60.24","127.0.0.1","192.168.103.238"]
+ALLOWED_HOSTS = ["192.168.1.196","192.168.129.238", "192.168.1.12", "192.168.1.10", "192.168.1.253", "10.100.60.24","127.0.0.1","192.168.103.238"]
 # 192.168.129.238
 # Application definition
 
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'tro_hay_ho_app.apps.TroHayHoAppConfig',
     'rest_framework',
     'oauth2_provider',
+    
 ]
 
 REST_FRAMEWORK = {
@@ -116,9 +117,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'vi-VN'
+LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Ho_Chi_Minh'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -151,3 +152,14 @@ client_secret = 'AG1n41T3umckBclAVuc97nNwW0YJTqxpDUanvjS2yju0kxLpwSp88FtuOZesCxm
 
 
 OAUTH2_PROVIDER = { 'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore' }
+
+
+
+import firebase_admin
+from firebase_admin import credentials
+
+# Đường dẫn tới tệp JSON cấu hình Firebase
+cred = credentials.Certificate("tro_hay_ho/fb_admin_sdk.json")
+
+# Khởi tạo Firebase Admin SDK
+firebase_admin.initialize_app(cred)
