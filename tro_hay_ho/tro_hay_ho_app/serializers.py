@@ -41,15 +41,21 @@ class WardSerializer(ModelSerializer):
     class Meta:
         model = Ward
         fields=['code','name','full_name']
+        
+        
 class DistrictSerializer(ModelSerializer):
     class Meta:
         model = District
-        fields = ['code', 'name', 'full_name']
+        fields = '__all__'
+
 
 class ProvinceSerializer(ModelSerializer):
     class Meta:
         model = Province
         fields = ['code', 'name', 'full_name']
+        
+    
+
 class AddressSerializer(ModelSerializer):
     province=ProvinceSerializer()
     district=DistrictSerializer()

@@ -23,6 +23,7 @@ import {
     GoogleSignin
 } from '@react-native-google-signin/google-signin';
 import ProfileUser from "./components/Home/User/ProfileUser";
+import PostForRentCreating from './components/PostCreating/PostForRentCreating';
 
 
 export default function App() {
@@ -122,7 +123,8 @@ export default function App() {
         <NavigationContainer>
             <MyUserContext.Provider value={user}>
                 <MyDispatchContext.Provider value={dispatch}>
-                    <MyAppNavigator/>
+                    {/* <MyAppNavigator/> */}
+                    <PostForRentCreating/>
                 </MyDispatchContext.Provider>
             </MyUserContext.Provider>
         </NavigationContainer>

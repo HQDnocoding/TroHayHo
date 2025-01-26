@@ -36,3 +36,4 @@ admin.site.register(DetailNotification)
 admin.site.register(Comment)
 
 
+

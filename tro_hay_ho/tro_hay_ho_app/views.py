@@ -265,3 +265,50 @@ class VerifyTokenView(APIView):
                 "email": user.email,
             },
         })
+        
+class ProvinceViewSet(ModelViewSet):
+    queryset = Province.objects.all()
+    serializer_class = ProvinceSerializer
+
+    @action(detail=True, methods=['get'], url_path='districts/(?P<district_code>[^/.]+)/wards')
+    def list_wards(self, request, pk=None, district_code=None):
+        try:
+            province = self.get_object()
+            district = province.districts.get(code=district_code)
+            wards = district.wards.all()
+            serializer = WardSerializer(wards, many=True)
+            return Response(serializer.data)
+        except District.DoesNotExist:
+            return Response({"detail": "District not found."}, status=404)
+        
+    @action(detail=True, methods=['get'], url_path='districts')
+    def list_districts(self,request,pk=None):
+        try:
+            
+            province=self.get_object()
+            districts=province.districts.all()
+            serializer=DistrictSerializer(districts,many=True)
+            return Response(serializer.data)
+            
+        except Exception as e:
+            raise 
+
+class DistrictViewSet(ModelViewSet):
+    queryset = District.objects.all()
+    serializer_class = DistrictSerializer
+    
+    @action(detail=True, methods=['get'], url_path='wards')
+    def list_wards(self, request, pk=None):
+        
+        district = self.get_object()
+        
+        wards = district.wards.all()
+        
+        serializer = WardSerializer(wards, many=True)
+        return Response(serializer.data)
+    
+
+class WardViewSet(ModelViewSet):
+    queryset = Ward.objects.all()
+    serializer_class = WardSerializer
+    

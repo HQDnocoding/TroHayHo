@@ -12,7 +12,9 @@ r.register('roles',RoleViewSet,basename='role')
 r.register('addresses',AddressViewSet,basename='address')
 r.register('post-wants',PostWantViewSet,basename='post_wants')
 r.register('post-for-rents',PostForRentViewSet,basename='post_for_rents')
-
+r.register('provinces',ProvinceViewSet,basename='province')
+r.register('districts',DistrictViewSet,basename='district')
+r.register('wards',WardViewSet,basename='ward')
 
 
 #================== duc========================
