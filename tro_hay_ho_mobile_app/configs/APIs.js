@@ -3,11 +3,11 @@ import axios from "axios";
 
 
 // ip cua Duc:http://192.168.129.238:8000/
-const BASE_URL="http://192.168.1.253:8000/"
+// const BASE_URL="http://192.168.1.253:8000/"
 // const BASE_URL="http://192.168.1.55:8000/"
 // const BASE_URL="http://192.168.1.12:8000/"
 //const BASE_URL="http://192.168.103.238:8000/"
-// const BASE_URL = "http://192.168.1.10:8000/"
+const BASE_URL = "http://192.168.1.11:8000/"
 // const BASE_URL = "http://192.168.1.196:8000/"
 
 
@@ -26,7 +26,9 @@ export const endpoints = {
     'post-want-detail': (postId) => `/post-wants/${postId}/`,
     'pw-comment': (postId) => `/post-wants/${postId}/comments/`,
     'pfr-comment': (postId) => `/post-for-rents/${postId}/comments/`,
-
+    'provinces': '/provinces/',
+    'provinces-districts': (provinceId) => `/provinces/${provinceId}/districts/`,
+    'provinces-districts-wards': (provinceId, districtId) => `/provinces/${provinceId}/districts/${districtId}/wards/`
 }
 export const endpointsDuc = {
     'getListNotification': (userId) => `/basic-user-info/${userId}/detail-notification/`,
@@ -35,8 +37,8 @@ export const endpointsDuc = {
     'getListPostWantByUserId': (userId) => `/user-post-wants/user/${userId}/`,
     'getListPostForRentByUserId': (userId) => `/user-post-for-rents/user/${userId}/`,
     'getBasicUserInfoByUserId': (userId) => `/basic-user-info/${userId}/`,
-    'checkMeFollowYour': (followerId,followedId) => `/basic-user-info/${followerId}/check-me-following-you/${followedId}/`,  
-    'updateMeFollowingYou': (followerId,followedId) => `/basic-user-info/${followerId}/update-me-following-you/${followedId}/`,
+    'checkMeFollowYour': (followerId, followedId) => `/basic-user-info/${followerId}/check-me-following-you/${followedId}/`,
+    'updateMeFollowingYou': (followerId, followedId) => `/basic-user-info/${followerId}/update-me-following-you/${followedId}/`,
 }
 
 export const authAPIs = (token) => {
