@@ -11,12 +11,12 @@ import PostForRent from './PostForRent';
 import React from 'react';
 import APIs, { endpointsDuc } from '../../../../configs/APIs';
 
-const PostCard = ({ item, routeName, params, dataPostFav,currentUser }) => {
+const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
     const nav = useNavigation()
-    const [isSave,setIsSave]=React.useState(false)
+    const [isSave, setIsSave] = React.useState(false)
     const infoUser = item.user
     const checkPostIsFavoriteUser = (postId) => {
-        if (currentUser!==null) {
+        if (currentUser !== null) {
             let check = dataPostFav.some(fav => fav.post.id === postId)
             if (check) return true
             else return false
@@ -24,32 +24,46 @@ const PostCard = ({ item, routeName, params, dataPostFav,currentUser }) => {
         return false
 
     }
-    const handleClickSaveBtn= async()=>{
-        if (currentUser!==null) {
-                let url= `${endpointsDuc.updateMeFavoritePost(currentUser.id,item.id)}`
-                let res= await APIs.patch(url,data_patch_active(!isSave))
-                if(res.data.active!==null){
-                    setIsSave(res.data.active)
-                    console.info(isSave)
+    const handleClickSaveBtn = async () => {
+        if (currentUser !== null) {
+            let url = `${endpointsDuc.updateMeFavoritePost(currentUser.id, item.id)}`
+            let res = await APIs.patch(url, data_patch_active(!isSave))
+            if (res.data.active !== null) {
+                setIsSave(res.data.active)
+                console.info(isSave)
 
-                }else{
-                    console.info("loi post card",res.data)
-                    
-                }
-        }else{
+            } else {
+                console.info("loi post card", res.data)
+
+            }
+        } else {
             alert("Vui lòng đăng nhập")
 
         }
     }
-    React.useEffect(()=>{
-        if(currentUser!==null){
-            if(checkPostIsFavoriteUser(item.id)===true){
+    const handleClickCommentBtn = () => {
+        let params = {
+            postId: item.id,
+            coordinates: item.address.coordinates
+        }
+        if (item.type === 'PostWant') {
+            let routeName = 'post_want'
+            nav.navigate(routeName, params)
+
+        } else if (item.type === 'PostForRent') {
+            let routeName = 'post_for_rent'
+            nav.navigate(routeName, params)
+        }
+    }
+    React.useEffect(() => {
+        if (currentUser !== null) {
+            if (checkPostIsFavoriteUser(item.id) === true) {
                 setIsSave(true)
-            }else{
+            } else {
                 setIsSave(false)
             }
         }
-    },[])
+    }, [])
     return (
 
         <Card style={styles.card}>
@@ -86,23 +100,23 @@ const PostCard = ({ item, routeName, params, dataPostFav,currentUser }) => {
 
                 {/* Actions */}
                 <View style={styles.actions}>
-                    <TouchableOpacity style={styles.actionButton}>
+                    <TouchableOpacity style={styles.actionButton} onPress={handleClickCommentBtn}>
                         <Icon source="comment-outline" size={20} />
-                        <Text style={styles.actionText}>23 Bình luận</Text>
+                        <Text style={styles.actionText}>Bình luận</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton} onPress={handleClickSaveBtn}>
-                    {isSave===true ? (
-                        <>
-                            <Icon source="heart" size={20} color={myYellow} />
-                            <Text style={styles.actionText}>Đã lưu</Text>
-                        </>
-                    ) : (
-                        <>
-                            <Icon source="heart-outline" size={20} color='black' />
-                            <Text style={styles.actionText}>Lưu</Text>
-                        </>
-                    )}
-                    
+                        {isSave === true ? (
+                            <>
+                                <Icon source="heart" size={20} color={myYellow} />
+                                <Text style={styles.actionText}>Đã lưu</Text>
+                            </>
+                        ) : (
+                            <>
+                                <Icon source="heart-outline" size={20} color='black' />
+                                <Text style={styles.actionText}>Lưu</Text>
+                            </>
+                        )}
+
 
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton}>

@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
-import { Card, Title, Paragraph } from 'react-native-paper';
+import { Card, Title, Paragraph, Provider, Portal } from 'react-native-paper';
 import PostForRent from "./duc/post/PostForRent";
 import PostWant from "./duc/post/PostWant";
 import WantPlace from "./duc/explore/WantPlace";
@@ -9,13 +9,14 @@ import AddressDialog from "./duc/explore/AddressDialog";
 import APIs, { endpoints } from "../../configs/APIs";
 import { shuffleArray } from '../../utils/Formatter';
 import { MyUserContext } from '../../configs/UserContexts';
-import { getInfoPostFavoriteOfUser} from '../../utils/MyFunctions';
+import { getInfoPostFavoriteOfUser } from '../../utils/MyFunctions';
 import PostCard from './duc/post/PostCard';
 
 
 const Home = () => {
     let currentUser
     const [visibleModelAddress, setVisibleModelAddress] = React.useState(false)
+  
     const [postWant, setPostWant] = React.useState([])
     const [postForRent, setPostForRent] = React.useState([])
     const [loading, setLoading] = React.useState(false);
@@ -24,8 +25,9 @@ const Home = () => {
     const [allPosts, setAllPosts] = React.useState([]);
     const [postFav, setPostFav] = React.useState([]);
 
-    const loadCurrentUser=()=>{
-        currentUser= useContext(MyUserContext)
+    
+    const loadCurrentUser = () => {
+        currentUser = useContext(MyUserContext)
 
     }
     loadCurrentUser()
@@ -67,14 +69,6 @@ const Home = () => {
             try {
                 let url = `${endpoints['getListPostForRent']}?page=${pageForRent}`
                 let res = await APIs.get(url)
-
-                // if(pageForRent === 1){
-                //     setPostForRent(res.data.results)
-
-                // } else {
-                //     setPostForRent(prevPosts => [...prevPosts, ...res.data.results])
-
-                // }
                 const newPosts = res.data.results.map(post => ({ ...post, type: 'PostForRent' }));
                 setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
 
@@ -97,7 +91,7 @@ const Home = () => {
     const loadInfoFavoriteOfCurrentUser = async () => {
         if (currentUser !== null) {
             try {
-                let data=await getInfoPostFavoriteOfUser(currentUser.id)
+                let data = await getInfoPostFavoriteOfUser(currentUser.id)
                 setPostFav(data)
             } catch (error) {
                 console.error("Error loading info favorite of current user:", error);
@@ -148,8 +142,8 @@ const Home = () => {
         // } else if (item.type === 'PostWant') {
         //     return <PostWant  routeName={'post_want'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
         // }return null;
-        return(
-        <PostCard key={item.id} item={item} dataPostFav={postFav} currentUser={currentUser}/>
+        return (
+            <PostCard key={item.id} item={item} dataPostFav={postFav} currentUser={currentUser} />
 
         )
 
@@ -172,6 +166,7 @@ const Home = () => {
 
 
     return (
+
         <View style={styles.container}>
 
             <FlatList
@@ -179,13 +174,14 @@ const Home = () => {
                 data={allPosts}
                 renderItem={renderItemPost}
                 ListHeaderComponent={flatListHeader}
-                keyExtractor={item => `${item.type}-${item.id}`}
+                keyExtractor={item => `${item.type}-${item.id}-${Date.now()}`}
                 onEndReached={loadMore}
                 ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
             />
             <AddressDialog visible={visibleModelAddress} onClose={hideModel} />
 
         </View>
+
 
     );
 }

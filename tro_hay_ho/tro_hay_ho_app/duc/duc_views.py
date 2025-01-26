@@ -234,6 +234,42 @@ class BasicUserInfoViewSet(ModelViewSet):
 
         except Exception as e:
             return Response({'error a': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    @action(detail=True, methods=['get'], url_path=r'post-want-following')
+    def post_want_following(self, request, pk=None):
+        try:
+            following_users = Following.objects.filter(follower_id=pk, active=True).values_list('followed_id', flat=True)
+            
+            post_wants = PostWant.objects.filter(user_id__in=following_users, active=True).order_by('-updated_date')
+            
+            page = self.paginate_queryset(post_wants)
+            if page is not None:
+                serializer = PostWantSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            
+            serializer = PostWantSerializer(post_wants, many=True)
+            return Response(serializer.data, status=HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({'error': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+    @action(detail=True, methods=['get'], url_path=r'post-for-rent-following')
+    def post_for_rent_following(self, request, pk=None):
+        try:
+            following_users = Following.objects.filter(follower_id=pk, active=True).values_list('followed_id', flat=True)
+            
+            post_for_rents = PostForRent.objects.filter(user_id__in=following_users, active=True).order_by('-updated_date')
+            
+            page = self.paginate_queryset(post_for_rents)
+            if page is not None:
+                serializer = PostForRentSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            
+            serializer = PostForRentSerializer(post_for_rents, many=True)
+            return Response(serializer.data, status=HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({'error': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 # class FollowViewSet(ViewSet, CreateAPIView):
 #     serializer_class = FollowSerializer
