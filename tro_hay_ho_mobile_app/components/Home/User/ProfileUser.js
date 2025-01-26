@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, FlatList, RefreshControl, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
 import { FontAwesome, Entypo } from '@expo/vector-icons';
 import { Button } from 'react-native-paper';
-import { data_patch_active_following, role_id_chu_tro, sampleAvatar } from '../../../utils/MyValues';
+import { data_patch_active, role_id_chu_tro, sampleAvatar, sampleImage2 } from '../../../utils/MyValues';
 import { ActivityIndicator } from "react-native-paper";
 import { formatDate } from '../../../utils/TimeFormat';
 import APIs, { endpointsDuc } from '../../../configs/APIs';
@@ -97,7 +97,7 @@ const ProfileUser = ({ navigation, route }) => {
             try {
                 setLoadingFollow(true)
                 let url = `${endpointsDuc['updateMeFollowingYou'](currentUser.id, infoUser.id)}`
-                const res = await APIs.patch(url, data_patch_active_following(!checkMeFollowYour))
+                const res = await APIs.patch(url, data_patch_active(!checkMeFollowYour))
                 if (res.data.active !== null) {
                     setCheckMeFollowYour(res.data.active)
                 } else {
@@ -167,6 +167,10 @@ const ProfileUser = ({ navigation, route }) => {
         return (
             <View >
                 <View style={styles.header}>
+                    <Image 
+                        source={{ uri: sampleImage2 }}
+                        style={styles.backgroundImage}
+                    />
                     <Image
                         source={{ uri: infoUser.avatar ? infoUser.avatar : sampleAvatar }}
                         style={styles.avatar}
@@ -268,6 +272,13 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#e0e0e0',
         height: 150,
+    },
+    backgroundImage: {
+        width: '100%', 
+        height: '100%',
+        position: 'absolute', 
+        top: 0,
+        left: 0,
     },
     avatar: {
         marginStart: 20,

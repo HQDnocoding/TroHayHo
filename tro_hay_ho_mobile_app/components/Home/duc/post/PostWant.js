@@ -12,24 +12,8 @@ const PostWant = ({ item, routeName, params }) => {
     const infoUser=item.user
     return (
 
-        <Card style={styles.card}>
             <View>
-                <View style={styles.header}>
-                    <Avatar.Image
-                        size={40}
-                        source={{ uri: item.user.avatar ? item.user.avatar : sampleAvatar }}
-                    />
-                    <View style={styles.userInfo}>
-                        <TouchableOpacity onPress={()=>nav.navigate('profile_user',{infoUser})}>
-                            <View>
-                                <Text style={styles.userName}
-                                    numberOfLines={1}>{item.user.first_name + " " + item.user.last_name}</Text>
-                            </View>
-                        </TouchableOpacity>
-
-                        <Text style={styles.timestamp} numberOfLines={1}>{formatTimeAgo(item.created_date)}</Text>
-                    </View>
-                </View>
+            
                 <TouchableOpacity activeOpacity={1} onPress={() => nav.navigate(routeName, params)}>
                     <View>
                         {/* Location */}
@@ -58,24 +42,9 @@ const PostWant = ({ item, routeName, params }) => {
                 </TouchableOpacity>
 
 
-                {/* Actions */}
-                <View style={styles.actions}>
-                    <TouchableOpacity style={styles.actionButton}>
-                        <Icon source="comment-outline" size={20} />
-                        <Text style={styles.actionText}>23 Bình luận</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton}>
-                        <Icon source="heart-outline" size={20} />
-                        <Text style={styles.actionText}>Lưu</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton}>
-                        <Icon source="share-variant-outline" size={20} />
-                        <Text style={styles.actionText}>Chia sẻ</Text>
-                    </TouchableOpacity>
-                </View>
+            
             </View>
 
-        </Card>
 
 
     );

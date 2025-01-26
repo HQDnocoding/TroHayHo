@@ -35,8 +35,10 @@ export const endpointsDuc = {
     'getListPostWantByUserId': (userId) => `/user-post-wants/user/${userId}/`,
     'getListPostForRentByUserId': (userId) => `/user-post-for-rents/user/${userId}/`,
     'getBasicUserInfoByUserId': (userId) => `/basic-user-info/${userId}/`,
+    'getMeFavoritePost': (userId) => `/basic-user-info/${userId}/me-favorite-post/`,
     'checkMeFollowYour': (followerId,followedId) => `/basic-user-info/${followerId}/check-me-following-you/${followedId}/`,  
     'updateMeFollowingYou': (followerId,followedId) => `/basic-user-info/${followerId}/update-me-following-you/${followedId}/`,
+    'updateMeFavoritePost': (userId,postId) => `/basic-user-info/${userId}/update-me-favotite-post/${postId}/`,
 }
 
 export const authAPIs = (token) => {

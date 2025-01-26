@@ -106,7 +106,7 @@ class FavoritePost(BaseModel):
         db_table = 'favourite_post'
 
     def __str__(self):
-        return f"{self.user.username} saved {self.post.title} at {self.saved_at}"
+        return f"{self.user.username} saved {self.post.title} "
     
     def get_post_images(self):
         return self.post.images.all()
@@ -152,7 +152,7 @@ class Comment(BaseModel):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='comments', related_query_name='comment')
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='comments', related_query_name='comment')
     replied_comment = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='comments',
-                                        related_query_name='comment', null=True)
+                                        related_query_name='comment', null=True,blank=True)
 
     def __str__(self):
         return self.content

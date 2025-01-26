@@ -195,7 +195,45 @@ class BasicUserInfoViewSet(ModelViewSet):
 
         except Exception as e:
             return Response({'error a': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
-    
+    @action(detail=True,methods=['get'],url_path='me-favorite-post')
+    def me_favorite_post(self,request,pk=None):
+        favoritePost = FavoritePost.objects.filter(active=True,user_id=pk).order_by('-updated_date')
+        page= self.paginate_queryset(favoritePost)
+        serializers=FavouritePostSerializer(favoritePost,many=True)
+        return Response(serializers.data)
+    @action(detail=True, methods=['patch'], url_path=r'update-me-favotite-post/(?P<post_id>\d+)')
+    def update_me_favotite_post(self, request, pk, post_id=None):
+        try:
+          
+            active_status = request.data.get('active')
+            if active_status is None:
+                return Response({'error': 'Active status is required.'}, status=HTTP_400_BAD_REQUEST)
+
+            favorite_post = FavoritePost.objects.filter(user_id=pk, post_id=post_id).first()
+
+            if not favorite_post:
+                new_favorite_post=FavoritePost.objects.create(user_id=pk, post_id=post_id)
+                new_favorite_post.active=active_status
+                new_favorite_post.save()
+                return Response({
+                'message': 'Favorite post updated successfully.',
+                'user': pk,
+                'post': post_id,
+                'active': new_favorite_post.active
+            }, status=HTTP_200_OK)
+
+            favorite_post.active = active_status
+            favorite_post.save()
+
+            return Response({
+                'message': 'Favorite post updated successfully.',
+                'user': pk,
+                'post': post_id,
+                'active': favorite_post.active
+            }, status=HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error a': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
 # class FollowViewSet(ViewSet, CreateAPIView):
 #     serializer_class = FollowSerializer
