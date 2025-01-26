@@ -1,10 +1,10 @@
 from zoneinfo import available_timezones
-
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView ,DestroyAPIView
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from ..models import *
 from ..serializers import *
-
+from rest_framework.exceptions import ValidationError
 
 class ConsersationSerializer(ModelSerializer):
     user1 = UserSerializer()
@@ -66,3 +66,20 @@ class DetailNotificationSerializer(ModelSerializer):
         model=DetailNotification
         fields='__all__'
 
+class BasicFollowSerializer(ModelSerializer):
+    follower=BasicUserInfoSerializer()
+    followed=BasicUserInfoSerializer()
+    class Meta:
+        model=Following
+        fields='__all__'
+    def validate(self, attrs):
+        follower = attrs.get('follower')
+        followed = attrs.get('followed')
+
+        if follower == followed:
+            raise ValidationError("A user cannot follow themselves.")
+
+        if Following.objects.filter(follower=follower, followed=followed).exists():
+            raise ValidationError("This follow relationship already exists.")
+
+        return attrs

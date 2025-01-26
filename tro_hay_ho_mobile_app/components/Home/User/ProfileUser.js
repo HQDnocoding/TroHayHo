@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, FlatList, RefreshControl, TouchableNativeFeedback,TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, FlatList, RefreshControl, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
 import { FontAwesome, Entypo } from '@expo/vector-icons';
 import { Button } from 'react-native-paper';
-import { role_id_chu_tro, sampleAvatar } from '../../../utils/MyValues';
+import { data_patch_active_following, role_id_chu_tro, sampleAvatar } from '../../../utils/MyValues';
 import { ActivityIndicator } from "react-native-paper";
 import { formatDate } from '../../../utils/TimeFormat';
 import APIs, { endpointsDuc } from '../../../configs/APIs';
@@ -19,7 +19,8 @@ const ProfileUser = ({ navigation, route }) => {
     const [post, setPost] = React.useState([])
     const [loading, setLoading] = React.useState(false);
     const [page, setPage] = React.useState(1);
-
+    const [checkMeFollowYour, setCheckMeFollowYour] = React.useState(false)
+    const [loadingFollow, setLoadingFollow] = React.useState(false)
 
     const loadPost = async () => {
         if (page > 0) {
@@ -80,6 +81,41 @@ const ProfileUser = ({ navigation, route }) => {
             }
         }
     }
+    const loadCheckMeFollowYour = async () => {
+        if (currentUser !== null)
+            try {
+                let url = `${endpointsDuc['checkMeFollowYour'](currentUser.id, infoUser.id)}`
+                const res = await APIs.get(url)
+                setCheckMeFollowYour(res.data.following)
+
+            } catch (error) {
+                console.error("Error loadCheckMeFollowYour:", error);
+            }
+    }
+    const handleClickFollowBtn = async () => {
+        if (currentUser !== null) {
+            try {
+                setLoadingFollow(true)
+                let url = `${endpointsDuc['updateMeFollowingYou'](currentUser.id, infoUser.id)}`
+                const res = await APIs.patch(url, data_patch_active_following(!checkMeFollowYour))
+                if (res.data.active !== null) {
+                    setCheckMeFollowYour(res.data.active)
+                } else {
+                    console.error("profile user loi server ", res.data)
+                }
+            } catch (error) {
+                console.error("profile user loi server ", res.data)
+
+            } finally {
+                setLoadingFollow(false)
+
+            }
+
+
+        }else{
+            alert("Vui lòng đăng nhập")
+        }
+    }
     const loadMore = () => {
         if (page > 0) {
             setPage(page + 1)
@@ -93,14 +129,14 @@ const ProfileUser = ({ navigation, route }) => {
     const handleConversation = async () => {
 
         if (currentUser !== null) {
-        console.log("profile user",infoUser.id)
+            console.log("profile user", infoUser.id)
 
             const conversation = await checkExistConversation(currentUser.id, infoUser.id)
             // neu da ton tai cuoc tro chuyen thi di chuyen den man hinh tro chuyen
             if (conversation !== null) {
-                console.log("profile usera",conversation)
-                const item=conversation
-                const partner=infoUser
+
+                const item = conversation
+                const partner = infoUser
                 navigation.navigate("message", { item, currentUser, partner })
             } else {
                 //tao moi cuoc tro chuyen va dan den 
@@ -109,7 +145,7 @@ const ProfileUser = ({ navigation, route }) => {
 
         } else {
             //hien thong bao dang nhap
-            alert("Vui lòng đăng nhập để thực hiện hành động này")
+            alert("Vui lòng đăng nhập")
         }
     }
     const renderItemPost = ({ item }) => {
@@ -121,9 +157,12 @@ const ProfileUser = ({ navigation, route }) => {
 
     }
     React.useEffect(() => {
+        loadCheckMeFollowYour()
+    }, [infoUser])
+    React.useEffect(() => {
 
         loadPost()
-    }, [page])
+    }, [page, infoUser])
     const headerFlatlist = () => {
         return (
             <View >
@@ -148,31 +187,59 @@ const ProfileUser = ({ navigation, route }) => {
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                   
-                    <TouchableOpacity style={[styles.buttonFM]} >
-                    <View style={[styles.buttonPositive]} labelStyle={styles.textPositive}>
-                        <FontAwesome name={'bell'} color="#000000" size={20} />
-                        <Text>
-                            Theo dõi
-                        </Text>
-                    </View>
+                    {currentUser !== null && currentUser.id === infoUser.id ? <>
+
+                    </> : <>
+                        <TouchableOpacity style={[styles.buttonFM]} onPress={handleClickFollowBtn}>
+
+                            {checkMeFollowYour ? <>
+                                <View style={[styles.buttonNegative]} labelStyle={styles.textPositive}>
+
+                                    {loadingFollow ? <>
+                                        <ActivityIndicator color="#FFBA00" size="small" />
+                                    </> : <>
+                                        <FontAwesome name={'bell'} color="#FFBA00" size={20} />
+                                        <Text style={styles.iconNegative}>
+                                            Đang theo dõi
+                                        </Text>
+                                    </>}
+
+                                </View>
+                            </> : <>
+                                <View style={[styles.buttonPositive]} labelStyle={styles.textPositive}>
+                                    {loadingFollow ? <>
+                                        <ActivityIndicator color="#000000" size="small" />
+                                    </> : <>
+                                        <FontAwesome name={'bell'} color="#000000" size={20} />
+                                        <Text >
+                                            Theo dõi
+                                        </Text>
+                                    </>}
+
+                                </View>
+                            </>}
+
+
                         </TouchableOpacity>
-   
-    <TouchableOpacity style={[styles.buttonFM]} onPress={handleConversation}>
-                        <View style={[styles.buttonPositive]} labelStyle={styles.textPositive}>
-                            <FontAwesome name={'send'} color="#000000" size={15} />
-                            <Text>
-                                Nhắn tin
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
-                   
+
+                        <TouchableOpacity style={[styles.buttonFM]} onPress={handleConversation}>
+                            <View style={[styles.buttonPositive]} labelStyle={styles.textPositive}>
+
+                                <FontAwesome name={'send'} color="#000000" size={15} />
+                                <Text>
+                                    Nhắn tin
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    </>}
+
+
                     <View style={styles.buttonThem}>
                         <Entypo name={'menu'} color="#000000" size={20} />
 
                     </View>
                 </View>
-            </View>
+            </View >
         )
 
     }
@@ -193,7 +260,7 @@ const ProfileUser = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: ' #f5f5f5',
+        backgroundColor: '#f5f5f5',
     },
     header: {
         alignItems: 'flex-start',
@@ -233,11 +300,11 @@ const styles = StyleSheet.create({
         color: '#808080',
         marginLeft: 8,
     },
-    shapeButton:{
+    shapeButton: {
         borderRadius: 8,
     },
-    buttonFM:{
-        
+    buttonFM: {
+
         flex: 5,
         borderRadius: 8,
         margin: 4,
@@ -248,7 +315,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         alignItems: 'center',
         backgroundColor: '#FFBA00',
-        flex:1,
+        flex: 1,
         borderRadius: 8,
 
     },
@@ -256,18 +323,31 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         margin: 4,
-        width: 40,
+        flex: 1,
         backgroundColor: '#FFBA00',
         borderRadius: 8,
+        height: 40,
     },
     buttonNegative: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#bdbdbd'
+        borderColor: '#FFBA00',
+        borderRadius: 8,
+        flex: 1,
+
     },
     textPositive: {
         fontSize: 14,
         color: '#000000',
     },
+    iconPositive: {
+        color: "#000000"
+    },
+    iconNegative: {
+        color: "#FFBA00"
+    }
 });
 
 export default ProfileUser;

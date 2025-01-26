@@ -6,6 +6,16 @@ export const NGUOI_THUE_TRO = 'nguoi_thue_tro'
 export const CHU_TRO = 'chu_tro'
 export const role_id_chu_tro = 2
 export const role_id_nguoi_thue = 3
+export const data_post_followed=(followedId)=>{
+    return({
+        "followed":followedId
+    })
+}
+export const data_patch_active_following=(active)=>{
+    return({
+        "active":active
+    })
+}
 export const tempUser = {
     "id": 2,
     "username": "duc",
