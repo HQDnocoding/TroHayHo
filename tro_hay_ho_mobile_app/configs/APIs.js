@@ -3,11 +3,11 @@ import axios from "axios";
 
 
 // ip cua Duc:http://192.168.129.238:8000/
-// const BASE_URL="http://192.168.1.253:8000/"
+const BASE_URL="http://192.168.1.253:8000/"
 // const BASE_URL="http://192.168.1.55:8000/"
 // const BASE_URL="http://192.168.1.12:8000/"
 //const BASE_URL="http://192.168.103.238:8000/"
-const BASE_URL = "http://192.168.1.11:8000/"
+// const BASE_URL = "http://192.168.1.10:8000/"
 // const BASE_URL = "http://192.168.1.196:8000/"
 
 
@@ -37,8 +37,10 @@ export const endpointsDuc = {
     'getListPostWantByUserId': (userId) => `/user-post-wants/user/${userId}/`,
     'getListPostForRentByUserId': (userId) => `/user-post-for-rents/user/${userId}/`,
     'getBasicUserInfoByUserId': (userId) => `/basic-user-info/${userId}/`,
-    'checkMeFollowYour': (followerId, followedId) => `/basic-user-info/${followerId}/check-me-following-you/${followedId}/`,
-    'updateMeFollowingYou': (followerId, followedId) => `/basic-user-info/${followerId}/update-me-following-you/${followedId}/`,
+    'getMeFavoritePost': (userId) => `/basic-user-info/${userId}/me-favorite-post/`,
+    'checkMeFollowYour': (followerId,followedId) => `/basic-user-info/${followerId}/check-me-following-you/${followedId}/`,
+    'updateMeFollowingYou': (followerId,followedId) => `/basic-user-info/${followerId}/update-me-following-you/${followedId}/`,
+    'updateMeFavoritePost': (userId,postId) => `/basic-user-info/${userId}/update-me-favotite-post/${postId}/`,
 }
 
 export const authAPIs = (token) => {

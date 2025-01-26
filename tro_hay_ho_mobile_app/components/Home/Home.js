@@ -1,25 +1,36 @@
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
-import { Card, Title, Paragraph } from 'react-native-paper';
+import { Card, Title, Paragraph, Provider, Portal } from 'react-native-paper';
 import PostForRent from "./duc/post/PostForRent";
 import PostWant from "./duc/post/PostWant";
 import WantPlace from "./duc/explore/WantPlace";
 import Banner from "./duc/explore/Banner";
-import React from "react";
+import React, { useContext } from "react";
 import AddressDialog from "./duc/explore/AddressDialog";
 import APIs, { endpoints } from "../../configs/APIs";
 import { shuffleArray } from '../../utils/Formatter';
+import { MyUserContext } from '../../configs/UserContexts';
+import { getInfoPostFavoriteOfUser } from '../../utils/MyFunctions';
+import PostCard from './duc/post/PostCard';
 
 
 const Home = () => {
+    let currentUser
     const [visibleModelAddress, setVisibleModelAddress] = React.useState(false)
+  
     const [postWant, setPostWant] = React.useState([])
     const [postForRent, setPostForRent] = React.useState([])
     const [loading, setLoading] = React.useState(false);
     const [pageWant, setPageWant] = React.useState(1);
     const [pageForRent, setPageForRent] = React.useState(1);
     const [allPosts, setAllPosts] = React.useState([]);
+    const [postFav, setPostFav] = React.useState([]);
 
+    
+    const loadCurrentUser = () => {
+        currentUser = useContext(MyUserContext)
 
+    }
+    loadCurrentUser()
     const loadPostWant = async () => {
 
         if (pageWant > 0) {
@@ -28,14 +39,6 @@ const Home = () => {
                 let url = `${endpoints['getListPostWant']}?page=${pageWant}`
                 let res = await APIs.get(url)
 
-                // if(pageWant > 1){
-                //     setPostWant(prevPosts => [...prevPosts, ...res.data.results])
-
-
-                // } else {
-                //     setPostWant(res.data.results)
-
-                // }
                 const newPosts = res.data.results.map(post => ({ ...post, type: 'PostWant' }));
                 setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
 
@@ -66,14 +69,6 @@ const Home = () => {
             try {
                 let url = `${endpoints['getListPostForRent']}?page=${pageForRent}`
                 let res = await APIs.get(url)
-
-                // if(pageForRent === 1){
-                //     setPostForRent(res.data.results)
-
-                // } else {
-                //     setPostForRent(prevPosts => [...prevPosts, ...res.data.results])
-
-                // }
                 const newPosts = res.data.results.map(post => ({ ...post, type: 'PostForRent' }));
                 setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
 
@@ -92,6 +87,17 @@ const Home = () => {
 
             }
         }
+    }
+    const loadInfoFavoriteOfCurrentUser = async () => {
+        if (currentUser !== null) {
+            try {
+                let data = await getInfoPostFavoriteOfUser(currentUser.id)
+                setPostFav(data)
+            } catch (error) {
+                console.error("Error loading info favorite of current user:", error);
+            }
+        }
+
     }
     const showModel = () => {
         setVisibleModelAddress(true)
@@ -116,20 +122,30 @@ const Home = () => {
 
     }
     React.useEffect(() => {
-
+        if (currentUser !== null) {
+            loadInfoFavoriteOfCurrentUser()
+        }
         loadPostForRent()
     }, [pageForRent])
 
     React.useEffect(() => {
+        if (currentUser !== null) {
+            loadInfoFavoriteOfCurrentUser()
+        }
         loadPostWant()
     }, [pageWant])
 
+
     const renderItemPost = ({ item }) => {
-        if (item.type === 'PostForRent') {
-            return <PostForRent key={item.id} item={item} routeName={'post_for_rent'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
-        } else if (item.type === 'PostWant') {
-            return <PostWant key={item.id} item={item} routeName={'post_want'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
-        }
+        // if (item.type === 'PostForRent') {
+        //     return <PostForRent key={item.id} item={item} routeName={'post_for_rent'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
+        // } else if (item.type === 'PostWant') {
+        //     return <PostWant  routeName={'post_want'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
+        // }return null;
+        return (
+            <PostCard key={item.id} item={item} dataPostFav={postFav} currentUser={currentUser} />
+
+        )
 
     }
     const flatListHeader = () => {
@@ -150,6 +166,7 @@ const Home = () => {
 
 
     return (
+
         <View style={styles.container}>
 
             <FlatList
@@ -157,13 +174,14 @@ const Home = () => {
                 data={allPosts}
                 renderItem={renderItemPost}
                 ListHeaderComponent={flatListHeader}
-                keyExtractor={item => item.id.toString()}
+                keyExtractor={item => `${item.type}-${item.id}-${Date.now()}`}
                 onEndReached={loadMore}
                 ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
             />
             <AddressDialog visible={visibleModelAddress} onClose={hideModel} />
 
         </View>
+
 
     );
 }

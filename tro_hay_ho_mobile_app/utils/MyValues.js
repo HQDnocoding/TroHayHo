@@ -2,6 +2,7 @@
 
 export const sampleAvatar = "https://drive.usercontent.google.com/download?id=1fPVkJqspSh0IQsQ_8teVapd5qf_q1ppV&authuser=0"
 export const sampleImage = "https://res.cloudinary.com/df5wj9kts/image/upload/v1732878598/cld-sample-4.jpg"
+export const sampleImage2 = "https://res.cloudinary.com/df5wj9kts/image/upload/v1732878597/samples/coffee.jpg"
 export const NGUOI_THUE_TRO = 'nguoi_thue_tro'
 export const CHU_TRO = 'chu_tro'
 export const role_id_chu_tro = 2
@@ -11,11 +12,12 @@ export const data_post_followed=(followedId)=>{
         "followed":followedId
     })
 }
-export const data_patch_active_following=(active)=>{
+export const data_patch_active=(active)=>{
     return({
         "active":active
     })
 }
+export const myYellow="#FFBA00"
 export const tempUser = {
     "id": 2,
     "username": "duc",
