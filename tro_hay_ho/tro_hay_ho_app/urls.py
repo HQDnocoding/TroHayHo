@@ -23,6 +23,9 @@ r.register('conversation-messages',duc_views.ConversationMessageViewSet,basename
 r.register('user-post-wants',duc_views.UserPostWantViewSet,basename='user-post-wants')
 r.register('user-post-for-rents',duc_views.UserPostForRentViewSet,basename='user-post-for-rents')
 r.register('basic-user-info',duc_views.BasicUserInfoViewSet,basename='basic-user-info')
+r.register('post-parent',duc_views.PostParentViewSet,basename='post-parent')
+r.register('detail-notification',duc_views.DetailNotificationViewSet,basename='detail-notification')
+
 # =============================================
 r.register('notifications',NotificationViewSet,basename='notifications')
 

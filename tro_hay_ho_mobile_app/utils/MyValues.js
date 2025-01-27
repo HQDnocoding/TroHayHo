@@ -17,6 +17,11 @@ export const data_patch_active=(active)=>{
         "active":active
     })
 }
+export const data_patch_is_read=(isRead)=>{
+    return({
+        "is_read":isRead
+    })
+}
 export const myYellow="#FFBA00"
 export const tempUser = {
     "id": 2,

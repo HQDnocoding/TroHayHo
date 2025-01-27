@@ -185,7 +185,9 @@ const FollowingHome = () => {
         <AddressDialog visible={visibleModelAddress} onClose={hideModel} />
 
       </> : <>
-        <RequestLoginDialog visible={true} onClose={() => null} />
+        <View style={{flexDirection:'column',justifyContent:'center',flex:1,alignItems:'center'}}>
+          <Text style={styles.text}>Bạn cần đăng nhập</Text>
+        </View>
       </>}
 
 

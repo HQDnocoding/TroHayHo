@@ -15,10 +15,11 @@ const PostManagementShowing = () => {
     const [page, setPage] = React.useState(1);
 
     const loadPost = async () => {
+        if (currentUser !== null)
         if (page > 0) {
 
             setLoading(true)
-            if (currentUser !== null)
+            
                 try {
                     let url;
                     let res;
@@ -46,14 +47,7 @@ const PostManagementShowing = () => {
                             }
                         })
                     }
-                    // let res = await APIs.get(url)
-                    // const postResults=res.data.results
-                    // const updatePostResults= postResults.map((item)=>{
-                    //     return{
-                    //         isPostWant:true,
-                    //         ...item
-                    //     }
-                    // })
+                  
                     if (page > 1) {
                         setPost(prev => [...prev, ...updatePostResults])
                     } else {

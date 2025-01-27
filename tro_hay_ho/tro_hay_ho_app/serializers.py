@@ -79,18 +79,22 @@ class PostForRentSerializer(ModelSerializer):
     user = UserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
     post_image=PostImageSerializer(many=True, source='images', read_only=True)
-    
+    type = serializers.SerializerMethodField()
     class Meta:
         model = PostForRent
         fields='__all__'
+    def get_type(self, obj):
+        return 'PostForRent'
 
 class PostWantSerializer(ModelSerializer):
     user=UserSerializer(read_only=True)
     address=AddressSerializer(read_only=True)
-    
+    type = serializers.SerializerMethodField()
     class Meta:
         model = PostWant
         fields='__all__'
+    def get_type(self, obj):
+        return 'PostWant'
         
 class PostSerializer(ModelSerializer):
     user=UserSerializer(read_only=True)
