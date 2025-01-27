@@ -27,11 +27,12 @@ const Login = () => {
     const login = async () => {
         setLoading(true);
         try {
-            const res = await APIs.post(endpoints["login"], {
-                client_id: "0R6hMr4Zhgl9LeXoWrxDNSTkLgpZymmtLJeINUFN",
-                client_secret: "AG1n41T3umckBclAVuc97nNwW0YJTqxpDUanvjS2yju0kxLpwSp88FtuOZesCxm2jmPhwREN2wpHHq8xdztMEsBDUYGWaMnDPDS6vLG7o851KmYvrESeBeI8sGvYzsgwz",
-                grant_type: "password",
-                ...user,
+            const res = await APIs.post(endpoints["login"],{
+                "grant_type":"password",
+                "client_id":"0R6hMr4Zhgl9LeXoWrxDNSTkLgpZymmtLJeINUFN",
+                "client_secret":"AG1n41T3umckBclAVuc97nNwW0YJTqxpDUanvjS2yju0kxLpwSp88FtuOZesCxm2jmPhwREN2wpHHq8xdztMEsBDUYGWaMnDPDS6vLG7o851KmYvrESeBeI8sGvYzsgw",
+                "username":user.username,
+                "password":user.password
             });
 
             await AsyncStorage.setItem("access_token", res.data.access_token);
@@ -113,15 +114,15 @@ const Login = () => {
 
     const signOut = async () => {
         try {
-          await GoogleSignin.signOut();
+            await GoogleSignin.signOut();
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
-      };
+    };
 
-    useEffect( () => {
+    useEffect(() => {
         signOut();
-    },[])
+    }, [])
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
