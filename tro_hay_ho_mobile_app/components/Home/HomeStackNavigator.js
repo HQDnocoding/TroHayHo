@@ -13,27 +13,26 @@ import MessageScreen from "./message/MessageScreen";
 import RequestLoginDialog from "./duc/RequestLoginDialog";
 import { MyUserContext } from "../../configs/UserContexts";
 import { useNavigation } from "@react-navigation/native";
+import { useRequestLoginDialog } from "../../utils/RequestLoginDialogContext";
 
 const HomeStackNavigator = () => {
-    const [visible, setVisible] = useState(false);
+
+    const {showDialog} = useRequestLoginDialog()
+
     const nav= useNavigation()
     const currentUser = useContext(MyUserContext)
 
-    const showModal = () => setVisible(true);
-    const hideModal = () => setVisible(false);
  
     const handleToRoute=(routeName)=>{
         if (currentUser!==null){
             nav.navigate(routeName)
         }else{
-            showModal()
+            showDialog()
         }
     }
     return (
         <Provider>
-            <Portal>
-                <RequestLoginDialog onClose={hideModal} visible={visible} />
-            </Portal>
+           
 
             <Stack.Navigator
                 screenOptions={({ navigation, route }) => ({

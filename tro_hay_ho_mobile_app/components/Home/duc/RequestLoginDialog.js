@@ -2,29 +2,32 @@ import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Modal, Text, Button } from "react-native-paper";
+import { useRequestLoginDialog } from "../../../utils/RequestLoginDialogContext";
 
 const RequestLoginDialog = ({ visible, onClose }) => {
     const nav = useNavigation()
+    const {isVisible,showDialog,hideDialog} = useRequestLoginDialog()
 
-    const handleSave = () => {
+    const handleNav = () => {
 
-        onClose();
+        nav.navigate('login')
+        hideDialog()
     };
 
     return (
         <Modal
-            visible={visible}
-            onDismiss={onClose}
+            visible={isVisible}
+            onDismiss={hideDialog}
             contentContainerStyle={styles.modalContainer}
             theme={{ colors: { backdrop: "rgba(0, 0, 0, 0.5)" } }}
         >
             <View style={styles.container}>
                 <Text style={styles.title}>Hãy Đăng nhập</Text>
                 <View style={styles.buttonContainer}>
-                    <Button mode="contained" onPress={()=>nav.navigate('login')} style={styles.loginButton} labelStyle={styles.font}>
+                    <Button mode="contained" onPress={handleNav} style={styles.loginButton} labelStyle={styles.font}>
                         Đăng nhập
                     </Button>
-                    <Button mode="contained" onPress={handleSave} style={styles.backButton} labelStyle={[styles.font,{color:'#FFBA00'}]}>
+                    <Button mode="contained" onPress={hideDialog} style={styles.backButton} labelStyle={[styles.font,{color:'#FFBA00'}]}>
                         Trở về
                     </Button>
                 </View>

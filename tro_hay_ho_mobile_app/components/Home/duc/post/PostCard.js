@@ -10,9 +10,12 @@ import PostWant from './PostWant';
 import PostForRent from './PostForRent';
 import React from 'react';
 import APIs, { endpointsDuc } from '../../../../configs/APIs';
+import { useRequestLoginDialog } from '../../../../utils/RequestLoginDialogContext';
 
 const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
     const nav = useNavigation()
+    const { showDialog } = useRequestLoginDialog()
+
     const [isSave, setIsSave] = React.useState(false)
     const infoUser = item.user
     const checkPostIsFavoriteUser = (postId) => {
@@ -37,7 +40,7 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
 
             }
         } else {
-            alert("Vui lòng đăng nhập")
+            showDialog()
 
         }
     }

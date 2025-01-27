@@ -1,6 +1,6 @@
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { useReducer, useState } from 'react';
+import React,{ useReducer, useState } from 'react';
 import { MyDispatchContext, MyUserContext } from './configs/UserContexts';
 import MyUserReducer from './configs/UserReducers';
 import BottomTabsNavigator from './components/Home/BottomTabsNavigator';
@@ -25,6 +25,9 @@ import {
 import ProfileUser from "./components/Home/User/ProfileUser";
 import PostForRentCreating from './components/PostCreating/PostForRentCreating';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { RequestLoginDialogContext, RequestLoginDialogProvider } from './utils/RequestLoginDialogContext';
+import RequestLoginDialog from './components/Home/duc/RequestLoginDialog';
 
 
 export default function App() {
@@ -121,17 +124,22 @@ export default function App() {
     }
 
     return (
-        <GestureHandlerRootView >
-            <NavigationContainer>
-                <MyUserContext.Provider value={user}>
-                    <MyDispatchContext.Provider value={dispatch}>
-                        <MyAppNavigator/>
-                        {/* <PostForRentCreating /> */}
-                    </MyDispatchContext.Provider>
-                </MyUserContext.Provider>
-            </NavigationContainer>
-        </GestureHandlerRootView>
-
+        <SafeAreaProvider>
+            <GestureHandlerRootView >
+                <NavigationContainer>
+                    <RequestLoginDialogProvider>
+                    <MyUserContext.Provider value={user}>
+                        <MyDispatchContext.Provider value={dispatch}>
+                           
+                            <MyAppNavigator />
+                            <RequestLoginDialog/>
+                            {/* <PostForRentCreating /> */}
+                        </MyDispatchContext.Provider>
+                    </MyUserContext.Provider>
+                    </RequestLoginDialogProvider >
+                </NavigationContainer>
+            </GestureHandlerRootView>
+        </SafeAreaProvider>
 
 
     );

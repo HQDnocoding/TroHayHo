@@ -11,9 +11,13 @@ import PostWant from '../duc/post/PostWant';
 import { checkExistConversation, getUserConversations } from '../../../utils/ChatFunction';
 import { MyUserContext } from '../../../configs/UserContexts';
 import { useNavigation } from '@react-navigation/native';
+import { RequestLoginDialogContext, useRequestLoginDialog } from '../../../utils/RequestLoginDialogContext';
+import PostCard from '../duc/post/PostCard';
 
 const ProfileUser = ({ navigation, route }) => {
     const currentUser = useContext(MyUserContext)
+    const {showDialog} = useRequestLoginDialog()
+const { requestLoginDialog } = useRequestLoginDialog();
     const params = route.params || {}
     const { infoUser } = params
     const [post, setPost] = React.useState([])
@@ -21,6 +25,7 @@ const ProfileUser = ({ navigation, route }) => {
     const [page, setPage] = React.useState(1);
     const [checkMeFollowYour, setCheckMeFollowYour] = React.useState(false)
     const [loadingFollow, setLoadingFollow] = React.useState(false)
+    const [postFav, setPostFav] = React.useState([]);
 
     const loadPost = async () => {
         if (page > 0) {
@@ -40,7 +45,7 @@ const ProfileUser = ({ navigation, route }) => {
                         const postResults = res.data.results
                         updatePostResults = postResults.map((item) => {
                             return {
-                                isPostWant: false,
+                                type: 'PostForRent',
                                 ...item
                             }
                         })
@@ -53,7 +58,7 @@ const ProfileUser = ({ navigation, route }) => {
                         const postResults = res.data.results
                         updatePostResults = postResults.map((item) => {
                             return {
-                                isPostWant: true,
+                                type: 'PostWant',
                                 ...item
                             }
                         })
@@ -113,8 +118,20 @@ const ProfileUser = ({ navigation, route }) => {
 
 
         }else{
-            alert("Vui lòng đăng nhập")
+            showDialog()
+            // alert("Vui lòng đăng nhập")
         }
+    }
+    const loadInfoFavoriteOfCurrentUser = async () => {
+        if (currentUser !== null) {
+            try {
+                let data = await getInfoPostFavoriteOfUser(currentUser.id)
+                setPostFav(data)
+            } catch (error) {
+                console.error("Error loading info favorite of current user:", error);
+            }
+        }
+
     }
     const loadMore = () => {
         if (page > 0) {
@@ -145,22 +162,22 @@ const ProfileUser = ({ navigation, route }) => {
 
         } else {
             //hien thong bao dang nhap
-            alert("Vui lòng đăng nhập")
+            showDialog()
         }
     }
     const renderItemPost = ({ item }) => {
-        if (item.isPostWant === false) {
-            return <PostForRent key={item.id} item={item} routeName={'post_for_rent'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
-        } else if (item.isPostWant === true) {
-            return <PostWant key={item.id} item={item} routeName={'post_want'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
-        }
+     
+            return <PostCard kkey={item.id} item={item} dataPostFav={postFav} currentUser={currentUser}/>;
+      
 
     }
     React.useEffect(() => {
         loadCheckMeFollowYour()
     }, [infoUser])
     React.useEffect(() => {
-
+        if (currentUser !== null) {
+            loadInfoFavoriteOfCurrentUser()
+        }
         loadPost()
     }, [page, infoUser])
     const headerFlatlist = () => {
