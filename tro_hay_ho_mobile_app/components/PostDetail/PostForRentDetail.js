@@ -5,7 +5,7 @@ import APIs, { endpoints } from "../../configs/APIs";
 import { ActivityIndicator, Avatar, Button, Card, Divider, Icon, IconButton } from "react-native-paper";
 import moment from "moment";
 import 'moment/locale/vi';
-import MapView, { Circle, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Circle, Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from 'react-native-maps';
 import CommentScreen from "./CommentPostWant";
 
 moment.locale('vi');
@@ -99,23 +99,25 @@ const PostForRentDetail = ({ route }) => {
                                         borderRadius: 10
                                     }}>
                                         <MapView
-                                        provider={PROVIDER_GOOGLE}
+                                        provider={PROVIDER_DEFAULT}
                                             style={{
                                                 height: 300,
                                                 borderRadius: 10
                                             }}
+                                            onPress={e => { console.log(e.nativeEvent.coordinate) }}
                                             initialRegion={{
                                                 ...centerCoordinates,
                                                 latitudeDelta: 0.0001,
                                                 longitudeDelta: 0.01,
                                             }}
                                         >
-                                            <Marker coordinate={centerCoordinates} title="Địa điểm" />
+                                            <Marker draggable coordinate={centerCoordinates} title="Địa điểm" />
                                             <Circle
                                                 center={centerCoordinates}
-                                                radius={500}
+                                                radius={600}
                                                 strokeColor="rgba(0, 0, 255, 0.5)"
                                                 fillColor="rgba(0, 0, 255, 0.2)"
+                                                
                                             />
                                         </MapView>
                                     </View>

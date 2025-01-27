@@ -1,17 +1,21 @@
-import { StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import { ActivityIndicator, Divider, RadioButton, TextInput } from "react-native-paper";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, Button, Divider, RadioButton, TextInput } from "react-native-paper";
 import Modal from "react-native-modal";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList, BottomSheetView } from "@gorhom/bottom-sheet";
 import APIs, { endpoints } from "../../configs/APIs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { set } from "firebase/database";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Circle, Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from "react-native-maps";
+import Map from "./Map";
+import { useNavigation } from "@react-navigation/native";
+import PickedImages from "./PickedImages";
 
 
 
 const PostForRentCreating = () => {
+    const navigation = useNavigation();
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [location, setLocation] = useState({ province: '', district: '', ward: '' });
@@ -19,12 +23,14 @@ const PostForRentCreating = () => {
     const sheetRef = useRef(null);
     const sheetRef2 = useRef(null);
     const sheetRef3 = useRef(null);
+    const sheetRefMap = useRef(null);
     const snapPoints = useMemo(() => ["1%", "50%", "50%"], []);
     const snapPoints2 = useMemo(() => ["1%", "50%", "50%"], []);
     const snapPoints3 = useMemo(() => ["1%", "50%", "50%"], []);
+    const snapPointsMap = useMemo(() => ["1%", "80%", "80%"], []);
     const [markerPosition, setMarkerPosition] = useState([{
-        latitude: 37.39094933041195,
-        longitude: -122.02503913145092,
+        latitude: 10.123456,
+        longitude: 106.654321,
     }]);
 
     const [infoText, setInfoText] = useState("");
@@ -84,6 +90,10 @@ const PostForRentCreating = () => {
         loadProvinces();
     }, []);
 
+    const handleMapSnapPress = useCallback((index) => {
+        sheetRefMap.current?.snapToIndex(index);
+    }, []);
+
 
     const handleSnapPress = useCallback((index) => {
 
@@ -122,7 +132,6 @@ const PostForRentCreating = () => {
 
     const renderProvinces = useCallback(({ item }) => (
         <TouchableOpacity onPress={() => {
-            console.log(item.code);
             setLocation({ province: item.name });
             handlePressProvince({ id: item.code });
         }}>
@@ -182,8 +191,18 @@ const PostForRentCreating = () => {
             setValid(false);
         } else setValid(true);
     }, [location.district, location.province, location.ward]);
+
+    const [coordinate, setCoordinate] = useState({
+        latitude: 10.123456,
+        longitude: 105.654321,
+    });
+
+    const handleMapPress = ({ nativeEvent }) => {
+        const { latitude, longitude } = nativeEvent.coordinate;
+        setCoordinate({ latitude, longitude });
+    };
     return (
-        <View style={styles.container}>
+        <View style={{ flex: 1 }}>
             <View >
                 <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
                     <Text style={styles.label}>Tiêu đề, mô tả bài đăng</Text>
@@ -236,8 +255,23 @@ const PostForRentCreating = () => {
 
                     </View>
                 </TouchableWithoutFeedback>
+                <TouchableWithoutFeedback onPress={() => { navigation.navigate('map', { latitude: 10.123456, longitude: 106.654321 }) }}>
+                    <View style={styles.flexRow}>
 
+                        <TextInput style={styles.input} mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
+                            onPress={() => { }}
+                            onFocus={() => { }}
+                            editable={false}
+                            value=''
+                            label={"Tọa độ"}
+                            right={<TextInput.Icon icon={'arrow-right-drop-circle-outline'} />}
+                            activeOutlineColor="#FFBA00" ></TextInput>
+
+                    </View>
+                </TouchableWithoutFeedback>
             </View>
+            <PickedImages />
+
             <BottomSheet
                 ref={sheetRef}
                 snapPoints={snapPoints}
@@ -283,35 +317,7 @@ const PostForRentCreating = () => {
                     contentContainerStyle={{ backgroundColor: 'white' }}
                 />
             </BottomSheet>
-            <MapView
-                provider={PROVIDER_GOOGLE}
-                style={{
-                    margin: 10, height: 300,
-                }}
-                initialRegion={{
-                    latitude: 37.39094933041195,
-                    longitude: -122.02503913145092,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                }}
-            >
-                {markerPosition.map((marker, index) => (
-                    <Marker
-                        key={index}
-                        coordinate={{ longitude: marker.longitude, latitude: marker.latitude}}
-                        draggable
-                        onDragEnd={onMarkerDragEnd}
-                        title="Draggable Marker"
-                        description={infoText}
-                    />
-                ))}
-
-            </MapView>
-            {infoText !== "" && (
-                <View style={styles.infoBox}>
-                    <Text style={styles.infoText}>{infoText}</Text>
-                </View>
-            )}
+            <Button style={{marginHorizontal:'auto',marginBottom:10, backgroundColor: "#ff7b00", width: 200, paddingVertical: 10, borderRadius: 10 }}><Text style={{ color: "white", fontSize: 20 }}>Đăng tin</Text></Button>
         </View>
     )
 }
@@ -343,9 +349,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignContent: 'center',
         alignItems: 'center',
-        paddingBottom: 10,
-        paddingHorizontal: 4,
-        paddingTop: 7,
+        paddingVertical: 3
     },
     label: {
         fontWeight: 600,
@@ -359,7 +363,10 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end', // Đặt modal ở phía dưới màn hình
         margin: 0,  // Loại bỏ margin mặc định
         height: '50%',  // Chiếm nửa màn hình
-    }
+    },
+    mapStyle: {
+        ...StyleSheet.absoluteFillObject
+    },
 })
 
 export default PostForRentCreating;

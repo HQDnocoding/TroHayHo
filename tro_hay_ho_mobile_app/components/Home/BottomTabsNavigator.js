@@ -47,7 +47,7 @@ const BottomTabsNavigator = () => {
 
       <Tab.Screen name="home" component={HomeStackNavigator} options={{ headerShown: false, title: 'Trang chủ' }} />
       <Tab.Screen name="post-management" component={PostManagementStackNavigator} options={{ headerShown: false, title: 'Quản lý tin' }} />
-      <Tab.Screen name="post-creating" component={PostCreatingStackNavigator} options={{ title: 'Đăng tin' }} />
+      <Tab.Screen name="post-creating" component={PostCreatingStackNavigator} options={{headerShown:false, title: 'Đăng tin' }} />
       <Tab.Screen name="account" component={AccountStackNavigator} options={{ headerShown: false, title: 'Tài khoản' }} />
 
     </Tab.Navigator>

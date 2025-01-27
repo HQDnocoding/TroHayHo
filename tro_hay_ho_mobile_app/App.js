@@ -1,6 +1,6 @@
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import React,{ useReducer, useState } from 'react';
+import React, { useReducer, useState } from 'react';
 import { MyDispatchContext, MyUserContext } from './configs/UserContexts';
 import MyUserReducer from './configs/UserReducers';
 import BottomTabsNavigator from './components/Home/BottomTabsNavigator';
@@ -28,6 +28,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RequestLoginDialogContext, RequestLoginDialogProvider } from './utils/RequestLoginDialogContext';
 import RequestLoginDialog from './components/Home/duc/RequestLoginDialog';
+import Map from './components/PostCreating/Map';
+import PickedImages from './components/PostCreating/PickedImages';
 
 
 export default function App() {
@@ -117,7 +119,11 @@ export default function App() {
                     component={SearchScreen}
                     options={{ title: null }} />
 
-
+                <Stack.Screen name='map' component={Map} options={{
+                    title: "Chọn vị trí", headerStyle: {
+                        backgroundColor: '#FFBA00',
+                    }
+                }} />
 
             </Stack.Navigator>
         )
@@ -128,14 +134,14 @@ export default function App() {
             <GestureHandlerRootView >
                 <NavigationContainer>
                     <RequestLoginDialogProvider>
-                    <MyUserContext.Provider value={user}>
-                        <MyDispatchContext.Provider value={dispatch}>
-                           
-                            <MyAppNavigator />
-                            <RequestLoginDialog/>
-                            {/* <PostForRentCreating /> */}
-                        </MyDispatchContext.Provider>
-                    </MyUserContext.Provider>
+                        <MyUserContext.Provider value={user}>
+                            <MyDispatchContext.Provider value={dispatch}>
+                                {/* <PickedImages/> */}
+                                <MyAppNavigator />
+                                <RequestLoginDialog />
+                                {/* <PostForRentCreating /> */}
+                            </MyDispatchContext.Provider>
+                        </MyUserContext.Provider>
                     </RequestLoginDialogProvider >
                 </NavigationContainer>
             </GestureHandlerRootView>

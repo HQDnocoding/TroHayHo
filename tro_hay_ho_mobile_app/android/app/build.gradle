@@ -151,6 +151,7 @@ dependencies {
     implementation("com.facebook.react:react-android")
 implementation("com.google.android.gms:play-services-maps:18.2.0")
 implementation project(':react-native-maps')
+  implementation("androidx.activity:activity:1.9.+")
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
     def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";
