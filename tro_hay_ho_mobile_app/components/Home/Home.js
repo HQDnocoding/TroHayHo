@@ -16,7 +16,7 @@ import PostCard from './duc/post/PostCard';
 const Home = () => {
     let currentUser
     const [visibleModelAddress, setVisibleModelAddress] = React.useState(false)
-  
+
     const [postWant, setPostWant] = React.useState([])
     const [postForRent, setPostForRent] = React.useState([])
     const [loading, setLoading] = React.useState(false);
@@ -25,7 +25,7 @@ const Home = () => {
     const [allPosts, setAllPosts] = React.useState([]);
     const [postFav, setPostFav] = React.useState([]);
 
-    
+
     const loadCurrentUser = () => {
         currentUser = useContext(MyUserContext)
 
@@ -40,8 +40,12 @@ const Home = () => {
                 let res = await APIs.get(url)
 
                 const newPosts = res.data.results.map(post => ({ ...post, type: 'PostWant' }));
-                setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
-
+                // setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
+                setAllPosts(prev => {
+                    const existingIds = new Set(prev.map(post => post.id))
+                    const filteredPosts = newPosts.filter(post => !existingIds.has(post.id))
+                    return [...prev, ...filteredPosts]
+                })
                 if (res.data.next === null) {
                     setPageWant(0)
                 }
@@ -70,8 +74,12 @@ const Home = () => {
                 let url = `${endpoints['getListPostForRent']}?page=${pageForRent}`
                 let res = await APIs.get(url)
                 const newPosts = res.data.results.map(post => ({ ...post, type: 'PostForRent' }));
-                setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
-
+                // xu ly trung lap du lieu
+                setAllPosts(prev => {
+                    const existingIds = new Set(prev.map(post => post.id))
+                    const filteredPosts = newPosts.filter(post => !existingIds.has(post.id))
+                    return [...prev, ...filteredPosts]
+                })
                 if (res.data.next === null) {
                     setPageForRent(0)
                 }
@@ -137,11 +145,6 @@ const Home = () => {
 
 
     const renderItemPost = ({ item }) => {
-        // if (item.type === 'PostForRent') {
-        //     return <PostForRent key={item.id} item={item} routeName={'post_for_rent'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
-        // } else if (item.type === 'PostWant') {
-        //     return <PostWant  routeName={'post_want'} params={{ postId: item.id, coordinates: item.address.coordinates }} />;
-        // }return null;
         return (
             <PostCard key={item.id} item={item} dataPostFav={postFav} currentUser={currentUser} />
 
@@ -158,27 +161,24 @@ const Home = () => {
         )
     }
 
-    // if (postForRent === null && postWant === null) {
-    //     return (
-    //         <ActivityIndicator/>
-    //     )
-    // }
 
 
     return (
-
         <View style={styles.container}>
 
-            <FlatList
-                refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
-                data={allPosts}
-                renderItem={renderItemPost}
-                ListHeaderComponent={flatListHeader}
-                keyExtractor={item => `${item.type}-${item.id}-${Date.now()}`}
-                onEndReached={loadMore}
-                ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
-            />
-            <AddressDialog visible={visibleModelAddress} onClose={hideModel} />
+            
+                <FlatList
+                    refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+                    data={allPosts}
+                    renderItem={renderItemPost}
+                    keyExtractor={item => `${item.type}-${item.id}-${Date.now()}`}
+                    onEndReached={loadMore}
+                    ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
+                />
+                <AddressDialog visible={visibleModelAddress} onClose={hideModel} />
+
+           
+
 
         </View>
 

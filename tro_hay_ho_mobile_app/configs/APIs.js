@@ -41,6 +41,9 @@ export const endpointsDuc = {
     'checkMeFollowYour': (followerId,followedId) => `/basic-user-info/${followerId}/check-me-following-you/${followedId}/`,
     'updateMeFollowingYou': (followerId,followedId) => `/basic-user-info/${followerId}/update-me-following-you/${followedId}/`,
     'updateMeFavoritePost': (userId,postId) => `/basic-user-info/${userId}/update-me-favotite-post/${postId}/`,
+    'getListFollowPostWant': (userId) => `/basic-user-info/${userId}/post-want-following/`,
+    'getListFollowPostForRent': (userId) => `/basic-user-info/${userId}/post-for-rent-following/`,
+
 }
 
 export const authAPIs = (token) => {

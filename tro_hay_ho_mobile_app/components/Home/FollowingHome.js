@@ -1,54 +1,195 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { Card, Title, Paragraph, Button } from 'react-native-paper';
-import {MyDispatchContext,MyUserContext} from '../../configs/UserContexts'
-import React from 'react';
-const FollowingHome = () => {
-  const user = React.useContext(MyUserContext)
-  
-  const followedPosts = [
-    {
-      id: 1,
-      title: 'Phòng trọ Quận Gò Vấp',
-      price: '2.200.000đ',
-      address: '789 Phan Văn Trị, Gò Vấp, TP.HCM',
-      status: 'Còn trống',
-      followedDate: '20/01/2025'
-    },
-    {
-      id: 2,
-      title: 'Phòng trọ Quận Tân Bình',
-      price: '2.500.000đ',
-      address: '321 Cộng Hòa, Tân Bình, TP.HCM',
-      status: 'Đã cho thuê',
-      followedDate: '18/01/2025'
-    },
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
+import { Card, Title, Paragraph, Provider, Portal } from 'react-native-paper';
+import PostForRent from "./duc/post/PostForRent";
+import PostWant from "./duc/post/PostWant";
+import WantPlace from "./duc/explore/WantPlace";
+import Banner from "./duc/explore/Banner";
+import React, { useContext } from "react";
+import AddressDialog from "./duc/explore/AddressDialog";
+import APIs, { endpoints, endpointsDuc } from "../../configs/APIs";
+import { shuffleArray } from '../../utils/Formatter';
+import { MyUserContext } from '../../configs/UserContexts';
+import { getInfoPostFavoriteOfUser } from '../../utils/MyFunctions';
+import PostCard from './duc/post/PostCard';
+import RequestLoginDialog from "./duc/RequestLoginDialog";
 
-  ];
+const FollowingHome = () => {
+  let currentUser
+  const [visibleModelAddress, setVisibleModelAddress] = React.useState(false)
+
+  const [postWant, setPostWant] = React.useState([])
+  const [postForRent, setPostForRent] = React.useState([])
+  const [loading, setLoading] = React.useState(false);
+  const [pageWant, setPageWant] = React.useState(1);
+  const [pageForRent, setPageForRent] = React.useState(1);
+  const [allPosts, setAllPosts] = React.useState([]);
+  const [postFav, setPostFav] = React.useState([]);
+
+
+  const loadCurrentUser = () => {
+    currentUser = useContext(MyUserContext)
+
+  }
+  loadCurrentUser()
+  const loadPostWant = async () => {
+    if (currentUser !== null) {
+      if (pageWant > 0) {
+        setLoading(true)
+        try {
+          let url = `${endpointsDuc.getListFollowPostWant(currentUser.id)}?page=${pageWant}`
+          let res = await APIs.get(url)
+
+          const newPosts = res.data.results.map(post => ({ ...post, type: 'PostWant' }));
+          setAllPosts(prev => {
+            const existingIds = new Set(prev.map(post => post.id))
+            const filteredPosts = newPosts.filter(post => !existingIds.has(post.id))
+            return [...prev, ...filteredPosts]
+          })
+
+          if (res.data.next === null) {
+            setPageWant(0)
+          }
+        } catch (error) {
+          if (error) {
+            // Xử lý lỗi 404: Dừng việc tăng giá trị pageWant
+            setPageWant(0);
+         
+            console.warn("Error loading follow posts want:", error, " == at page: ", pageWant);
+          }
+
+        } finally {
+          setLoading(false)
+
+        }
+      }
+    }
+
+
+  }
+  const loadPostForRent = async () => {
+
+    if (currentUser !== null) {
+      if (pageForRent > 0) {
+        setLoading(true)
+
+        try {
+
+          let url = `${endpointsDuc.getListFollowPostForRent(currentUser.id)}?page=${pageForRent}`
+          let res = await APIs.get(url)
+          const newPosts = res.data.results.map(post => ({ ...post, type: 'PostForRent' }));
+
+          setAllPosts(prev => {
+            
+              const existingIds = new Set(prev.map(post => post.id))
+              const filteredPosts = newPosts.filter(post => !existingIds.has(post.id))
+              return [...prev, ...filteredPosts]
+            
+          })
+          
+          if (res.data.next === null) {
+
+            setPageForRent(0)
+          }
+        } catch (error) {
+          if (error) {
+            // Xử lý lỗi 404: Dừng việc tăng giá trị pageForRent
+            setPageForRent(0);
+            console.warn("Error loading follow posts for rent:", error, " == at page: ", pageForRent);
+          }
+        } finally {
+          setLoading(false)
+
+        }
+      }
+    }
+
+
+  }
+  const loadInfoFavoriteOfCurrentUser = async () => {
+    if (currentUser !== null) {
+      try {
+        let data = await getInfoPostFavoriteOfUser(currentUser.id)
+        setPostFav(data)
+      } catch (error) {
+        console.error("Error loading follow info favorite of current user:", error);
+      }
+    }
+
+  }
+  const showModel = () => {
+    setVisibleModelAddress(true)
+  }
+  const hideModel = () => {
+    setVisibleModelAddress(false)
+  }
+
+  const loadMore = () => {
+    if(currentUser!==null)
+    {
+      if (pageWant > 0) {
+        setPageWant(pageWant + 1)
+      }
+      if (pageForRent > 0) {
+        setPageForRent(pageForRent + 1)
+      }
+    }
+    
+  }
+
+  const refresh = () => {
+    setAllPosts([])
+    setPageForRent(1)
+    setPageWant(1)
+
+  }
+  React.useEffect(() => {
+    if (currentUser !== null) {
+      loadInfoFavoriteOfCurrentUser()
+      loadPostForRent()
+    }
+ 
+  }, [pageForRent])
+
+  React.useEffect(() => {
+    if (currentUser !== null) {
+      loadInfoFavoriteOfCurrentUser()
+      loadPostWant()
+    }
+  }, [pageWant])
+
+
+  const renderItemPost = ({ item }) => {
+
+    return (
+      <PostCard key={item.id} item={item} dataPostFav={postFav} currentUser={currentUser} />
+
+    )
+
+  }
+ 
+
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Phòng trọ đang theo dõi</Text>
-        {(user !==null)?
-    <Text>{JSON.stringify(user)}</Text>
-  :
-    <Text>chua dang nhap</Text>
-  }
-      </View>
 
-      {followedPosts.map(post => (
-        <Card key={post.id} style={styles.card}>
-          <Card.Content>
-            <Title>{post.title}</Title>
-            <Text style={styles.price}>{post.price}</Text>
-            <Text style={styles.address}>{post.address}</Text>
-            <Text style={styles.status}>Trạng thái: {post.status}</Text>
-            <Text style={styles.followDate}>Theo dõi từ: {post.followedDate}</Text>
-          </Card.Content>
+    <View style={styles.container}>
 
-        </Card>
-      ))}
-    </ScrollView>
+      {currentUser !== null ? <>
+        <FlatList
+          refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+          data={allPosts}
+          renderItem={renderItemPost}
+          keyExtractor={item => `${item.type}-${item.id}-${Date.now()}`}
+          onEndReached={loadMore}
+          ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
+        />
+        <AddressDialog visible={visibleModelAddress} onClose={hideModel} />
+
+      </> : <>
+        <RequestLoginDialog visible={true} onClose={() => null} />
+      </>}
+
+
+    </View>
   );
 }
 
@@ -63,6 +204,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   headerText: {
+    color: 'red',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -80,18 +222,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 5,
   },
-  status: {
-    marginTop: 5,
-    fontSize: 14,
-  },
-  followDate: {
-    color: '#666',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  button: {
-    marginTop: 10,
-  }
 });
 
 export default FollowingHome;
