@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
@@ -126,6 +126,28 @@ class BasicUserInfoViewSet(ModelViewSet):
             return self.get_paginated_response(serializers.data)
         serializers=self.get_serializer(detail_notification,many=True)
         return Response(serializers.data)
+    @action(detail=True,methods=['patch'],url_path=r'detail-notification/(?P<d_noti_id>\d+)')
+   
+    def update_id_read_detail_notification(self,request,pk=None,d_noti_id=None):
+        try:
+            is_read_status = request.data.get('is_read')
+            if is_read_status is None:
+                return Response({'error': 'Is read status is required.'}, status=HTTP_400_BAD_REQUEST)
+            
+            detail_notification=DetailNotification.objects.filter(id=d_noti_id).first()
+            if not detail_notification:
+                return Response({'error':' can noit update read because detail-notification not found'},status=HTTP_400_BAD_REQUEST)
+            detail_notification.is_read=is_read_status
+            detail_notification.save()
+            
+            return Response({
+                'message': 'is read updated successfully.',
+                'receiver': pk,
+                'detail_notification': d_noti_id,
+                'is_read': detail_notification.is_read
+            }, status=HTTP_200_OK)
+        except Exception as e:
+            return Response({'error a': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
     # lay nhung ai minh dang theo doi va tao theo doi moi
     @action(detail=True,methods=['get','post'],url_path='following')
     def manager_following(self,request,pk=None):
@@ -270,7 +292,40 @@ class BasicUserInfoViewSet(ModelViewSet):
         except Exception as e:
             return Response({'error': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
         
+class PostParentViewSet(ModelViewSet):
+    queryset = Post.objects.filter(active=True).order_by('-created_date')
+    serializer_class=PostParentSerializer
+    pagination_class=ItemSmallPaginator
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        
+        try:
+            return PostWant.objects.get(id=pk)
+        except PostWant.DoesNotExist:
+            pass
+            
+        try:
+            return PostForRent.objects.get(id=pk)
+        except PostForRent.DoesNotExist:
+            pass
+            
+        return super().get_object()
 
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            obj = self.get_object()
+            if isinstance(obj, PostWant):
+                return PostWantSerializer
+            elif isinstance(obj, PostForRent):
+                return PostForRentSerializer
+                
+        return super().get_serializer_class()
+    
+class DetailNotificationViewSet(ModelViewSet):
+    queryset = DetailNotification.objects.filter(active=True).order_by('-created_date')
+    serializer_class=DetailNotificationSerializer
+    pagination_class=ItemSmallPaginator
+    
 # class FollowViewSet(ViewSet, CreateAPIView):
 #     serializer_class = FollowSerializer
   

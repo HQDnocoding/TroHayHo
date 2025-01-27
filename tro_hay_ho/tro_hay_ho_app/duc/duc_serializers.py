@@ -83,3 +83,8 @@ class BasicFollowSerializer(ModelSerializer):
             raise ValidationError("This follow relationship already exists.")
 
         return attrs
+class PostParentSerializer(ModelSerializer):
+    address=AddressSerializer()
+    class Meta:
+        model=Post
+        fields='__all__'

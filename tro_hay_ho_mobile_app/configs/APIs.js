@@ -32,6 +32,7 @@ export const endpoints = {
 }
 export const endpointsDuc = {
     'getListNotification': (userId) => `/basic-user-info/${userId}/detail-notification/`,
+    'getDetailNotification': (detailNotiId) => `/detail-notification/${detailNotiId}/`,
     'getListConversationByUserId': (userId) => `/user-conversations/user/${userId}/`,
     'getListMessageByConversationId': (conversationId) => `/conversation-messages/conversation/${conversationId}/`,
     'getListPostWantByUserId': (userId) => `/user-post-wants/user/${userId}/`,
@@ -43,7 +44,10 @@ export const endpointsDuc = {
     'updateMeFavoritePost': (userId,postId) => `/basic-user-info/${userId}/update-me-favotite-post/${postId}/`,
     'getListFollowPostWant': (userId) => `/basic-user-info/${userId}/post-want-following/`,
     'getListFollowPostForRent': (userId) => `/basic-user-info/${userId}/post-for-rent-following/`,
+    'getPostParent': (postID) => `/post-parent/${postID}/`,
+    'updateDetailNotification': (userId,postId) => `/basic-user-info/${userId}/detail-notification/${postId}/`,
 
+    
 }
 
 export const authAPIs = (token) => {

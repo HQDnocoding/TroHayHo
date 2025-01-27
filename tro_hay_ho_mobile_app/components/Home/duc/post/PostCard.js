@@ -72,10 +72,12 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
         <Card style={styles.card}>
             <View>
                 <View style={styles.header}>
-                    <Avatar.Image
-                        size={40}
-                        source={{ uri: item.user.avatar ? item.user.avatar : sampleAvatar }}
-                    />
+                    <TouchableOpacity onPress={() => nav.navigate('profile_user', { infoUser })}>
+                        <Avatar.Image
+                            size={40}
+                            source={{ uri: item.user.avatar ? item.user.avatar : sampleAvatar }}
+                        />
+                    </TouchableOpacity>
                     <View style={styles.userInfo}>
                         <TouchableOpacity onPress={() => nav.navigate('profile_user', { infoUser })}>
                             <View>

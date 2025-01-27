@@ -1,13 +1,30 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, TouchableNativeFeedback } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; // Đảm bảo bạn đã cài đặt expo/vector-icons
 import { sampleImage, CHU_TRO, NGUOI_THUE_TRO } from '../../utils/MyValues'
 import { formatTimeAgo } from '../../utils/TimeFormat';
 import { formatPrice } from '../../utils/Formatter';
+import { MyUserContext } from '../../configs/UserContexts';
+import APIs, { endpointsDuc } from '../../configs/APIs';
 
 const PostManagementCard = ({ item, params, routeName }) => {
-    console.log("post manager card",item)
 
+    console.log("post manager card",item)
+    const currentUser=useContext(MyUserContext)
+    const [post,setPost]=useState(null)
+    const loadPost=async()=>{
+        if(currentUser!==null){
+            const res= await APIs.get(endpointsDuc.getPostParent(item.id))
+            if(res.data){
+                setPost(res.data)
+            }
+        }
+    }
+    React.useEffect(()=>{
+        if(item.id!==null &&currentUser!==null){
+            loadPost()
+        }
+    },[])
     return (
 
         <View style={styles.card} >

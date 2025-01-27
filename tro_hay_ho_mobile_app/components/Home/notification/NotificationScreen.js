@@ -61,7 +61,7 @@ const NotificationScreen = ()=>{
     },[page])
     const renderItemNotification=({item})=>{
         return(
-            <NotificationCard key={item.id} item={item} params={{}} routeName={''}/>
+            <NotificationCard key={item.id} item={item}/>
         )
     }
     return (

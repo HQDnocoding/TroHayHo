@@ -13,6 +13,7 @@ import { MyUserContext } from '../../../configs/UserContexts';
 import { useNavigation } from '@react-navigation/native';
 import { RequestLoginDialogContext, useRequestLoginDialog } from '../../../utils/RequestLoginDialogContext';
 import PostCard from '../duc/post/PostCard';
+import { getInfoPostFavoriteOfUser } from '../../../utils/MyFunctions';
 
 const ProfileUser = ({ navigation, route }) => {
     const currentUser = useContext(MyUserContext)
