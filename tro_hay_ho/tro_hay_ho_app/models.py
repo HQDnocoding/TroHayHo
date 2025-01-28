@@ -89,13 +89,13 @@ class Post(BaseModel):
     title = models.TextField(null=False)
     description = models.TextField(null=True, blank=True)
     price = models.FloatField(null=True, blank=True, default=0)
-
+    is_show=models.BooleanField(null=True,blank=True,default=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='posts', related_query_name='post')
     address = models.ForeignKey('Address', on_delete=models.SET_NULL, related_name='posts', related_query_name='post',
                                 null=models.SET_NULL)
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ----id: {str(self.id)}"
     
     
 class FavoritePost(BaseModel):

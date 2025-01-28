@@ -80,10 +80,12 @@ class ConversationMessageViewSet(ModelViewSet):
 class UserPostWantViewSet(ModelViewSet):
     pagination_class = ItemSmallPaginator
     serializer_class = PostWantSerializer
-    queryset = PostWant.objects.filter(active=True)
-    @action(detail=False,methods=['get'],url_path=r'user/(?P<user_id>\d+)')
+    queryset = PostWant.objects.filter( active=True)
+    @action(detail=False,methods=['get'],url_path=r'show/user/(?P<user_id>\d+)')
     def get_user_post_want(self,request,user_id=None):
-        post_want= PostWant.objects.filter(active=True,
+        post_want= PostWant.objects.filter(
+             Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),
+            active=True,
                                           user_id=user_id
                                           ).order_by('-updated_date')
         page= self.paginate_queryset(post_want)
@@ -92,16 +94,47 @@ class UserPostWantViewSet(ModelViewSet):
             return self.get_paginated_response(serializers.data)
         serializers=self.get_serializer(post_want,many=True)
         return Response(serializers.data)
+    @action(detail=False,methods=['get'],url_path=r'hide/user/(?P<user_id>\d+)')
+    def get_user_hide_post_want(self,request,user_id=None):
+        post_for_rent= PostWant.objects.filter(
+                                           is_show=False,
+
+                                            active=True,
+                                          user_id=user_id,
+                                          ).order_by('-updated_date')
+        page= self.paginate_queryset(post_for_rent)
+        if page is not None:
+            serializers=self.get_serializer(page,many=True)
+            return self.get_paginated_response(serializers.data)
+        serializers=self.get_serializer(post_for_rent,many=True)
+        return Response(serializers.data)
 
 
 class UserPostForRentViewSet(ModelViewSet):
     pagination_class = ItemSmallPaginator
     serializer_class = PostForRentSerializer
-    queryset = PostForRent.objects.filter(active=True)
-    @action(detail=False,methods=['get'],url_path=r'user/(?P<user_id>\d+)')
+    queryset = PostForRent.objects.filter( active=True)
+    @action(detail=False,methods=['get'],url_path=r'show/user/(?P<user_id>\d+)')
     def get_user_post_for_rent(self,request,user_id=None):
-        post_for_rent= PostForRent.objects.filter(active=True,
-                                          user_id=user_id
+        post_for_rent= PostForRent.objects.filter(
+                                           Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),
+
+                                            active=True,
+                                          user_id=user_id,
+                                          ).order_by('-updated_date')
+        page= self.paginate_queryset(post_for_rent)
+        if page is not None:
+            serializers=self.get_serializer(page,many=True)
+            return self.get_paginated_response(serializers.data)
+        serializers=self.get_serializer(post_for_rent,many=True)
+        return Response(serializers.data)
+    @action(detail=False,methods=['get'],url_path=r'hide/user/(?P<user_id>\d+)')
+    def get_user_hide_post_for_rent(self,request,user_id=None):
+        post_for_rent= PostForRent.objects.filter(
+                                           is_show=False,
+
+                                            active=True,
+                                          user_id=user_id,
                                           ).order_by('-updated_date')
         page= self.paginate_queryset(post_for_rent)
         if page is not None:
@@ -262,7 +295,7 @@ class BasicUserInfoViewSet(ModelViewSet):
         try:
             following_users = Following.objects.filter(follower_id=pk, active=True).values_list('followed_id', flat=True)
             
-            post_wants = PostWant.objects.filter(user_id__in=following_users, active=True).order_by('-updated_date')
+            post_wants = PostWant.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),user_id__in=following_users, active=True).order_by('-updated_date')
             
             page = self.paginate_queryset(post_wants)
             if page is not None:
@@ -279,7 +312,7 @@ class BasicUserInfoViewSet(ModelViewSet):
         try:
             following_users = Following.objects.filter(follower_id=pk, active=True).values_list('followed_id', flat=True)
             
-            post_for_rents = PostForRent.objects.filter(user_id__in=following_users, active=True).order_by('-updated_date')
+            post_for_rents = PostForRent.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),user_id__in=following_users, active=True).order_by('-updated_date')
             
             page = self.paginate_queryset(post_for_rents)
             if page is not None:
@@ -291,6 +324,43 @@ class BasicUserInfoViewSet(ModelViewSet):
         
         except Exception as e:
             return Response({'error': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+    @action(detail=True,methods=['patch'],url_path=r'update-post-manager/(?P<post_id>\d+)')
+    def update_post_manager(self,request,pk=None,post_id=None):
+        try:
+            is_show_status = request.data.get('is_show')
+            if is_show_status is None:
+                return Response({'error': 'Is show status is required.'}, status=HTTP_400_BAD_REQUEST)
+            
+            post=Post.objects.filter(id=post_id).first()
+            if not post:
+                return Response({'error':' can noit update is show because post not found'},status=HTTP_400_BAD_REQUEST)
+            post.is_show=is_show_status
+            post.save()
+            
+            return Response({
+                'message': 'is show updated successfully.',
+                'user': pk,
+                'post_id': post_id,
+                'is_read': post.is_show
+            }, status=HTTP_200_OK)
+        except Exception as e:
+            return Response({'error a': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+    @action(detail=True,methods=['delete'],url_path=r'delete-post-manager/(?P<post_id>\d+)')
+    def delete_post_manager(self,request,pk=None,post_id=None):
+        try:
+            post=Post.objects.filter(id=post_id).first()
+            if not post:
+                return Response({'error':' can noit delete because post not found'},status=HTTP_400_BAD_REQUEST)
+            post.active=False
+            post.save()   
+            return Response({
+                'message': 'delete soft post successfully.',
+                'receiver': pk,
+                'post_id': post_id,
+                'active': post.active
+            }, status=HTTP_200_OK)
+        except Exception as e:
+            return Response({'error a': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
         
 class PostParentViewSet(ModelViewSet):
     queryset = Post.objects.filter(active=True).order_by('-created_date')
@@ -326,6 +396,27 @@ class DetailNotificationViewSet(ModelViewSet):
     serializer_class=DetailNotificationSerializer
     pagination_class=ItemSmallPaginator
     
+    
+class BasicPostForRentShowViewSet(ModelViewSet):
+    serializer_class = PostForRentSerializer
+    pagination_class = ItemPaginator
+    queryset = PostForRent.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True)
+
+    def get_queryset(self):
+        return PostForRent.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True) \
+            .select_related('user', 'address') \
+            .prefetch_related('images')
+            
+            
+class BasicPostWantShowViewSet(ModelViewSet):
+    queryset = PostWant.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True)
+    serializer_class = PostWantSerializer
+    pagination_class = ItemPaginator
+
+    def get_queryset(self):
+        return PostWant.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True) \
+            .select_related('user', 'address') \
+           
 # class FollowViewSet(ViewSet, CreateAPIView):
 #     serializer_class = FollowSerializer
   

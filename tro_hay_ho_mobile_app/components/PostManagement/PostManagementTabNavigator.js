@@ -6,41 +6,212 @@ import Home from "../Home/Home";
 import PostManagementShowing from "./PostManagementShowing";
 import PostManagementPendingApproval from "./PostManagementPendingApproval";
 import PostManagementHidden from "./PostManagementHidden";
+import APIs, { endpointsDuc } from '../../configs/APIs';
+import { MyUserContext } from '../../configs/UserContexts';
+import { role_id_chu_tro, tempUser2 } from '../../utils/MyValues';
 
-const Showing = () => (<PostManagementShowing/>);
-const Approval = () => (<PostManagementPendingApproval/>);
-const Hidden = () => (<PostManagementHidden/>);
-
-const renderScene = SceneMap({
-  
-  first: Showing,
-  second: Approval,
-  three: Hidden,
-
-});
-
-const routes = [
-  { key: 'first', title: 'Đang hiện thị (3)' },
-  { key: 'second', title: 'Chờ phê duyệt (0)' },
-  { key: 'three', title: 'Đang ẩn (0)' },
-
-];
 
 export default function PostManagementTabNavigator() {
   const layout = useWindowDimensions();
   const [index, setIndex] = React.useState(0);
 
+
+  ////////////Show--/////////////
+
+  const currentUser = React.useContext(MyUserContext)
+    const [postShow, setPostShow] = React.useState([])
+
+    const [loadingShow, setLoadingShow] = React.useState(false);
+    const [pageShow, setPageShow] = React.useState(1);
+
+    const loadPostShow = async () => {
+
+        if (currentUser !== null)
+            if (pageShow > 0) {
+
+                setLoadingShow(true)
+
+                try {
+                    let url;
+                    let res;
+                    let updatePostResults
+                    if (currentUser.role === role_id_chu_tro)//chu tro
+                    {
+                        url = `${endpointsDuc['getListPostForRentByUserId'](currentUser.id)}?page=${pageShow}`
+                        res = await APIs.get(url)
+                        const postResults = res.data.results
+                        updatePostResults = postResults.map((item) => {
+                            return {
+                                isPostWant: false,
+                                ...item
+                            }
+                        })
+                    } else {
+                        //nguoi thue
+                        url = `${endpointsDuc['getListPostWantByUserId'](currentUser.id)}?page=${pageShow}`
+                        res = await APIs.get(url)
+                        const postResults = res.data.results
+                        updatePostResults = postResults.map((item) => {
+                            return {
+                                isPostWant: true,
+                                ...item
+                            }
+                        })
+                    }
+                    console.info("pm nẽt",postShow)
+
+                    if (pageShow > 1) {
+                        setPostShow(prev => [...prev, ...updatePostResults])
+                    } else {
+                        setPostShow(updatePostResults)
+
+                    }
+                    if (res.data.next === null) {
+                        setPageShow(0)
+                    }
+                } catch (error) {
+                    if (error.response?.status === 404) {
+                        setPageShow(0);
+                    } else {
+                        console.error("Error loading post:", error, " == at page: ", pageForRent);
+                    }
+                } finally {
+                    setLoadingShow(false)
+
+                }
+            }
+    }
+    const loadMoreShow = () => {
+      console.info("pm",pageShow)
+
+      if (!loadingShow && pageShow > 0) {
+            setPageShow(pageShow + 1)
+        }
+
+    }
+    const refreshShow = () => {
+        setPageShow(1)
+
+    }
+    const handleUpdateListShow = () => {
+      console.info("an",pageShow)
+      setPageHide(1)
+      setPageShow(1)
+    };
+    React.useEffect(() => {
+
+        loadPostShow()
+    }, [pageShow])
+  
+  //////////////////////////
+  /////////////Hide////////////
+  const [postHide, setPostHide] = React.useState([])
+
+    const [loadingHide, setLoadingHide] = React.useState(false);
+    const [pageHide, setPageHide] = React.useState(1);
+
+    const loadPostHide = async () => {
+        if (currentUser !== null)
+            if (pageHide > 0) {
+
+                setLoadingHide(true)
+
+                try {
+                    let url;
+                    let res;
+                    let updatePostResults
+                    if (currentUser.role === role_id_chu_tro)//chu tro
+                    {
+                        url = `${endpointsDuc['getListHidePostForRentByUserId'](currentUser.id)}?page=${pageHide}`
+                        res = await APIs.get(url)
+                        const postResults = res.data.results
+                        updatePostResults = postResults.map((item) => {
+                            return {
+                                isPostWant: false,
+                                ...item
+                            }
+                        })
+                    } else {
+                        //nguoi thue
+                        url = `${endpointsDuc['getListHidePostWantByUserId'](currentUser.id)}?page=${pageHide}`
+                        res = await APIs.get(url)
+                        const postResults = res.data.results
+                        updatePostResults = postResults.map((item) => {
+                            return {
+                                isPostWant: true,
+                                ...item
+                            }
+                        })
+                    }
+
+                    if (pageHide > 1) {
+                        setPostHide(prev => [...prev, ...updatePostResults])
+                    } else {
+                        setPostHide(updatePostResults)
+
+                    }
+                    if (res.data.next === null) {
+                        setPageHide(0)
+                    }
+                } catch (error) {
+                    if (error.response?.status === 404) {
+                        setPageHide(0);
+                    } else {
+                        console.error("Error loading post:", error, " == at page: ", pageForRent);
+                    }
+                } finally {
+                    setLoadingHide(false)
+
+                }
+            }
+    }
+    const loadMoreHide = () => {
+        if (!loadMoreHide&& pageHide > 0) {
+            setPageHide(pageHide + 1)
+        }
+
+    }
+    const refreshHide = () => {
+        setPageHide(1)
+
+    }
+    React.useEffect(() => {
+
+        loadPostHide()
+    }, [pageHide])
+
+  /////////////////////////
+  const Showing = () => (<PostManagementShowing  handleUpdateList={handleUpdateListShow} post={postShow} loading={loadingShow} refresh={refreshShow} loadMore={loadMoreShow}/>);
+  const Approval = () => (<PostManagementPendingApproval />);
+  const Hidden = () => (<PostManagementHidden  handleUpdateList={handleUpdateListShow} post={postHide} loading={loadingHide} refresh={refreshHide} loadMore={loadMoreHide} />);
+
+  const renderScene = SceneMap({
+
+    first: Showing,
+    // second: Hidden,
+    three: Hidden,
+
+  });
+
+  const routes = [
+    { key: 'first', title: `Đang hiện thị (${postShow.length})`  },
+    { key: 'three', title: `Đang ẩn (${postHide.length})` },
+
+  ];
+  // { key: 'second', title: 'Chờ phê duyệt (0)' },
+
   const renderTabBar = props => (
     <TabBar
       {...props}
-      scrollEnabled={true}
+      // scrollEnabled={true}
       style={styles.tabBar}
       labelStyle={styles.label}
-      tabStyle={styles.tab}
+      // tabStyle={styles.tab}
       indicatorStyle={styles.indicator}
       activeColor={'#000000'}
       inactiveColor={'#9d9d9d'}
-      gap={20}
+      
+    // gap={20}
     />
   );
 
@@ -70,9 +241,9 @@ const styles = StyleSheet.create({
   },
   tab: {
     width: 'auto',
-    minWidth:120,
+    minWidth: 120,
     paddingHorizontal: 15,
-    color:'black',
+    color: 'black',
   },
   indicator: {
     backgroundColor: '#000000',

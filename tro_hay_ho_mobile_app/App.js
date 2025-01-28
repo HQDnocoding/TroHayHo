@@ -26,6 +26,7 @@ import ProfileUser from "./components/Home/User/ProfileUser";
 import PostForRentCreating from './components/PostCreating/PostForRentCreating';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider as PaperProvider } from 'react-native-paper';
 import { RequestLoginDialogContext, RequestLoginDialogProvider } from './utils/RequestLoginDialogContext';
 import RequestLoginDialog from './components/Home/duc/RequestLoginDialog';
 import Map from './components/PostCreating/Map';
@@ -132,18 +133,20 @@ export default function App() {
     return (
         <SafeAreaProvider>
             <GestureHandlerRootView >
-                <NavigationContainer>
-                    <RequestLoginDialogProvider>
-                        <MyUserContext.Provider value={user}>
-                            <MyDispatchContext.Provider value={dispatch}>
-                                {/* <PickedImages/> */}
-                                <MyAppNavigator />
-                                <RequestLoginDialog />
-                                {/* <PostForRentCreating /> */}
-                            </MyDispatchContext.Provider>
-                        </MyUserContext.Provider>
-                    </RequestLoginDialogProvider >
-                </NavigationContainer>
+                <PaperProvider>
+                    <NavigationContainer>
+                        <RequestLoginDialogProvider>
+                            <MyUserContext.Provider value={user}>
+                                <MyDispatchContext.Provider value={dispatch}>
+                                    {/* <PickedImages/> */}
+                                    <MyAppNavigator />
+                                    <RequestLoginDialog />
+                                    {/* <PostForRentCreating /> */}
+                                </MyDispatchContext.Provider>
+                            </MyUserContext.Provider>
+                        </RequestLoginDialogProvider >
+                    </NavigationContainer>
+                </PaperProvider>
             </GestureHandlerRootView>
         </SafeAreaProvider>
 

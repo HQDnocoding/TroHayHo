@@ -6,7 +6,7 @@ import WantPlace from "./duc/explore/WantPlace";
 import Banner from "./duc/explore/Banner";
 import React, { useContext } from "react";
 import AddressDialog from "./duc/explore/AddressDialog";
-import APIs, { endpoints } from "../../configs/APIs";
+import APIs, { endpoints, endpointsDuc } from "../../configs/APIs";
 import { shuffleArray } from '../../utils/Formatter';
 import { MyUserContext } from '../../configs/UserContexts';
 import { getInfoPostFavoriteOfUser } from '../../utils/MyFunctions';
@@ -36,7 +36,7 @@ const Home = () => {
         if (pageWant > 0) {
             setLoading(true)
             try {
-                let url = `${endpoints['getListPostWant']}?page=${pageWant}`
+                let url = `${endpointsDuc.getListPostWantShow}?page=${pageWant}`
                 let res = await APIs.get(url)
 
                 const newPosts = res.data.results.map(post => ({ ...post, type: 'PostWant' }));
@@ -50,11 +50,11 @@ const Home = () => {
                     setPageWant(0)
                 }
             } catch (error) {
-                if (error.response?.status === 404) {
+                if (error) {
                     // Xử lý lỗi 404: Dừng việc tăng giá trị pageWant
                     setPageWant(0);
-                } else {
-                    console.error("Error loading posts want:", error, " == at page: ", pageWant);
+               
+                    console.warn("Error loading posts want:", error, " == at page: ", pageWant);
                 }
 
             } finally {
@@ -71,7 +71,7 @@ const Home = () => {
             setLoading(true)
 
             try {
-                let url = `${endpoints['getListPostForRent']}?page=${pageForRent}`
+                let url = `${endpointsDuc.getListPostForRentShow}?page=${pageForRent}`
                 let res = await APIs.get(url)
                 const newPosts = res.data.results.map(post => ({ ...post, type: 'PostForRent' }));
                 // xu ly trung lap du lieu
@@ -84,11 +84,11 @@ const Home = () => {
                     setPageForRent(0)
                 }
             } catch (error) {
-                if (error.response?.status === 404) {
+                if (error) {
                     // Xử lý lỗi 404: Dừng việc tăng giá trị pageForRent
                     setPageForRent(0);
-                } else {
-                    console.error("Error loading posts for rent:", error, " == at page: ", pageForRent);
+                
+                    console.warn("Error loading posts for rent:", error, " == at page: ", pageForRent);
                 }
             } finally {
                 setLoading(false)
@@ -102,7 +102,7 @@ const Home = () => {
                 let data = await getInfoPostFavoriteOfUser(currentUser.id)
                 setPostFav(data)
             } catch (error) {
-                console.error("Error loading info favorite of current user:", error);
+                console.warn("Error loading info favorite of current user:", error);
             }
         }
 

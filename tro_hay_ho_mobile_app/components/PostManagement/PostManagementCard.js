@@ -1,30 +1,93 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, TouchableNativeFeedback } from 'react-native';
+import { ActivityIndicator, Menu } from 'react-native-paper';
 import { Entypo } from '@expo/vector-icons'; // Đảm bảo bạn đã cài đặt expo/vector-icons
-import { sampleImage, CHU_TRO, NGUOI_THUE_TRO } from '../../utils/MyValues'
+import { sampleImage, CHU_TRO, NGUOI_THUE_TRO, data_patch_is_show } from '../../utils/MyValues'
 import { formatTimeAgo } from '../../utils/TimeFormat';
 import { formatPrice } from '../../utils/Formatter';
 import { MyUserContext } from '../../configs/UserContexts';
 import APIs, { endpointsDuc } from '../../configs/APIs';
 
-const PostManagementCard = ({ item, params, routeName }) => {
+const PostManagementCard = ({ item, params, routeName, onUpdateList, type }) => {
 
-    console.log("post manager card",item)
-    const currentUser=useContext(MyUserContext)
-    const [post,setPost]=useState(null)
-    const loadPost=async()=>{
-        if(currentUser!==null){
-            const res= await APIs.get(endpointsDuc.getPostParent(item.id))
-            if(res.data){
+    const currentUser = useContext(MyUserContext)
+    const [post, setPost] = useState(null)
+    const [menuVisible, setMenuVisible] = useState(false);
+    const [loading, setLoading] = useState(false)
+    const handleDelete = async () => {
+        if (currentUser !== null) {
+            setLoading(true)
+            try {
+                const response = await APIs.delete(endpointsDuc.deleteSoftPost(currentUser.id, item.id))
+                if (response.data.active !== null) {
+                    console.log("xoa", response.data)
+                    if (onUpdateList) onUpdateList()
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setLoading(false)
+            }
+
+
+        }
+
+        setMenuVisible(false);
+    };
+
+    const handleHide = async () => {
+        if (currentUser !== null) {
+            setLoading(true)
+            try {
+                const response = await APIs.patch(endpointsDuc.updateShowPost(currentUser.id, item.id), data_patch_is_show(false))
+                if (response.data.is_show !== null) {
+                    console.log("ẩn ", response.data)
+                    if (onUpdateList) onUpdateList()
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setLoading(false)
+            }
+
+
+        }
+
+        setMenuVisible(false);
+    }
+    const handleShow = async () => {
+        if (currentUser !== null) {
+            setLoading(true)
+            try {
+                const response = await APIs.patch(endpointsDuc.updateShowPost(currentUser.id, item.id), data_patch_is_show(true))
+                if (response.data.is_show !== null) {
+                    console.log("hiện", response.data)
+                    if (onUpdateList) onUpdateList()
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setLoading(false)
+            }
+
+
+        }
+
+        setMenuVisible(false);
+    }
+    const loadPost = async () => {
+        if (currentUser !== null) {
+            const res = await APIs.get(endpointsDuc.getPostParent(item.id))
+            if (res.data) {
                 setPost(res.data)
             }
         }
     }
-    React.useEffect(()=>{
-        if(item.id!==null &&currentUser!==null){
+    React.useEffect(() => {
+        if (item.id !== null && currentUser !== null) {
             loadPost()
         }
-    },[])
+    }, [])
     return (
 
         <View style={styles.card} >
@@ -68,20 +131,57 @@ const PostManagementCard = ({ item, params, routeName }) => {
 
                 </View>
                 <View style={{ flex: 1 }}>
-                    <TouchableOpacity style={styles.icon}>
-                        <View>
-                            <Entypo name="dots-three-vertical" size={18} color="#666" />
+                    {loading === false ? <>
+                        <Menu
+                            contentStyle={styles.icon}
+                            visible={menuVisible}
+                            onDismiss={() => setMenuVisible(false)}
+                            anchor={
+                                <TouchableOpacity
+                                    style={styles.icon}
+                                    onPress={() => setMenuVisible(true)}
+                                >
+                                    <Entypo name="dots-three-vertical" size={18} color="#666" />
+                                </TouchableOpacity>
+                            }
+                        >
+                            <Menu.Item
+                                onPress={handleDelete}
+                                title="Xóa bài"
+                                leadingIcon="delete"
+                            />
+                            {type === "hide" ?
 
-                        </View>
-                    </TouchableOpacity>
+                                <Menu.Item
+                                    onPress={handleShow}
+                                    title="Hiện bài"
+                                    leadingIcon="eye"
+                                />
+                                :
+                                <Menu.Item
+                                    onPress={handleHide}
+                                    title="Ẩn bài"
+                                    leadingIcon="eye-off"
+                                />
+                            }
+
+
+                        </Menu>
+                    </> :
+                        <>
+                            <ActivityIndicator animating={loading} />
+                        </>}
+
                 </View>
 
             </View>
+
         </View>
 
 
     );
 };
+
 const styles = StyleSheet.create({
 
     card: {
@@ -131,6 +231,8 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     icon: {
+        backgroundColor: '#fff',
+
     },
     priceRed: {
         fontSize: 15,

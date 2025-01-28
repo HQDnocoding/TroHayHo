@@ -24,6 +24,8 @@ r.register('user-post-wants',duc_views.UserPostWantViewSet,basename='user-post-w
 r.register('user-post-for-rents',duc_views.UserPostForRentViewSet,basename='user-post-for-rents')
 r.register('basic-user-info',duc_views.BasicUserInfoViewSet,basename='basic-user-info')
 r.register('post-parent',duc_views.PostParentViewSet,basename='post-parent')
+r.register('post-wants-show',duc_views.BasicPostWantShowViewSet,basename='post-wants-show')
+r.register('post-for-rents-show',duc_views.BasicPostForRentShowViewSet,basename='post-for-rents-show')
 r.register('detail-notification',duc_views.DetailNotificationViewSet,basename='detail-notification')
 
 # =============================================
