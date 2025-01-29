@@ -31,6 +31,7 @@ import { RequestLoginDialogContext, RequestLoginDialogProvider } from './utils/R
 import RequestLoginDialog from './components/Home/duc/RequestLoginDialog';
 import Map from './components/PostCreating/Map';
 import PickedImages from './components/PostCreating/PickedImages';
+import ImagePickerComponent from './components/User/test';
 
 
 export default function App() {
@@ -138,10 +139,9 @@ export default function App() {
                         <RequestLoginDialogProvider>
                             <MyUserContext.Provider value={user}>
                                 <MyDispatchContext.Provider value={dispatch}>
-                                    {/* <PickedImages/> */}
                                     <MyAppNavigator />
                                     <RequestLoginDialog />
-                                    {/* <PostForRentCreating /> */}
+                                    {/* <ImagePickerComponent/> */}
                                 </MyDispatchContext.Provider>
                             </MyUserContext.Provider>
                         </RequestLoginDialogProvider >

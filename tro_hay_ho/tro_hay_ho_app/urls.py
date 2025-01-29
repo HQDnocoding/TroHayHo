@@ -15,7 +15,7 @@ r.register('post-for-rents',PostForRentViewSet,basename='post_for_rents')
 r.register('provinces',ProvinceViewSet,basename='province')
 r.register('districts',DistrictViewSet,basename='district')
 r.register('wards',WardViewSet,basename='ward')
-
+r.register('images',PostImageView,basename='image')
 
 #================== duc========================
 r.register('user-conversations', duc_views.UserConversationViewSet, basename='user-conversations')

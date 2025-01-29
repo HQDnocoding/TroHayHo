@@ -22,6 +22,7 @@ export const endpoints = {
     'address': '/addresses/',
     'getListPostWant': '/post-wants/',
     'getListPostForRent': '/post-for-rents/',
+    'image': '/images/',
     'post-for-rent-detail': (postId) => `/post-for-rents/${postId}/`,
     'post-want-detail': (postId) => `/post-wants/${postId}/`,
     'pw-comment': (postId) => `/post-wants/${postId}/comments/`,
@@ -43,17 +44,17 @@ export const endpointsDuc = {
     'getListHidePostForRentByUserId': (userId) => `/user-post-for-rents/hide/user/${userId}/`,
     'getBasicUserInfoByUserId': (userId) => `/basic-user-info/${userId}/`,
     'getMeFavoritePost': (userId) => `/basic-user-info/${userId}/me-favorite-post/`,
-    'checkMeFollowYour': (followerId,followedId) => `/basic-user-info/${followerId}/check-me-following-you/${followedId}/`,
-    'updateMeFollowingYou': (followerId,followedId) => `/basic-user-info/${followerId}/update-me-following-you/${followedId}/`,
-    'updateMeFavoritePost': (userId,postId) => `/basic-user-info/${userId}/update-me-favotite-post/${postId}/`,
+    'checkMeFollowYour': (followerId, followedId) => `/basic-user-info/${followerId}/check-me-following-you/${followedId}/`,
+    'updateMeFollowingYou': (followerId, followedId) => `/basic-user-info/${followerId}/update-me-following-you/${followedId}/`,
+    'updateMeFavoritePost': (userId, postId) => `/basic-user-info/${userId}/update-me-favotite-post/${postId}/`,
     'getListFollowPostWant': (userId) => `/basic-user-info/${userId}/post-want-following/`,
     'getListFollowPostForRent': (userId) => `/basic-user-info/${userId}/post-for-rent-following/`,
     'getPostParent': (postID) => `/post-parent/${postID}/`,
-    'updateDetailNotification': (userId,postId) => `/basic-user-info/${userId}/detail-notification/${postId}/`,
-    'updateShowPost': (userId,postId) => `/basic-user-info/${userId}/update-post-manager/${postId}/`,
-    'deleteSoftPost': (userId,postId) => `/basic-user-info/${userId}/delete-post-manager/${postId}/`,
-    
-    
+    'updateDetailNotification': (userId, postId) => `/basic-user-info/${userId}/detail-notification/${postId}/`,
+    'updateShowPost': (userId, postId) => `/basic-user-info/${userId}/update-post-manager/${postId}/`,
+    'deleteSoftPost': (userId, postId) => `/basic-user-info/${userId}/delete-post-manager/${postId}/`,
+
+
 }
 
 export const authAPIs = (token) => {

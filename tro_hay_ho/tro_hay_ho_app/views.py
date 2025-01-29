@@ -11,7 +11,8 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView ,DestroyAPIView
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
@@ -107,13 +108,13 @@ class PostWantViewSet(ModelViewSet):
 
 
 class PostForRentViewSet(ModelViewSet):
-
     serializer_class = PostForRentSerializer
     pagination_class = ItemPaginator
+    parser_classes = [MultiPartParser,JSONParser ]
+
     
     def perform_create(self, serializer):
-        serializer=serializer.save(user=self.request.user)
-        return super().perform_create(serializer)
+        serializer.save(user=self.request.user)
     
 
     def get_queryset(self):
@@ -121,7 +122,7 @@ class PostForRentViewSet(ModelViewSet):
             .select_related('user', 'address') \
             .prefetch_related('images')
             
-            
+    
             
     @action(methods=['get','post'],url_path='comments',detail=True)
     def get_comments(self,request,pk):
@@ -154,21 +155,22 @@ class AddressViewSet(ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
     
+    def create(self, request, *args, **kwargs):
+        print("Received Data:", request.data)
+
+    
+    
     
     @action(detail=False, methods=['post'], url_path='create-address')
     def create_address(self, request):
-        # Ghi log dữ liệu nhận được
         print("Dữ liệu nhận được:", request.data)
 
-        # Tạo instance serializer từ dữ liệu request
         serializer = self.get_serializer(data=request.data)
         
-        # Kiểm tra dữ liệu có hợp lệ không
         if serializer.is_valid():
             address = serializer.save()
             return Response({"message": "Address created successfully!", "data": AddressSerializer(address).data}, status=status.HTTP_201_CREATED)
         else:
-            # Trả về lỗi nếu không hợp lệ
             print("Errors:", serializer.errors)
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -338,6 +340,20 @@ class WardViewSet(ModelViewSet):
     serializer_class = WardSerializer
     
     
-class PostImageViewSet(ModelViewSet):
-    queryset=PostImage.objects.filter(active=True)
-    serializer_class=PostImageSerializer
+class PostImageView(ModelViewSet):
+    queryset = PostImage.objects.all()
+    serializer_class = PostImageSerializer
+    parser_classes = (MultiPartParser, FormParser,JSONParser)
+
+    def perform_create(self, serializer):
+        post_id = self.request.data.get('post')
+        image = self.request.FILES.get('image')
+
+        if not post_id or not image:
+            return Response({"error": "Missing post_id or image"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            post = PostForRent.objects.get(id=post_id) 
+            serializer.save(post=post, image=image)
+        except PostForRent.DoesNotExist:
+            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)

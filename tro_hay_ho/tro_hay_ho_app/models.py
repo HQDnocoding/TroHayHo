@@ -91,7 +91,7 @@ class Post(BaseModel):
     price = models.FloatField(null=True, blank=True, default=0)
     is_show=models.BooleanField(null=True,blank=True,default=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='posts', related_query_name='post')
-    address = models.ForeignKey('Address', on_delete=models.SET_NULL, related_name='posts', related_query_name='post',
+    address = models.ForeignKey('Address', on_delete=models.CASCADE, related_name='posts', related_query_name='post',
                                 null=models.SET_NULL)
 
     def __str__(self):
@@ -126,7 +126,7 @@ class PostForRent(Post):
     phone_contact = models.CharField(max_length=15, null=False)
     name_agent = models.CharField(max_length=100, null=False)
     verified = models.BooleanField(default=True, null=False)
-
+    
     class Meta:
         db_table = 'post_for_rent'
 
@@ -140,7 +140,7 @@ class PostImage(BaseModel):
 
     @property
     def get_url(self):
-        if self.image:
+        if self.image:  
             return self.image.url
         return None
 

@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { ActivityIndicator, Button, Divider, RadioButton, Snackbar, TextInput } from "react-native-paper";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList } from "react-native-gesture-handler";
@@ -17,7 +17,9 @@ const PostForRentCreating = () => {
     const [imageList, setImageList] = useState([]);
     const convertToImageObjects = () => {
         const imageObjects = imageList.map((image) => ({
-            image: image.uri
+            uri: image.uri,
+            name: image.fileName,
+            type: image.type,
         }));
         console.log(imageObjects);
         return imageObjects;
@@ -59,7 +61,7 @@ const PostForRentCreating = () => {
                 console.log('error');
 
             }
-            else if(data.specified_address===undefined){
+            else if (data.specified_address === undefined) {
                 setSnackBarText("Vui lòng điền địa chỉ chi tiết");
                 setVisible(!visible);
             }
@@ -82,7 +84,7 @@ const PostForRentCreating = () => {
                 setSnackBarText("Vui lòng điền đúng giá trị giá cho thuê là số");
                 setVisible(!visible);
             }
-            else if (imageList.length < 6 || imageList.length === 0) {
+            else if (imageList.length < 1 || imageList.length === 0) {
                 setSnackBarText("Vui lòng thêm hình ảnh về nơi muốn cho thuê");
                 setVisible(!visible);
             }
@@ -98,12 +100,7 @@ const PostForRentCreating = () => {
                             : '',
                     };
 
-                    // let res = await APIs.post(endpoints['create-address'], payload, {
-                    //     headers: {
-                    //         'Content-Type': 'application/json'
-                    //     }
-                    // });
-                    // const addressId = res.data.data.id;
+
                     const imageDict = convertToImageObjects();
 
                     const jsonData = {
@@ -114,26 +111,60 @@ const PostForRentCreating = () => {
                         "description": postValues.description,
                         "name_agent": postValues.name_agent,
                         "address": payload,
-                        "post_image": imageDict,
-                        "phone_contact": user.phone||"0",
+                        // "post_image": imageDict,
+                        "phone_contact": user.phone || "0",
                     };
 
+                    const formData = new FormData();
 
-                    console.log("ppo", jsonData);
+                    formData.append('title', jsonData.title);
+                    formData.append('acreage', jsonData.acreage);
+                    formData.append('max_number_of_people', jsonData.max_number_of_people);
+                    formData.append('price', jsonData.price);
+                    formData.append('description', jsonData.description);
+                    formData.append('name_agent', jsonData.name_agent);
+                    formData.append('phone_contact', jsonData.phone_contact);
+
+                    // formData.append("address[specified_address]", payload.specified_address);
+                    // formData.append("address[coordinates]",payload.coordinates);
+                    // formData.append("address[province]", payload.province);
+                    // formData.append("address[district]", payload.district);
+                    // formData.append("address[ward]", payload.ward);
+
+
+                    formData.append("address", payload)
+
+                    // jsonData.post_image.forEach((image, index) => {
+                    //     formData.append(`post_image`, {
+                    //         uri: image.uri,
+                    //         type: image.type,
+                    //         name: image.fileName || `image_${Date.now()}_${index}.jpg`,
+                    //     });
+                    // });
+
+
+
                     const token = await AsyncStorage.getItem("access_token");
 
-                    let resPost = await authAPIs(token).post(endpoints['getListPostForRent'], jsonData,
+                    console.log("form", formData);
+                    console.log("json", jsonData);
+                    console.log("token", token);
+
+
+                    const res = await authAPIs(token).post(endpoints['getListPostForRent'], jsonData,
                         {
                             headers: {
-                                'Content-Type': 'application/json'
-                            }
+                                'Content-Type': 'application/json',
+
+                            },
                         }
                     );
 
-                    console.log(resPost.data);
+                    console.log(res.data);
 
+                    imageDict.forEach(image => uploadImage(image, res.data.id));
 
-
+                    
 
                 } catch (ex) {
                     console.error(ex);
@@ -141,6 +172,34 @@ const PostForRentCreating = () => {
             }
         }
     }
+
+    const uploadImage = async (image, id) => {
+        const formData = new FormData();
+        formData.append('image', {
+            uri: image.uri,
+            type: image.type,
+            name: image.name || `image_${Date.now()}.jpg`,
+        });
+
+        formData.append('post', id); // Giả sử post ID là 1, bạn cần thay đổi giá trị này
+        console.log("pp", formData);
+        try {
+            const response = await APIs.post(endpoints['image'], formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            console.log(response)
+            if (response.ok) {
+                Alert.alert('Upload thành công', 'Ảnh đã được tải lên');
+            } else {
+                Alert.alert('Lỗi', result.message || 'Có lỗi xảy ra');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+        }
+    };
 
     const [data, setData] = useState({
         specified_address: '', coordinates: '',

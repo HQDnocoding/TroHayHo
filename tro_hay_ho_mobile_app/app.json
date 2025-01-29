@@ -23,8 +23,9 @@
       "package": "com.hqd112004.tro_hay_ho_mobile_app",
       "config": {
         "googleMaps": {
-            "apiKey": "AIzaSyDtIE78MdhgmSfLUZcBwDtxce2g7jIZATg"
-        }}
+          "apiKey": "AIzaSyDtIE78MdhgmSfLUZcBwDtxce2g7jIZATg"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,11 +35,19 @@
         "projectId": "94043acc-8640-4a9c-a63e-b1f7d7221de1"
       }
     },
-     "plugins": [
+    "plugins": [
       [
         "@react-native-google-signin/google-signin",
         {
           "iosUrlScheme": "com.googleusercontent.apps.1094159227138-lvlg2n85bnu91f8vahfifbclhgiroqls"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
         }
       ]
     ]

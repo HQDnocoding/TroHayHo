@@ -38,8 +38,15 @@ INSTALLED_APPS = [
     'tro_hay_ho_app.apps.TroHayHoAppConfig',
     'rest_framework',
     'oauth2_provider',
-    
+    'ckeditor',
+    'ckeditor_uploader',
+    'cloudinary_storage',
+    'corsheaders'
 ]
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CKEDITOR_UPLOAD_PATH = "images/ckeditor/"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -59,7 +66,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'tro_hay_ho.urls'
 
@@ -156,6 +166,7 @@ OAUTH2_PROVIDER = { 'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSO
 
 
 import firebase_admin
+from firebase_admin import credentials
 from firebase_admin import credentials
 
 # Đường dẫn tới tệp JSON cấu hình Firebase

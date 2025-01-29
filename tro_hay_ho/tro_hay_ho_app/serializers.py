@@ -76,25 +76,29 @@ class PostImageSerializer(ModelSerializer):
 class PostForRentSerializer(ModelSerializer):
     user = UserSerializer(read_only=True)
     address = AddressSerializer()
-    post_image=PostImageSerializer(many=True, source='images')
-    type = serializers.SerializerMethodField()
+    post_image=PostImageSerializer(many=True, source='images',required=False)
+    type = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = PostForRent
         fields='__all__'
+     
     def get_type(self, obj):
         return 'PostForRent'
     
     def create(self, validated_data):
-        address_data = validated_data.pop('address', None)
-        images_data = validated_data.pop('images', [])
+        request = self.context['request']
+        images_data = request.FILES.getlist('images')
+        address_data = validated_data.pop('address')
 
-        address = Address.objects.create(** address_data)
-        user = self.context['request'].user
-        
+        # Tạo địa chỉ
+        address = Address.objects.create(**address_data)
+
+        # Tạo bài đăng
         post_for_rent = PostForRent.objects.create(address=address, **validated_data)
 
+        # Tạo các hình ảnh liên quan
         for image_data in images_data:
-            PostImage.objects.create(post=post_for_rent, **image_data)
+            PostImage.objects.create(post=post_for_rent, image=image_data)
 
         return post_for_rent
     
@@ -143,7 +147,6 @@ class CommentSerializer(ModelSerializer):
 
 class FavouritePostSerializer(serializers.ModelSerializer):
 
-
     post = PostSerializer(read_only=True)
 
     class Meta:
@@ -152,7 +155,8 @@ class FavouritePostSerializer(serializers.ModelSerializer):
 
 
 class PostImageSerializer(serializers.ModelSerializer):
-    
+    image=serializers.ImageField()
+    post = serializers.PrimaryKeyRelatedField(  queryset=Post.objects.all(), required=False)
     class Meta:
         model=PostImage
         fields='__all__'

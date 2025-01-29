@@ -11,8 +11,8 @@ const PickedImages = ({ imageList, setImageList }) => {
         console.log("Chọn ảnh...");
         const res = await launchImageLibrary(
             {
-                mediaType: "photo", 
-                selectionLimit: 0,
+                mediaType: "photo", // Chỉ chọn ảnh
+                selectionLimit: 0, // Cho phép chọn nhiều ảnh
             }
         );
 
@@ -21,7 +21,7 @@ const PickedImages = ({ imageList, setImageList }) => {
         } else if (res.errorCode) {
             Alert.alert("Lỗi", res.errorMessage);
         } else {
-            const newImages = res.assets.map((asset) => asset);
+                const newImages = res.assets.map((asset) => asset);
             console.log(res);
             setImageList((prevImageList) => [...prevImageList, ...newImages]);
         }
@@ -30,7 +30,7 @@ const PickedImages = ({ imageList, setImageList }) => {
     const removeImage = (uri) => {
         setImageList((prevImageList) => prevImageList.filter((image) => image.uri !== uri.uri));
     };
-
+    
     const renderImages = ({ item }) => (
         <View style={{
             marginHorizontal: 4, position: 'relative',
@@ -42,18 +42,18 @@ const PickedImages = ({ imageList, setImageList }) => {
             <IconButton
                 style={{
                     position: 'absolute',
-                    top: -16,
+                    top: -16, 
                     right: -10,
-                    borderRadius: 12,
+                    borderRadius: 12, 
                     padding: 5,
                 }}
                 icon={"sticker-remove"}
                 iconColor="black"
-                onPress={() => removeImage(item)}
+                onPress={() => removeImage(item)} 
             />
         </View>
     );
-
+    
     const width = Dimensions.get("window");
 
     const [full, setFull] = useState(false);
@@ -98,7 +98,7 @@ const PickedImages = ({ imageList, setImageList }) => {
             <FlatList horizontal={true}
                 keyExtractor={(item, index) => index.toString()}
                 data={imageList}
-
+                
                 renderItem={renderImages}
                 contentContainerStyle={styles.list}
             />
@@ -111,7 +111,7 @@ export default PickedImages;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: 10,
+        marginTop:10,
         flexDirection: 'row'
     },
 
