@@ -110,6 +110,11 @@ class PostForRentViewSet(ModelViewSet):
 
     serializer_class = PostForRentSerializer
     pagination_class = ItemPaginator
+    
+    def perform_create(self, serializer):
+        serializer=serializer.save(user=self.request.user)
+        return super().perform_create(serializer)
+    
 
     def get_queryset(self):
         return PostForRent.objects.filter(active=True) \
@@ -144,9 +149,29 @@ class PostForRentViewSet(ModelViewSet):
             return Response(CommentSerializer(comments,many=True).data)
 
             
+            
 class AddressViewSet(ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
+    
+    
+    @action(detail=False, methods=['post'], url_path='create-address')
+    def create_address(self, request):
+        # Ghi log dữ liệu nhận được
+        print("Dữ liệu nhận được:", request.data)
+
+        # Tạo instance serializer từ dữ liệu request
+        serializer = self.get_serializer(data=request.data)
+        
+        # Kiểm tra dữ liệu có hợp lệ không
+        if serializer.is_valid():
+            address = serializer.save()
+            return Response({"message": "Address created successfully!", "data": AddressSerializer(address).data}, status=status.HTTP_201_CREATED)
+        else:
+            # Trả về lỗi nếu không hợp lệ
+            print("Errors:", serializer.errors)
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
     
 
 
@@ -312,3 +337,7 @@ class WardViewSet(ModelViewSet):
     queryset = Ward.objects.all()
     serializer_class = WardSerializer
     
+    
+class PostImageViewSet(ModelViewSet):
+    queryset=PostImage.objects.filter(active=True)
+    serializer_class=PostImageSerializer

@@ -57,18 +57,16 @@ class ProvinceSerializer(ModelSerializer):
     
 
 class AddressSerializer(ModelSerializer):
-    province=ProvinceSerializer()
-    district=DistrictSerializer()
-    ward=WardSerializer()
+    
     class Meta:
         model = Address
-        fields='__all__'
+        fields = '__all__'
+        
 class PostImageSerializer(ModelSerializer):
-
 
     class Meta:
         model = PostImage
-        fields = ['id', 'image', 'post']
+        fields = ['image']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -77,15 +75,30 @@ class PostImageSerializer(ModelSerializer):
 
 class PostForRentSerializer(ModelSerializer):
     user = UserSerializer(read_only=True)
-    address = AddressSerializer(read_only=True)
-    post_image=PostImageSerializer(many=True, source='images', read_only=True)
+    address = AddressSerializer()
+    post_image=PostImageSerializer(many=True, source='images')
     type = serializers.SerializerMethodField()
     class Meta:
         model = PostForRent
         fields='__all__'
     def get_type(self, obj):
         return 'PostForRent'
+    
+    def create(self, validated_data):
+        address_data = validated_data.pop('address', None)
+        images_data = validated_data.pop('images', [])
 
+        address = Address.objects.create(** address_data)
+        user = self.context['request'].user
+        
+        post_for_rent = PostForRent.objects.create(address=address, **validated_data)
+
+        for image_data in images_data:
+            PostImage.objects.create(post=post_for_rent, **image_data)
+
+        return post_for_rent
+    
+    
 class PostWantSerializer(ModelSerializer):
     user=UserSerializer(read_only=True)
     address=AddressSerializer(read_only=True)
@@ -137,4 +150,9 @@ class FavouritePostSerializer(serializers.ModelSerializer):
         model = FavoritePost
         fields = ['id', 'created_date', 'updated_date', 'active', 'user', 'post']
 
+
+class PostImageSerializer(serializers.ModelSerializer):
     
+    class Meta:
+        model=PostImage
+        fields='__all__'

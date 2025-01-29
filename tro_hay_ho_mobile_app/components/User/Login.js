@@ -40,6 +40,7 @@ const Login = () => {
 
             // Lấy thông tin người dùng
             const token = res.data.access_token;
+            console.log(token)
             const userInfo = await authAPIs(token).get(endpoints["current-user"]);
 
             // Lưu vào context
@@ -78,6 +79,7 @@ const Login = () => {
 
             // Lấy thông tin người dùng
             const token = response.data.access_token;
+            console.log(token)
             const user = await authAPIs(token).get(endpoints["current-user"]);
 
             // Lưu vào context

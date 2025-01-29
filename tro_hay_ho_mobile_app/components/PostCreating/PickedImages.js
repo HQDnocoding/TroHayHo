@@ -6,14 +6,13 @@ import { Button, IconButton } from "react-native-paper";
 
 
 
-const PickedImages = () => {
-    const [imageList, setImageList] = useState([]); // imageList là mảng
+const PickedImages = ({ imageList, setImageList }) => {
     const openImageLibrary = async () => {
         console.log("Chọn ảnh...");
         const res = await launchImageLibrary(
             {
-                mediaType: "photo", // Chỉ chọn ảnh
-                selectionLimit: 0, // Cho phép chọn nhiều ảnh
+                mediaType: "photo", 
+                selectionLimit: 0,
             }
         );
 
@@ -22,12 +21,15 @@ const PickedImages = () => {
         } else if (res.errorCode) {
             Alert.alert("Lỗi", res.errorMessage);
         } else {
-            // Thêm các ảnh mới vào mảng
-            const newImages = res.assets.map((asset) => asset.uri);
+            const newImages = res.assets.map((asset) => asset);
+            console.log(res);
             setImageList((prevImageList) => [...prevImageList, ...newImages]);
         }
     };
 
+    const removeImage = (uri) => {
+        setImageList((prevImageList) => prevImageList.filter((image) => image.uri !== uri.uri));
+    };
 
     const renderImages = ({ item }) => (
         <View style={{
@@ -36,16 +38,22 @@ const PickedImages = () => {
             width: 120, alignItems: 'center', justifyContent: 'center',
             borderStyle: 'dashed', borderWidth: 1.5, borderColor: '#FFBA00'
         }}>
-            <Image source={{ uri: item }} style={styles.image} />
-            <IconButton style={{
-                position: 'absolute',
-                top: -16, // Khoảng cách từ trên cùng
-                right: -10, // Khoảng cách từ bên phải
-                borderRadius: 12, // Bo tròn nút
-                padding: 5,
-            }} icon={"sticker-remove"} iconColor="black"   onPress={() => { }} />
+            <Image source={{ uri: item.uri }} style={styles.image} />
+            <IconButton
+                style={{
+                    position: 'absolute',
+                    top: -16,
+                    right: -10,
+                    borderRadius: 12,
+                    padding: 5,
+                }}
+                icon={"sticker-remove"}
+                iconColor="black"
+                onPress={() => removeImage(item)}
+            />
         </View>
-    )
+    );
+
     const width = Dimensions.get("window");
 
     const [full, setFull] = useState(false);
@@ -90,7 +98,7 @@ const PickedImages = () => {
             <FlatList horizontal={true}
                 keyExtractor={(item, index) => index.toString()}
                 data={imageList}
-                
+
                 renderItem={renderImages}
                 contentContainerStyle={styles.list}
             />
@@ -103,7 +111,7 @@ export default PickedImages;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop:10,
+        marginTop: 10,
         flexDirection: 'row'
     },
 

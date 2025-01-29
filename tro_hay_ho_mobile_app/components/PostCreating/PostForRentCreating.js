@@ -1,23 +1,32 @@
 import { ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import { ActivityIndicator, Button, Divider, RadioButton, TextInput } from "react-native-paper";
-import Modal from "react-native-modal";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ActivityIndicator, Button, Divider, RadioButton, Snackbar, TextInput } from "react-native-paper";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { FlatList } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList, BottomSheetView } from "@gorhom/bottom-sheet";
-import APIs, { endpoints } from "../../configs/APIs";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { set } from "firebase/database";
-import MapView, { Circle, Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from "react-native-maps";
-import Map from "./Map";
-import { useNavigation } from "@react-navigation/native";
+import APIs, { authAPIs, endpoints } from "../../configs/APIs";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import PickedImages from "./PickedImages";
-
+import { MyUserContext } from "../../configs/UserContexts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomNumericInput from "./CustomNumericInput";
 
 
 const PostForRentCreating = () => {
     const navigation = useNavigation();
+    const route = useRoute();
+    const [imageList, setImageList] = useState([]);
+    const convertToImageObjects = () => {
+        const imageObjects = imageList.map((image) => ({
+            image: image.uri
+        }));
+        console.log(imageObjects);
+        return imageObjects;
+    };
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
+    const [pId, setPId] = useState(null);
+    const [dId, setDId] = useState(null);
+    const [wId, setWId] = useState(null);
     const [location, setLocation] = useState({ province: '', district: '', ward: '' });
     const [wards, setWards] = useState([]);
     const sheetRef = useRef(null);
@@ -28,32 +37,125 @@ const PostForRentCreating = () => {
     const snapPoints2 = useMemo(() => ["1%", "50%", "50%"], []);
     const snapPoints3 = useMemo(() => ["1%", "50%", "50%"], []);
     const snapPointsMap = useMemo(() => ["1%", "80%", "80%"], []);
-    const [markerPosition, setMarkerPosition] = useState([{
-        latitude: 10.123456,
-        longitude: 106.654321,
-    }]);
+    const [snackBarText, setSnackBarText] = useState(null);
+    const [price, setPrice] = useState(0);
+    const [visible, setVisible] = useState(false);
 
-    const [infoText, setInfoText] = useState("");
 
-    const onMarkerDragEnd = (e) => {
-        const { latitude, longitude } = e.nativeEvent.coordinate;
-        setMarkerPosition({ latitude, longitude });
-        setInfoText(`Pin dropped at: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
-    };
 
-    const [isSheetVisible, setIsSheetVisible] = useState(false);
+    const onDismissSnackBar = () => setVisible(false);
+    const user = useContext(MyUserContext);
+    const createPost = async () => {
+
+        console.log("click");
+
+        if (user !== null) {
+            console.log("click2")
+            if (data.district == '' || data.province == ''
+                || data.ward == '' || data.specified_address == ''
+                || data.coordinates == '' || data.coordinates === null || data.coordinates === undefined) {
+                setSnackBarText("Vui lòng điền địa chỉ đầy đủ");
+                setVisible(!visible);
+                console.log('error');
+
+            }
+            else if(data.specified_address===undefined){
+                setSnackBarText("Vui lòng điền địa chỉ chi tiết");
+                setVisible(!visible);
+            }
+            else if (postValues.acreage == '' || postValues.title == '' ||
+                postValues.description == '' || postValues.name_agent == ''
+                || postValues.price == '' || postValues.max_number_of_people == ''
+            ) {
+                setSnackBarText("Vui lòng điền đầy đủ thông tin");
+                setVisible(!visible);
+            }
+            else if (!/^\d+$/.test(postValues.acreage)) {
+                setSnackBarText("Vui lòng điền đúng giá trị diện tích là số nguyên");
+                setVisible(!visible);
+            }
+            else if (!/^\d+$/.test(postValues.max_number_of_people)) {
+                setSnackBarText("Vui lòng điền đúng giá trị số người ở tối đa là số nguyên");
+                setVisible(!visible);
+            }
+            else if (!/^\d+$/.test(postValues.acreage)) {
+                setSnackBarText("Vui lòng điền đúng giá trị giá cho thuê là số");
+                setVisible(!visible);
+            }
+            else if (imageList.length < 6 || imageList.length === 0) {
+                setSnackBarText("Vui lòng thêm hình ảnh về nơi muốn cho thuê");
+                setVisible(!visible);
+            }
+            else {
+                try {
+                    const payload = {
+                        "specified_address": data.specified_address,
+                        "province": data.province,
+                        "district": data.district,
+                        "ward": data.ward,
+                        "coordinates": data.coordinates?.latitude && data.coordinates?.longitude
+                            ? `${data.coordinates.latitude}, ${data.coordinates.longitude}`
+                            : '',
+                    };
+
+                    // let res = await APIs.post(endpoints['create-address'], payload, {
+                    //     headers: {
+                    //         'Content-Type': 'application/json'
+                    //     }
+                    // });
+                    // const addressId = res.data.data.id;
+                    const imageDict = convertToImageObjects();
+
+                    const jsonData = {
+                        "title": postValues.title,
+                        "acreage": postValues.acreage,
+                        "max_number_of_people": postValues.max_number_of_people,
+                        "price": postValues.price,
+                        "description": postValues.description,
+                        "name_agent": postValues.name_agent,
+                        "address": payload,
+                        "post_image": imageDict,
+                        "phone_contact": user.phone||"0",
+                    };
+
+
+                    console.log("ppo", jsonData);
+                    const token = await AsyncStorage.getItem("access_token");
+
+                    let resPost = await authAPIs(token).post(endpoints['getListPostForRent'], jsonData,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    );
+
+                    console.log(resPost.data);
+
+
+
+
+                } catch (ex) {
+                    console.error(ex);
+                }
+            }
+        }
+    }
+
+    const [data, setData] = useState({
+        specified_address: '', coordinates: '',
+        province: '', district: '', ward: ''
+    });
+
+    const [postValues, setPostValues] = useState({
+        title: '', description: '', price: '', acreage: '',
+        max_number_of_people: '', name_agent: '',
+    });
+
     const handleSheetChange = useCallback((index) => {
         console.log("handleSheetChange", index);
     }, []);
 
-    const saveProvincesId = async ({ id }) => {
-        // setCurrentPId(id);
-        AsyncStorage.setItem("provinceId", id);
-    }
-
-    const saveDistrictId = async ({ id }) => {
-        AsyncStorage.setItem("districtId", id);
-    }
 
     const loadProvinces = async () => {
         try {
@@ -78,7 +180,6 @@ const PostForRentCreating = () => {
 
     const loadWards = async ({ dId }) => {
         try {
-            const pId = await AsyncStorage.getItem("provinceId");
             const res = await APIs.get(endpoints["provinces-districts-wards"](pId, dId));
             setWards(res.data);
         } catch (ex) {
@@ -90,9 +191,6 @@ const PostForRentCreating = () => {
         loadProvinces();
     }, []);
 
-    const handleMapSnapPress = useCallback((index) => {
-        sheetRefMap.current?.snapToIndex(index);
-    }, []);
 
 
     const handleSnapPress = useCallback((index) => {
@@ -116,7 +214,7 @@ const PostForRentCreating = () => {
     const handlePressProvince = ({ id }) => {
 
 
-        saveProvincesId({ id: id });
+        setPId(id);
 
         loadDistricts({ id: id });
         handleSnapPress2(2);
@@ -124,7 +222,8 @@ const PostForRentCreating = () => {
 
 
     const handlePressDistricts = ({ id }) => {
-        saveDistrictId({ id: id });
+
+        setDId(id);
         loadWards({ dId: id });
         handleSnapPress3(2);
     }
@@ -167,6 +266,7 @@ const PostForRentCreating = () => {
             sheetRef3.current?.close();
             setWards([]);
             setDistricts([]);
+            setWId(item.code);
         }}>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 15, paddingVertical: 10, paddingStart: 20 }}>{item.name}</Text>
@@ -185,92 +285,192 @@ const PostForRentCreating = () => {
         ),
         []
     );
+
     const [valid, setValid] = useState(false);
+
     useEffect(() => {
         if (location.district == '' || location.ward == '' || location.ward == '') {
             setValid(false);
-        } else setValid(true);
-    }, [location.district, location.province, location.ward]);
+        } else {
+            setData({ province: pId, district: dId, ward: wId });
+            setValid(true);
+        };
+    }, [pId, dId, wId]);
 
-    const [coordinate, setCoordinate] = useState({
-        latitude: 10.123456,
-        longitude: 105.654321,
-    });
 
-    const handleMapPress = ({ nativeEvent }) => {
-        const { latitude, longitude } = nativeEvent.coordinate;
-        setCoordinate({ latitude, longitude });
-    };
+    useEffect(() => {
+        console.log(postValues);
+    }, [postValues])
+
+    useFocusEffect(
+
+        useCallback(() => {
+            console.log("dosodos");
+            const getData = async () => {
+                const storedCoord = await AsyncStorage.getItem("coord");
+                if (storedCoord) {
+                    setData((prev) => ({ ...prev, coordinates: JSON.parse(storedCoord) }));
+                }
+            };
+            getData();
+        }, [])
+    );
+
     return (
         <View style={{ flex: 1 }}>
-            <View >
-                <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
-                    <Text style={styles.label}>Tiêu đề, mô tả bài đăng</Text>
-                </View>
-                <View style={styles.flexRow}>
-                    <TextInput style={styles.input} mode="outlined"
-                        label={"Tên bài đăng"}
-                        outlineColor="#CAC4D0"
-                        placeholderTextColor="#CAC4D0"
-                        activeOutlineColor="#FFBA00" />
-                </View>
-                <View style={styles.flexRow}>
-                    <TextInput style={styles.input} mode="outlined"
-                        outlineColor="#CAC4D0"
-                        label={"Diện tích"}
-                        placeholderTextColor="#CAC4D0"
-                        activeOutlineColor="#FFBA00" />
-                </View>
-                <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
-                    <Text style={styles.label}>Thông tin diện tích, giá cả</Text>
-                </View>
-                <View style={styles.flexRow}>
-                    <TextInput style={styles.input} mode="outlined"
-                        outlineColor="#CAC4D0"
-                        label={"Số người ở tối đa"}
-                        placeholderTextColor="#CAC4D0"
-                        activeOutlineColor="#FFBA00" keyboardType="numeric" inputMode="numeric" />
-                </View>
-                <View style={styles.flexRow}>
-                    <TextInput style={styles.input} mode="outlined"
-                        outlineColor="#CAC4D0"
-                        label={"Mô tả"}
-                        placeholderTextColor="#CAC4D0"
-                        activeOutlineColor="#FFBA00"></TextInput>
-                </View>
-                <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
-                    <Text style={styles.label}>Địa chỉ</Text>
-                </View>
-                <TouchableWithoutFeedback onPress={() => { handleSnapPress(2) }}>
+            <FlatList
+                ListHeaderComponent={<View >
+                    <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
+                        <Text style={styles.label}>Tiêu đề, mô tả bài đăng</Text>
+                    </View>
                     <View style={styles.flexRow}>
+                        <TextInput style={styles.input} mode="outlined"
+                            label={"Tên bài đăng"}
+                            outlineColor="#CAC4D0"
+                            onChange={(newText) => {
+                                const textValue = newText.nativeEvent.text;
+                                setPostValues((prev) => ({
+                                    ...prev,
+                                    title: textValue,
+                                }));
+                            }}
+                            placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00" />
+                    </View>
 
-                        <TextInput style={styles.input} mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
-                            onPress={() => { }}
-                            onFocus={() => { }}
-                            editable={false}
-                            value={`${location.ward ? location.ward + ', ' : ''}${location.district ? location.district + ', ' : ''}${location.province}`}
-                            label={"Địa chỉ"}
-                            right={<TextInput.Icon icon={'arrow-right-drop-circle-outline'} onPress={() => { handleSnapPress(1) }} />}
-                            activeOutlineColor="#FFBA00" ></TextInput>
+                    <View style={styles.flexRow}>
+                        <TextInput style={styles.input} mode="outlined"
+                            outlineColor="#CAC4D0"
+                            label={"Mô tả"}
+                            multiline={true}
+                            onChange={(newText) => {
+                                const textValue = newText.nativeEvent.text;
+                                setPostValues((prev) => ({
+                                    ...prev,
+                                    description: textValue,
+                                }));
+                            }}
+                            placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00"></TextInput>
+                    </View>
+                    <View style={styles.flexRow}>
+                        <TextInput style={styles.input} mode="outlined"
+                            outlineColor="#CAC4D0"
+                            label={"Tên người đại diện bên cho thuê"}
+                            multiline={true}
+                            onChange={(newText) => {
+                                const textValue = newText.nativeEvent.text;
+                                setPostValues((prev) => ({
+                                    ...prev,
+                                    name_agent: textValue,
+                                }));
+                            }}
+                            placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00"></TextInput>
+                    </View>
+                    <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
+                        <Text style={styles.label}>Thông tin diện tích, giá cả</Text>
+                    </View>
+                    <View style={styles.flexRow}>
+                        <TextInput style={styles.input} mode="outlined"
+                            outlineColor="#CAC4D0"
+                            label={"Số người ở tối đa"}
+
+                            placeholderTextColor="#CAC4D0"
+                            onChange={(newText) => {
+                                const textValue = newText.nativeEvent.text;
+                                setPostValues((prev) => ({
+                                    ...prev,
+                                    max_number_of_people: textValue,
+                                }));
+                            }}
+                            activeOutlineColor="#FFBA00" keyboardType="numeric" inputMode="numeric" />
+                    </View>
+                    <View style={styles.flexRow}>
+                        <TextInput style={styles.input} mode="outlined"
+                            outlineColor="#CAC4D0"
+                            label={"Diện tích"}
+                            keyboardType="number-pad"
+                            onChange={(newText) => {
+                                const textValue = newText.nativeEvent.text;
+                                setPostValues((prev) => ({
+                                    ...prev,
+                                    acreage: textValue,
+                                }));
+                            }}
+                            placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00" />
+                    </View>
+                    <View style={styles.flexRow}>
+                        <Text style={{ fontSize: 16, marginHorizontal: 20 }}>Giá cho thuê</Text>
+                        <CustomNumericInput price={price} setPostValues={setPostValues} />
+                        <Text style={{ fontSize: 16, marginStart: 10 }}>VNĐ</Text>
 
                     </View>
-                </TouchableWithoutFeedback>
-                <TouchableWithoutFeedback onPress={() => { navigation.navigate('map', { latitude: 10.123456, longitude: 106.654321 }) }}>
-                    <View style={styles.flexRow}>
-
-                        <TextInput style={styles.input} mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
-                            onPress={() => { }}
-                            onFocus={() => { }}
-                            editable={false}
-                            value=''
-                            label={"Tọa độ"}
-                            right={<TextInput.Icon icon={'arrow-right-drop-circle-outline'} />}
-                            activeOutlineColor="#FFBA00" ></TextInput>
-
+                    <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
+                        <Text style={styles.label}>Địa chỉ</Text>
                     </View>
-                </TouchableWithoutFeedback>
-            </View>
-            <PickedImages />
+                    <TouchableWithoutFeedback onPress={() => { handleSnapPress(2) }}>
+                        <View style={styles.flexRow}>
+
+                            <TextInput style={styles.input} mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
+                                onPress={() => { }}
+                                onFocus={() => { }}
+                                editable={false}
+                                value={`${location.ward ? location.ward + ', ' : ''}${location.district ? location.district + ', ' : ''}${location.province}`}
+                                label={"Địa chỉ"}
+                                right={<TextInput.Icon icon={'arrow-right-drop-circle-outline'} onPress={() => { handleSnapPress(1) }} />}
+                                activeOutlineColor="#FFBA00" >
+                            </TextInput>
+
+                        </View>
+                    </TouchableWithoutFeedback>
+                    <View style={styles.flexRow}>
+                        <TextInput style={styles.input} mode="outlined"
+                            outlineColor="#CAC4D0"
+
+                            label={"Số nhà, Tên đường"}
+                            onChange={(newText) => {
+                                // Lấy giá trị từ sự kiện trước khi sử dụng
+                                const textValue = newText.nativeEvent.text; // Hoặc newText nếu bạn đang truyền giá trị thẳng
+                                setData((prev) => ({
+                                    ...prev,
+                                    specified_address: textValue, // Cập nhật giá trị address
+                                }));
+                            }} placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00" />
+                    </View>
+                    <TouchableWithoutFeedback onPress={() => {
+                        navigation.navigate('map')
+                    }}>
+                        <View style={styles.flexRow}>
+
+                            <TextInput style={styles.input} mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
+                                onPress={() => { }}
+                                onFocus={() => { }}
+                                editable={false}
+                                value={`(${data.coordinates?.latitude}, ${data.coordinates?.longitude})`}
+                                label={"Tọa độ"}
+                                right={<TextInput.Icon icon={'arrow-right-drop-circle-outline'} />}
+                                activeOutlineColor="#FFBA00" ></TextInput>
+
+                        </View>
+                    </TouchableWithoutFeedback>
+
+                    <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
+                        <Text style={styles.label}>Hình ảnh</Text>
+                    </View>
+                    <PickedImages imageList={imageList} setImageList={setImageList} />
+
+                    <Button onPress={createPost} style={{ marginHorizontal: 'auto', marginVertical: 10, backgroundColor: "#ff7b00", width: 200, paddingVertical: 10, borderRadius: 10 }}><Text style={{ color: "white", fontSize: 20 }}>Đăng tin</Text></Button>
+                    <Snackbar visible={visible}
+                        onDismiss={onDismissSnackBar} >
+                        {snackBarText}
+                    </Snackbar>
+
+                </View>}
+
+            />
 
             <BottomSheet
                 ref={sheetRef}
@@ -317,7 +517,8 @@ const PostForRentCreating = () => {
                     contentContainerStyle={{ backgroundColor: 'white' }}
                 />
             </BottomSheet>
-            <Button style={{marginHorizontal:'auto',marginBottom:10, backgroundColor: "#ff7b00", width: 200, paddingVertical: 10, borderRadius: 10 }}><Text style={{ color: "white", fontSize: 20 }}>Đăng tin</Text></Button>
+
+
         </View>
     )
 }
