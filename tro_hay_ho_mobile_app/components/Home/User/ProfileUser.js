@@ -17,8 +17,8 @@ import { getInfoPostFavoriteOfUser } from '../../../utils/MyFunctions';
 
 const ProfileUser = ({ navigation, route }) => {
     const currentUser = useContext(MyUserContext)
-    const {showDialog} = useRequestLoginDialog()
-const { requestLoginDialog } = useRequestLoginDialog();
+    const { showDialog } = useRequestLoginDialog()
+    const { requestLoginDialog } = useRequestLoginDialog();
     const params = route.params || {}
     const { infoUser } = params
     const [post, setPost] = React.useState([])
@@ -118,7 +118,7 @@ const { requestLoginDialog } = useRequestLoginDialog();
             }
 
 
-        }else{
+        } else {
             showDialog()
             // alert("Vui lòng đăng nhập")
         }
@@ -167,9 +167,9 @@ const { requestLoginDialog } = useRequestLoginDialog();
         }
     }
     const renderItemPost = ({ item }) => {
-     
-            return <PostCard kkey={item.id} item={item} dataPostFav={postFav} currentUser={currentUser}/>;
-      
+
+        return <PostCard kkey={item.id} item={item} dataPostFav={postFav} currentUser={currentUser} />;
+
 
     }
     React.useEffect(() => {
@@ -185,7 +185,7 @@ const { requestLoginDialog } = useRequestLoginDialog();
         return (
             <View >
                 <View style={styles.header}>
-                    <Image 
+                    <Image
                         source={{ uri: sampleImage2 }}
                         style={styles.backgroundImage}
                     />
@@ -292,9 +292,9 @@ const styles = StyleSheet.create({
         height: 150,
     },
     backgroundImage: {
-        width: '100%', 
+        width: '100%',
         height: '100%',
-        position: 'absolute', 
+        position: 'absolute',
         top: 0,
         left: 0,
     },

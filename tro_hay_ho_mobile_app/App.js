@@ -18,7 +18,7 @@ import ConversationScreen from "./components/Home/conversation/ConversationScree
 import MessageScreen from './components/Home/message/MessageScreen';
 import MessageStackNavigator from "./components/Home/message/MessageStackNavigator";
 import FavouritePost from './components/User/FavouritePost';
-import SearchScreen from './components/Home/SearchScreen';
+import SearchScreen from './components/Home/search/SearchScreen';
 import {
     GoogleSignin
 } from '@react-native-google-signin/google-signin';
@@ -119,8 +119,13 @@ export default function App() {
                 }} />
                 <Stack.Screen name={"search"}
                     component={SearchScreen}
-                    options={{ title: null }} />
-
+                    options={{
+                        headerTitle: 'Tìm kiếm',
+                        headerStyle: {
+                            backgroundColor: '#FFBA00',
+                        }
+                    }}/>
+                
                 <Stack.Screen name='map' component={Map} options={{
                     title: "Chọn vị trí", headerStyle: {
                         backgroundColor: '#FFBA00',

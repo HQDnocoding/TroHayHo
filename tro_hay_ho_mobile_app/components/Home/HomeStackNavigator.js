@@ -1,13 +1,13 @@
 import { Stack } from "../../general/General";
-import { IconButton, Searchbar, Modal, Portal, Provider } from "react-native-paper";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { IconButton, Searchbar, Modal, Portal, Provider, Icon } from "react-native-paper";
+import { View, StyleSheet, TouchableOpacity,Text } from "react-native";
 import { useState,useContext } from 'react';
-
+import { FontAwesome, Entypo,MaterialIcons  } from '@expo/vector-icons';
 import Home from "./Home";
 import NotificationScreen from "./notification/NotificationScreen";
 import ConversationScreen from "./conversation/ConversationScreen";
 import HomeTabNavigator from "./HomeTabNavigator";
-import SearchScreen from "./SearchScreen";
+import SearchScreen from "./search/SearchScreen";
 import NotificationTabNaviagtor from "./notification/NotificationTabNaviagtor";
 import MessageScreen from "./message/MessageScreen";
 import RequestLoginDialog from "./duc/RequestLoginDialog";
@@ -22,7 +22,10 @@ const HomeStackNavigator = () => {
     const nav= useNavigation()
     const currentUser = useContext(MyUserContext)
 
- 
+    const handleToSearch=()=>{
+        console.log("home seact")
+        nav.navigate('search')
+    }
     const handleToRoute=(routeName)=>{
         if (currentUser!==null){
             nav.navigate(routeName)
@@ -40,12 +43,13 @@ const HomeStackNavigator = () => {
                     headerLeft: () => {
                         if (route.name === "HomeTab") {
                             return (
-                                <TouchableOpacity>
-                                    <Searchbar
-                                        placeholder={"Tìm kiếm"}
+                                <TouchableOpacity onPress={handleToSearch}>
+                                    <View
                                         style={styles.searchBar}
-                                        inputStyle={styles.searchInput}
-                                    />
+                                    >
+                                       <MaterialIcons style={styles.iconSearch} name="search" size={24} color="black" />
+                                        <Text style={styles.searchInput}>Tìm kiếm ...</Text>
+                                    </View>
                                 </TouchableOpacity>
                             );
                         }
@@ -82,11 +86,7 @@ const HomeStackNavigator = () => {
                     options={{ title: null, headerShown: true }}
                 />
                 
-                <Stack.Screen 
-                    name={"search"}
-                    component={SearchScreen}
-                    options={{ title: null }} 
-                />
+                
             </Stack.Navigator>
         </Provider>
     );
@@ -101,10 +101,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         elevation: 0,
         borderRadius: 20,
+        alignItems:'center',
+        flexDirection:'row',
+
+
+    },
+    iconSearch:{
+        marginLeft:10,
+
     },
     searchInput: {
         fontSize: 14,
         minHeight: 0,
+        marginLeft:10,
     },
     modalContainer: {
         backgroundColor: 'white',
