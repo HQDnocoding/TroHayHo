@@ -1,5 +1,8 @@
+import random
 from datetime import timedelta
 import secrets
+
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.timezone import now
@@ -10,14 +13,14 @@ from oauth2_provider.models import Application, AccessToken
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView ,DestroyAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView ,DestroyAPIView,UpdateAPIView
 from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from rest_framework.viewsets import ModelViewSet
-# from rest_framework_simplejwt.tokens import RefreshToken
+from twilio.rest import Client
 
 from .paginator import ItemPaginator
 from .models import User,Role,Comment
@@ -25,6 +28,14 @@ from .paginator import ItemPaginator,ItemSmallPaginator
 from .models import User, Role
 from .serializers import *
 from .paginator import *
+from tro_hay_ho.settings import TWILIO_SERVICE_SID, TWILIO_AUTH_TOKEN, TWILIO_ACCOUNT_SID,TWILIO_PHONE_NUMBER
+
+from tro_hay_ho.settings import verify_firebase_token
+
+
+
+# from tro_hay_ho.settings import verify_firebase_token
+
 
 
 class UserViewSet(ViewSet,CreateAPIView):
@@ -32,6 +43,8 @@ class UserViewSet(ViewSet,CreateAPIView):
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
     pagination_class = ItemPaginator
+    
+     
     
     def get_permissions(self):
         if self.action in ['get_current_user','get_favorites']:
@@ -56,7 +69,74 @@ class UserViewSet(ViewSet,CreateAPIView):
         serializer = FavouritePostSerializer(favorite_posts, many=True) 
         return Response(serializer.data)
 
+
+    @action(methods=['post'], url_path='add-phone-number', detail=False)
+    def add_phone_number(self, request):
+        id_token = request.data.get("id_token")
+        phone_number = request.data.get("phone_number")
+        
+        user_data = verify_firebase_token(id_token)
+        if not user_data:
+            return Response({"error": "Token không hợp lệ"}, status=400)
+        
+        if phone_number != user_data.get("phone_number"):
+            return Response({"error": "Số điện thoại không khớp với Firebase"}, status=400)
+        
+        user = request.user
+        print(user)
+        user.phone = phone_number
+        user.save()
+        
+        return Response({"message": "Số điện thoại đã xác thực và lưu thành công."})
+        pass
     
+    @action(methods=['post'],url_path='send-otp',detail=False)
+    def send_otp(self, request):
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
+        phone_number = request.data.get("phone_number")
+        if not phone_number:
+            return Response({"error": "Số điện thoại không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Tạo OTP 6 số ngẫu nhiên
+        otp = str(random.randint(100000, 999999))
+        cache.set(phone_number, otp, timeout=300)  # Lưu OTP vào cache (5 phút)
+
+        # Gửi OTP qua Twilio
+        try:
+            client.messages.create(
+                body=f"OTP: {otp}",
+                from_=TWILIO_PHONE_NUMBER,
+                to=phone_number
+            )
+            return Response({"message": "OTP đã được gửi thành công"})
+        except Exception as e:
+            return Response({"error": f"Gửi OTP thất bại: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    @action(methods=['post'],url_path='verify-otp',detail=False)
+    def verify_otp(self,request):
+        phone_number = request.data.get("phone_number")
+        otp = request.data.get("otp_code")
+
+        if not phone_number or not otp:
+            return Response({"error": "Số điện thoại hoặc OTP không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Kiểm tra OTP từ cache
+        cached_otp = cache.get(phone_number)
+        if cached_otp is None:
+            return Response({"error": "OTP đã hết hạn hoặc không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if cached_otp == otp:
+            user=request.user
+            user.phone=phone_number
+            user.save()
+            cache.delete(phone_number)  # Xóa OTP sau khi xác thực thành công
+            return Response({"message": "Xác thực thành công"})
+        else:
+            return Response({"error": "OTP không chính xác"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
     
     
@@ -87,6 +167,8 @@ class PostWantViewSet(ModelViewSet):
     queryset = PostWant.objects.filter(active=True)
     serializer_class = PostWantSerializer
     pagination_class = ItemPaginator
+    
+
     
     @action(methods=['get','post'],url_path='comments',detail=True)
     def get_comments(self,request,pk):

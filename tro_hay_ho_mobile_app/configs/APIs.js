@@ -15,6 +15,9 @@ const BASE_URL = "http://192.168.1.11:8000/"
 export const endpoints = {
     'login': '/o/token/',
     'current-user': '/users/current-user/',
+    'add-phone-number':'/users/add-phone-number/',
+    'send-otp':'/users/send-otp/',
+    'verify-otp':'/users/verify-otp/',
     'register': '/users/',
     'google-login': '/google-login/',
     'favourite-posts': '/users/favorites/',

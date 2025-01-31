@@ -9,6 +9,11 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import firebase_admin
+from firebase_admin import credentials, auth
+
+cred = credentials.Certificate("firebase/serviceAccountKey.json")  # Thay bằng đường dẫn file JSON của Firebase
+firebase_admin.initialize_app(cred)
 
 from pathlib import Path
 
@@ -41,8 +46,24 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'cloudinary_storage',
-    'corsheaders'
+    'corsheaders',
+    'phone_verify',
 ]
+
+
+# PHONE_VERIFICATION = {
+#     'BACKEND': 'phone_verify.backends.twilio.TwilioBackend',
+#     'TWILIO_SANDBOX_TOKEN':'123456',
+#     'OPTIONS': {
+#         'SID': 'fake',
+#         'SECRET': 'fake',
+#         'FROM': '+14755292729'
+#     },
+#     'TOKEN_LENGTH': 6,
+#     'MESSAGE': 'Welcome to {app}! Please use security code {otp} to proceed.',
+#     'APP_NAME': 'Phone Verify',
+#     'OTP_EXPIRATION_TIME': 3600  # In seconds only
+# }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
@@ -165,12 +186,19 @@ OAUTH2_PROVIDER = { 'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSO
 
 
 
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import credentials
+def verify_firebase_token(id_token):
+    try:
+        decoded_token = auth.verify_id_token(id_token)
+        return decoded_token  # Trả về thông tin người dùng nếu token hợp lệ
+    except Exception:
+        return None  # Token không hợp lệ
+    
 
-# Đường dẫn tới tệp JSON cấu hình Firebase
-cred = credentials.Certificate("tro_hay_ho/fb_admin_sdk.json")
 
-# Khởi tạo Firebase Admin SDK
-firebase_admin.initialize_app(cred)
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+    }
+}

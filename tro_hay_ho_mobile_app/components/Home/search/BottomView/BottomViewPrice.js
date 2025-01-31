@@ -42,15 +42,15 @@ const BottomViewPrice = forwardRef((props, ref) => {
             snapPoints={snapPoints}
             onChange={handleSheetChanges}
             enablePanDownToClose={true}
-            handleIndicatorStyle={{ backgroundColor: 'grey' }}
+            handleIndicatorStyle={{ backgroundColor: 'white' }}
             handleStyle={{
-                borderTopRightRadius: 8,
-                borderTopLeftRadius: 8,
-                backgroundColor: 'rgb(238, 238, 238)'
+              borderTopRightRadius: 8,
+              borderTopLeftRadius: 8,
+              backgroundColor: "rgb(255, 215, 121)"
             }}
         >
             <BottomSheetView style={styles.contentContainer}>
-                <Text>Giá</Text>
+                <Text style={{margin:10,fontSize:20}}>Giá</Text>
                 <TextInput
                     label="Giá tối thiểu"
                     value={minPrice}
@@ -81,11 +81,12 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 24,
         alignItems: 'center',
-        backgroundColor: 'rgb(175, 174, 174)'
+        backgroundColor: 'white'
     },
     input: {
         width: '100%',
         marginBottom: 10,
+        backgroundColor:'rgb(255, 255, 255)'
     },
     button: {
         backgroundColor: '#EEEEEE',

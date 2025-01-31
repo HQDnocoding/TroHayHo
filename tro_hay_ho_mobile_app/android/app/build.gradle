@@ -1,6 +1,9 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
@@ -152,6 +155,8 @@ dependencies {
 implementation("com.google.android.gms:play-services-maps:18.2.0")
 implementation project(':react-native-maps')
   implementation("androidx.activity:activity:1.9.+")
+  implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+implementation("com.google.firebase:firebase-auth")
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
     def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";

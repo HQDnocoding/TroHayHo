@@ -32,6 +32,7 @@ import RequestLoginDialog from './components/Home/duc/RequestLoginDialog';
 import Map from './components/PostCreating/Map';
 import PickedImages from './components/PostCreating/PickedImages';
 import ImagePickerComponent from './components/User/test';
+import PhoneSignIn from './components/User/Test2';
 
 
 export default function App() {
@@ -146,7 +147,7 @@ export default function App() {
                                 <MyDispatchContext.Provider value={dispatch}>
                                     <MyAppNavigator />
                                     <RequestLoginDialog />
-                                    {/* <ImagePickerComponent/> */}
+                                    {/* <PhoneSignIn/> */}
                                 </MyDispatchContext.Provider>
                             </MyUserContext.Provider>
                         </RequestLoginDialogProvider >
