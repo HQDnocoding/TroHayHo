@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Button, TouchableWithoutFeedback, FlatList, RefreshControl, Keyboard, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Button, TouchableWithoutFeedback, FlatList, RefreshControl, Keyboard, TouchableOpacity, Animated, ScrollView, ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Feather, Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,8 @@ import Provinces from './BottomView/Address/Provinces';
 import Districts from './BottomView/Address/Districts';
 import Wards from './BottomView/Address/Wards';
 import { parseStringToFloat } from '../../../utils/MyFunctions';
+import { endpointsDucFilter } from '../../../configs/UrlFilter';
+import APIs from '../../../configs/APIs';
 const CustomRadioButton = ({ selected, onSelect }) => {
     const [animation] = useState(new Animated.Value(selected === 'newest' ? 0 : 1));
 
@@ -97,10 +99,15 @@ export const TypeEnum = {
     POSTFORRENT: "POSTFORRENT"
 };
 
-const noneProvince = { code: "-1", name: "chọn tỉnh/tp", full_name: "chọn tỉnh/tp" }
-const noneDistrict = { code: "-1", name: "chọn quận/huyện", full_name: "chọn quận/huyện" }
-const noneWard = { code: "-1", name: "chọn xã/phường", full_name: "chọn xã/phường" }
-const SearchScreen = () => {
+export const noneProvince = { code: "-1", name: "chọn tỉnh/tp", full_name: "chọn tỉnh/tp" }
+export const noneDistrict = { code: "-1", name: "chọn quận/huyện", full_name: "chọn quận/huyện" }
+export const noneWard = { code: "-1", name: "chọn xã/phường", full_name: "chọn xã/phường" }
+export const SearchScreen = () => {
+    const [allPost, setAllPost] = useState([])
+    const [page, setPage] = useState(1)
+    const [loading, setLoading] = useState(false)
+    const [urlFilter, setUrlFilter] = useState("/post-parent/?is_newest=1")
+
     //chi de hien thi
     const [selectedAcreage, setSelectedAcreage] = useState('Diện tích');
     const [selectedAddress, setSelectedAddress] = useState('Toàn quốc');
@@ -255,6 +262,16 @@ const SearchScreen = () => {
 
         handleClose(BottomSheetType.ADDRESS);
     };
+    const handleAddressUnSelected = () => {
+        setSelectedProvince(noneProvince)
+        setSelectedDistrict(noneDistrict)
+        setSelectedWard(noneWard)
+        setProvince(noneProvince)
+        setDistrict(noneDistrict)
+        setWard(noneWard)
+
+        handleClose(BottomSheetType.ADDRESS);
+    };
     const handlePriceSelected = (price) => {
         setMinPrice(parseStringToFloat(price.min))
         setMaxPrice(parseStringToFloat(price.max))
@@ -302,7 +319,108 @@ const SearchScreen = () => {
         // Optional: close bottom sheet after selection
         // closeBottomSheet();
     };
+    const getUrlFilter = () => {
+        let url = endpointsDucFilter
+        if (selectedProvince.code !== "-1") {
+            url.province_code(selectedProvince.code)
+        } else {
+            url.params.delete('province_code');
+        }
+        if (selectedDistrict.code !== "-1") {
+            url.district_code(selectedDistrict.code)
+        } else {
+            url.params.delete('district_code');
+        }
+        if (selectedWard.code !== "-1") {
+            url.ward_code(selectedWard.code)
+        } else {
+            url.params.delete('ward_code');
+        }
 
+
+        if (maxAcreage > 0) {
+            url.max_acreage(maxAcreage);
+        } else {
+            url.params.delete('max_acreage');
+        }
+        if (minAcreage > 0) {
+            url.min_acreage(minAcreage);
+        } else {
+            url.params.delete('min_acreage');
+        }
+
+
+
+        if (maxPrice > 0) {
+            url.max_price(maxPrice)
+        } else {
+            url.params.delete('max_price');
+        }
+        if (minPrice !== 0) {
+            url.min_price(minPrice)
+        } else {
+            url.params.delete('min_price');
+        }
+
+        if (type) {
+            url.type(type.toLowerCase())
+        }
+        if (sortBy.toString() === "newest") {
+            url.is_newest(1)
+        } else if (sortBy.toString() === "oldest") {
+            url.is_newest(0)
+        } else {
+            url.is_newest(1)
+
+        }
+        let finalUrl = url.build()
+        return finalUrl
+    }
+    const loadAllPost = async () => {
+
+        setLoading(true)
+        try {
+            if (page > 0) {
+                let url = urlFilter
+
+                url = `${url}&page=${page}`
+                const res = await APIs.get(url)
+                if (page === 1) {
+                    setAllPost(res.data.results)
+                } else {
+                    setAllPost(pre => [...pre, ...res.data.results])
+                }
+                if (res.data.next === null) {
+                    setPage(0)
+                }
+                // console.info('post ', res.data.results)
+
+            }
+
+        } catch (error) {
+            console.warn("loi lay post", error," page ", page, " url ",urlFilter)
+            setPage(0)
+        } finally {
+            setLoading(false)
+        }
+
+    }
+    const loadMore=()=>{
+        if(page>0)
+        {
+
+            setPage(page+1)
+        }
+    }
+    const handleFilter = () => {
+        console.info('save ', getUrlFilter())
+        setAllPost([])
+        setLoading(true)
+        setUrlFilter(getUrlFilter())
+        setPage(0); // Reset page ve lai 0 de efect chay lai
+        setTimeout(() => setPage(1), 0);
+
+    }
     const renderFilterButton = (label, value, onPress, icon) => (
         <TouchableOpacity
             style={styles.filterButton}
@@ -316,6 +434,9 @@ const SearchScreen = () => {
     const renderItemPost = ({ item }) => {
         return (
             <PostCard item={item} />
+            // <View >
+            //     <Text>{item.id}</Text>
+            // </View>
         )
     }
     const flatListHeader = () => {
@@ -359,7 +480,7 @@ const SearchScreen = () => {
                     selected={sortBy}
                     onSelect={handleSortChange}
                 />
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handleFilter}>
                     <View style={{
                         backgroundColor: myYellow,
                         padding: 10,
@@ -373,7 +494,6 @@ const SearchScreen = () => {
                     </View>
                 </TouchableOpacity>
                 <View style={{ borderBottomColor: 'gray', width: "100%", height: 1, borderBottomWidth: 1, marginVertical: 20 }}></View>
-
 
             </View>
         )
@@ -422,7 +542,6 @@ const SearchScreen = () => {
 
     }, [minAcreage, maxAcreage])
     React.useEffect(() => {
-        console.log("the loai", type)
         switch (type) {
             case TypeEnum.ALL:
                 setSelectedType("Tất cả");
@@ -441,16 +560,32 @@ const SearchScreen = () => {
 
 
     }, [type])
+    React.useEffect(() => {
+        if(page>0){
+
+            loadAllPost()
+        }
+
+
+    }, [page])
     return (
         <View style={styles.container}>
 
             <FlatList
+                onEndReached={loadMore}
                 renderItem={renderItemPost}
-                data={posts}
-                ListHeaderComponent={flatListHeader} />
+                data={allPost}
+                onEndReachedThreshold={0.5}
+                ListHeaderComponent={flatListHeader} 
+                ListFooterComponent= {loading &&<ActivityIndicator animating={loading} />}
+                />
+
+               
+
             <BottomViewAddress
                 ref={bottomAddressRef}
                 onSelectAddress={handleAddressSelected}
+                onUnSelectAddress={handleAddressUnSelected}
                 onOpenProvince={handleAddressOpen}
                 onOpenDistrict={handleAddressOpen}
                 onOpenWard={handleAddressOpen}
@@ -496,6 +631,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white',
+        paddingBottom:20,
     },
     mainContent: {
         flex: 1,

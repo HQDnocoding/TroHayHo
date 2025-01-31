@@ -33,7 +33,7 @@ const Districts = forwardRef((props, ref) => {
         if (res.data !== null) {
           setDistrict(res.data)
         }
-      }else{
+      } else {
         setDistrict([])
       }
 
@@ -74,11 +74,11 @@ const Districts = forwardRef((props, ref) => {
       onChange={handleSheetChange}
       enablePanDownToClose={true}
       index={-1}
-      handleIndicatorStyle={{ backgroundColor: 'grey' }}
+      handleIndicatorStyle={{ backgroundColor: 'white' }}
       handleStyle={{
         borderTopRightRadius: 8,
         borderTopLeftRadius: 8,
-        backgroundColor: 'rgb(238, 238, 238)'
+        backgroundColor: "rgb(255, 215, 121)"
       }}
 
     >
@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
   itemContainer: {
     padding: 10,
     borderBottomWidth: 0.8,
-    borderBottomColor: 'grey',
-    backgroundColor: 'rgb(175, 174, 174)'
+    borderBottomColor: 'rgb(230, 230, 230)',
+    backgroundColor: 'rgb(255, 255, 255)'
   },
 });
 

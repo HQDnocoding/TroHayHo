@@ -42,11 +42,11 @@ const BottomViewAcreage = forwardRef((props, ref) => {
             snapPoints={snapPoints}
             onChange={handleSheetChanges}
             enablePanDownToClose={true}
-            handleIndicatorStyle={{ backgroundColor: 'grey' }}
+            handleIndicatorStyle={{ backgroundColor: 'white' }}
             handleStyle={{
-                borderTopRightRadius: 8,
-                borderTopLeftRadius: 8,
-                backgroundColor: 'rgb(238, 238, 238)'
+              borderTopRightRadius: 8,
+              borderTopLeftRadius: 8,
+              backgroundColor: "rgb(255, 215, 121)"
             }}
         >
             <BottomSheetView style={styles.contentContainer}>
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 24,
         alignItems: 'center',
-        backgroundColor: 'rgb(175, 174, 174)'
+        backgroundColor: 'white'
     },
     input: {
         width: '100%',

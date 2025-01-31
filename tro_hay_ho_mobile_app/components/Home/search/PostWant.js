@@ -10,34 +10,20 @@ import APIs, { endpointsDuc } from '../../../configs/APIs';
 
 const PostWant = ({ item }) => {
 
-    const [post, setPost] = useState(null)
-
-
-
-    const loadPost = async () => {
-        // const res = await APIs.get(endpointsDuc.getPostParent(item.id))
-        // if (res.data) {
-        //     setPost(res.data)
-        // }
-    }
-    React.useEffect(() => {
-        // if (item.id !== null && currentUser !== null) {
-        //     loadPost()
-        // }
-    }, [])
+   
     return (
-
+        
         <View style={styles.card} >
             <View style={styles.contentContainer}>
                 <View style={styles.header}>
                     <TouchableNativeFeedback >
                         <View>
-                            <Text style={styles.title} numberOfLines={2}>tieu de</Text>
+                            <Text style={styles.title} numberOfLines={2}>{ item ? item.title:""}</Text>
 
                         </View>
                     </TouchableNativeFeedback>
-                    <Text style={styles.priceGreen}>gia</Text>
-                    <Text style={styles.dateTime}>gio</Text>
+                    <Text style={styles.priceGreen}>Giá mong muốn {item ?item.price:""} đ/tháng</Text>
+                    <Text style={styles.priceMinMax}>Có thể xem xét từ:{item ?item.price_range_min:''}-{item ?item.price_range_max:''} đ/tháng</Text>
                 </View>
             </View>
         </View>
@@ -76,7 +62,7 @@ const styles = StyleSheet.create({
     },
     title: {
 
-        fontSize: 13,
+        fontSize: 15,
         fontWeight: '500',
         color: '#333',
     },
@@ -90,13 +76,13 @@ const styles = StyleSheet.create({
         color: '#FF0000',
     },
     priceGreen: {
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#38ab1e',
     },
-    dateTime: {
-        fontSize: 10,
-        color: '#666',
+    priceMinMax: {
+        fontSize: 14,
+        color: 'black',
     },
 });
 

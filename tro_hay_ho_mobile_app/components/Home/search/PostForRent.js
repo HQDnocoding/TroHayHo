@@ -10,27 +10,13 @@ import APIs, { endpointsDuc } from '../../../configs/APIs';
 
 const PostForRent = ({ item }) => {
 
-    const [post, setPost] = useState(null)
-
-
-
-    const loadPost = async () => {
-        // const res = await APIs.get(endpointsDuc.getPostParent(item.id))
-        // if (res.data) {
-        //     setPost(res.data)
-        // }
-    }
-    React.useEffect(() => {
-        // if (item.id !== null && currentUser !== null) {
-        //     loadPost()
-        // }
-    }, [])
+   
     return (
 
         <View style={styles.card} >
             <View style={styles.imageContainer}>
                 <Image
-                    source={{ uri: sampleImage }}
+                    source={{ uri: item && item.post_image &&item.post_image[0]  ?item.post_image[0].image: sampleImage }}
                     style={styles.image}
                     resizeMode="cover"
                 />
@@ -39,13 +25,13 @@ const PostForRent = ({ item }) => {
                 <View style={styles.header}>
                     <TouchableNativeFeedback >
                         <View>
-                            <Text style={styles.title} numberOfLines={2}>tieu de</Text>
+                            <Text style={styles.title} numberOfLines={2}>{item?item.title:""}</Text>
 
                         </View>
                     </TouchableNativeFeedback>
-                    <Text style={styles.priceRed}>gia</Text>
+                    <Text style={styles.priceRed}>{item? item.price:""} đ/tháng</Text>
 
-                    <Text style={styles.dateTime}>gio</Text>
+                    <Text style={styles.acreage}>Diện tích: {item? item.acreage:""} m2</Text>
                 </View>
             </View>
 
@@ -89,7 +75,7 @@ const styles = StyleSheet.create({
     },
     title: {
 
-        fontSize: 13,
+        fontSize: 15,
         fontWeight: '500',
         color: '#333',
     },
@@ -98,7 +84,7 @@ const styles = StyleSheet.create({
 
     },
     priceRed: {
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#FF0000',
     },
@@ -107,9 +93,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#38ab1e',
     },
-    dateTime: {
-        fontSize: 10,
-        color: '#666',
+    acreage: {
+        fontSize: 14,
+        color: 'black',
     },
 });
 

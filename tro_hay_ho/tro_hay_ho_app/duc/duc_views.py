@@ -365,7 +365,63 @@ class BasicUserInfoViewSet(ModelViewSet):
 class PostParentViewSet(ModelViewSet):
     queryset = Post.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True).order_by('-created_date')
     serializer_class=PostParentSerializer
-    pagination_class=ItemSmallPaginator
+    pagination_class=ItemPaginator
+    def get_queryset(self):
+        queryset = Post.objects.filter(
+            Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),
+            active=True
+        ).order_by('-created_date')
+
+        # Get filter parameters from request
+        min_price = self.request.query_params.get('min_price')
+        max_price = self.request.query_params.get('max_price')
+        min_acreage = self.request.query_params.get('min_acreage')
+        max_acreage = self.request.query_params.get('max_acreage')
+        post_type = self.request.query_params.get('type')
+        province_code = self.request.query_params.get('province_code')
+        district_code = self.request.query_params.get('district_code')
+        ward_code = self.request.query_params.get('ward_code')
+        kw_title = self.request.query_params.get('kw_title')
+        is_newest = self.request.query_params.get('is_newest')
+
+        # sap xep lai thu tu
+        if is_newest is not None:
+            is_newest = int(is_newest)
+        if is_newest==1:
+            queryset = queryset.order_by('-created_date')
+        elif is_newest==0:
+            queryset = queryset.order_by('created_date')
+        else:
+            queryset = queryset.order_by('-created_date')
+            
+        if min_price:
+            queryset = queryset.filter(price__gte=float(min_price))
+        
+        if max_price:
+            queryset = queryset.filter(price__lte=float(max_price))
+
+        if post_type:
+            if post_type.lower() == 'postwant':
+                queryset = queryset.filter(postwant__isnull=False)
+            elif post_type.lower() == 'postforrent':
+                queryset = queryset.filter(postforrent__isnull=False)
+                
+                if min_acreage:
+                    queryset = queryset.filter(postforrent__acreage__gte=float(min_acreage))
+                if max_acreage:
+                    queryset = queryset.filter(postforrent__acreage__lte=float(max_acreage))
+
+        if province_code:
+            queryset = queryset.filter(address__province=province_code)
+        if district_code:
+            queryset = queryset.filter(address__district=district_code)
+        if ward_code:
+            queryset = queryset.filter(address__ward=ward_code)
+
+        if kw_title:
+            queryset = queryset.filter(title__icontains=kw_title)
+
+        return queryset
     def get_object(self):
         pk = self.kwargs.get('pk')
         
@@ -385,9 +441,9 @@ class PostParentViewSet(ModelViewSet):
         if self.action == 'retrieve':
             obj = self.get_object()
             if isinstance(obj, PostWant):
-                return PostWantSerializer
+                return BasicPostWantSerializer
             elif isinstance(obj, PostForRent):
-                return PostForRentSerializer
+                return BasicPostForRentSerializer
                 
         return super().get_serializer_class()
     
@@ -415,7 +471,7 @@ class BasicPostWantShowViewSet(ModelViewSet):
 
     def get_queryset(self):
         return PostWant.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True) \
-            .select_related('user', 'address') \
+            .select_related('user', 'address') 
            
 # class FollowViewSet(ViewSet, CreateAPIView):
 #     serializer_class = FollowSerializer
