@@ -50,7 +50,7 @@ const BottomViewPrice = forwardRef((props, ref) => {
             }}
         >
             <BottomSheetView style={styles.contentContainer}>
-                <Text>Giá</Text>
+                <Text style={{margin:10,fontSize:20}}>Giá</Text>
                 <TextInput
                     label="Giá tối thiểu"
                     value={minPrice}
@@ -81,11 +81,12 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 24,
         alignItems: 'center',
-        backgroundColor: 'rgb(175, 174, 174)'
+        backgroundColor: 'rgb(175, 175, 174)'
     },
     input: {
         width: '100%',
         marginBottom: 10,
+        backgroundColor:'rgb(255, 255, 255)'
     },
     button: {
         backgroundColor: '#EEEEEE',

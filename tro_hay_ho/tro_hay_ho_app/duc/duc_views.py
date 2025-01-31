@@ -363,7 +363,7 @@ class BasicUserInfoViewSet(ModelViewSet):
             return Response({'error a': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
         
 class PostParentViewSet(ModelViewSet):
-    queryset = Post.objects.filter(active=True).order_by('-created_date')
+    queryset = Post.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True).order_by('-created_date')
     serializer_class=PostParentSerializer
     pagination_class=ItemSmallPaginator
     def get_object(self):

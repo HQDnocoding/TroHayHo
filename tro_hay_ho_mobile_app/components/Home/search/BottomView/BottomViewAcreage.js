@@ -50,7 +50,7 @@ const BottomViewAcreage = forwardRef((props, ref) => {
             }}
         >
             <BottomSheetView style={styles.contentContainer}>
-                <Text>Diện tích</Text>
+                <Text style={{margin:10,fontSize:20}}>Diện tích</Text>
                 <TextInput
                     label="Diện tích tối thiểu"
                     value={minAcreage}
@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         marginBottom: 10,
+        backgroundColor:'white'
     },
     button: {
         backgroundColor: '#EEEEEE',

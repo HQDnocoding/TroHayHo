@@ -2,23 +2,25 @@ import React, { useCallback, useMemo, useRef, forwardRef, useImperativeHandle, u
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Feather, Ionicons } from '@expo/vector-icons';
+import { AddressEnum } from '../SearchScreen';
 
-const renderFilterButton = (label, value, onPress) => (
-    <TouchableOpacity
-        style={styles.filterButton}
-        onPress={onPress}
-    >
-        <Text style={styles.filterText}>{value}</Text>
-        <Ionicons name="chevron-down" size={16} color="#666" />
-    </TouchableOpacity>
-);
+const renderFilterButton = (label, value, onPress) => {
+    return (
+        <TouchableOpacity
+            style={styles.filterButton}
+            onPress={onPress}
+        >
+            <Text style={styles.filterText}>{value}</Text>
+            <Ionicons name="chevron-down" size={16} color="#666" />
+        </TouchableOpacity>
+    )
+
+}
 
 const BottomViewAddress = forwardRef((props, ref) => {
+
     const bottomSheetRef = useRef(null);
     const snapPoints = useMemo(() => ['25%', '50%',], []);
-    const [province, setProvince] = useState("chọn tỉnh/tp")
-    const [district, setDistrict] = useState("chọn quận/huyện")
-    const [ward, setWard] = useState("chọn xã/phường")
     useImperativeHandle(ref, () => ({
         open: () => {
             bottomSheetRef.current?.snapToIndex(1);
@@ -34,14 +36,37 @@ const BottomViewAddress = forwardRef((props, ref) => {
 
     const handleSelectAddress = useCallback(() => {
         let address = {
-            province: province,
-            district: district,
-            ward: ward,
+            province: props.province,
+            district: props.district,
+            ward: props.ward,
         }
         if (props.onSelectAddress) {
             props.onSelectAddress(address);
         }
-    }, [props.onSelectAddress,province,district,ward]);
+    }, [props.onSelectAddress, props.province, props.district,props.ward]);
+
+    const handleOpenProvince = useCallback(() => {
+        if (props.onOpenProvince) {
+
+            props.onOpenProvince(AddressEnum.PROVINCE)
+        }
+
+    }, [props.onOpenProvince])
+    const handleOpenDistrict = useCallback(() => {
+        if (props.onOpenDistrict) {
+
+            props.onOpenDistrict(AddressEnum.DISTRICT)
+        }
+
+    }, [props.onOpenDistrict])
+    const handleOpenWard = useCallback(() => {
+        if (props.onOpenWard) {
+
+            props.onOpenWard(AddressEnum.WARD)
+        }
+    }, [props.onOpenWard])
+    
+        
 
     return (
         <BottomSheet
@@ -62,22 +87,22 @@ const BottomViewAddress = forwardRef((props, ref) => {
                 <View style={styles.rowLine}>
                     {renderFilterButton(
                         'Tỉnh/TP',
-                        province,
-                        () => { },
+                        props.province.name,
+                        handleOpenProvince,
                     )}
                 </View>
                 <View style={styles.rowLine}>
                     {renderFilterButton(
                         'Quận/Huyện',
-                        district,
-                        () => { },
+                        props.district.name,
+                        handleOpenDistrict,
                     )}
                 </View>
                 <View style={styles.rowLine}>
                     {renderFilterButton(
                         'Xã/Phường',
-                        ward,
-                        () => { },
+                        props.ward.name,
+                        handleOpenWard,
                     )}
                 </View>
                 <TouchableOpacity
@@ -116,6 +141,8 @@ const styles = StyleSheet.create({
         marginRight: 8,
         backgroundColor: 'white',
         justifyContent: 'space-between',
+        backgroundColor: 'white'
+
     },
     sortButton: {
         flexDirection: 'row',

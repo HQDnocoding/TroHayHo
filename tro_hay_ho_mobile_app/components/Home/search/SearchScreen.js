@@ -9,6 +9,10 @@ import BottomViewAddress from './BottomView/BottomViewAddress';
 import BottomViewPrice from './BottomView/BottomViewPrice';
 import BottomViewAcreage from './BottomView/BottomViewAcreage';
 import BottomViewType from './BottomView/BottomViewType';
+import Provinces from './BottomView/Address/Provinces';
+import Districts from './BottomView/Address/Districts';
+import Wards from './BottomView/Address/Wards';
+import { parseStringToFloat } from '../../../utils/MyFunctions';
 const CustomRadioButton = ({ selected, onSelect }) => {
     const [animation] = useState(new Animated.Value(selected === 'newest' ? 0 : 1));
 
@@ -82,17 +86,54 @@ const BottomSheetType = {
     PRICE: 'PRICE',
     TYPE: 'TYPE',
 };
+export const AddressEnum = {
+    PROVINCE: 'PROVINCE',
+    DISTRICT: 'DISTRICT',
+    WARD: 'WARD',
+};
+export const TypeEnum = {
+    ALL: "ALL",
+    POSTWANT: "POSTWANT",
+    POSTFORRENT: "POSTFORRENT"
+};
+
+const noneProvince = { code: "-1", name: "chọn tỉnh/tp", full_name: "chọn tỉnh/tp" }
+const noneDistrict = { code: "-1", name: "chọn quận/huyện", full_name: "chọn quận/huyện" }
+const noneWard = { code: "-1", name: "chọn xã/phường", full_name: "chọn xã/phường" }
 const SearchScreen = () => {
+    //chi de hien thi
     const [selectedAcreage, setSelectedAcreage] = useState('Diện tích');
     const [selectedAddress, setSelectedAddress] = useState('Toàn quốc');
     const [selectedPrice, setSelectedPrice] = useState('Giá');
     const [selectedType, setSelectedType] = useState('Loại bài đăng');
-    const [sortBy, setSortBy] = useState('newest');
+    //du lieu chinh
+    //dia chi trung gian
+    const [province, setProvince] = useState(noneProvince)
+    const [district, setDistrict] = useState(noneDistrict)
+    const [ward, setWard] = useState(noneWard)
+    //dia chi sau khi da chon
+    const [selectedProvince, setSelectedProvince] = useState(noneProvince)
+    const [selectedDistrict, setSelectedDistrict] = useState(noneDistrict)
+    const [selectedWard, setSelectedWard] = useState(noneWard)
+    //dien tich
+    const [minAcreage, setMinAcreage] = useState(0)
+    const [maxAcreage, setMaxAcreage] = useState(0)
+    //gia
+    const [minPrice, setMinPrice] = useState(0)
+    const [maxPrice, setMaxPrice] = useState(0)
+    //loai bai dang
+    const [type, setType] = useState(TypeEnum.ALL);
+
     const bottomAddressRef = useRef(null);
     const bottomPriceRef = useRef(null);
     const bottomTypeRef = useRef(null);
     const bottomAcreageRef = useRef(null);
 
+    const bottomProvincesRef = useRef(null);
+    const bottomDistrictsRef = useRef(null);
+    const bottomWardsRef = useRef(null);
+
+    const [sortBy, setSortBy] = useState('newest');
     const handleOpen = (type) => {
         switch (type) {
             case BottomSheetType.ADDRESS:
@@ -102,6 +143,9 @@ const SearchScreen = () => {
                 bottomPriceRef.current?.close();
                 bottomTypeRef.current?.close();
 
+                bottomDistrictsRef.current?.close();
+                bottomWardsRef.current?.close();
+                bottomProvincesRef.current?.close();
                 break;
             case BottomSheetType.ACREAGE:
                 bottomAcreageRef.current?.open();
@@ -109,6 +153,10 @@ const SearchScreen = () => {
                 bottomAddressRef.current?.close();
                 bottomPriceRef.current?.close();
                 bottomTypeRef.current?.close();
+
+                bottomDistrictsRef.current?.close();
+                bottomWardsRef.current?.close();
+                bottomProvincesRef.current?.close();
                 break;
             case BottomSheetType.PRICE:
                 bottomPriceRef.current?.open();
@@ -116,6 +164,10 @@ const SearchScreen = () => {
                 bottomAcreageRef.current?.close();
                 bottomAddressRef.current?.close();
                 bottomTypeRef.current?.close();
+
+                bottomDistrictsRef.current?.close();
+                bottomWardsRef.current?.close();
+                bottomProvincesRef.current?.close();
                 break;
             case BottomSheetType.TYPE:
                 bottomTypeRef.current?.open();
@@ -123,9 +175,41 @@ const SearchScreen = () => {
                 bottomAcreageRef.current?.close();
                 bottomPriceRef.current?.close();
                 bottomAddressRef.current?.close();
+
+                bottomDistrictsRef.current?.close();
+                bottomWardsRef.current?.close();
+                bottomProvincesRef.current?.close();
                 break;
             default:
                 console.warn('Unknown bottom sheet type');
+        }
+    };
+    const handleAddressOpen = (type) => {
+        switch (type) {
+            case AddressEnum.PROVINCE:
+                bottomProvincesRef.current?.open();
+                //mot thang mo, 3 thang dong
+                bottomDistrictsRef.current?.close();
+                bottomWardsRef.current?.close();
+
+                break;
+            case AddressEnum.DISTRICT:
+                bottomDistrictsRef.current?.open();
+                //mot thang mo, 3 thang dong
+                bottomProvincesRef.current?.close();
+                bottomWardsRef.current?.close();
+
+                break;
+            case AddressEnum.WARD:
+                bottomWardsRef.current?.open();
+                //mot thang mo, 3 thang dong
+                bottomDistrictsRef.current?.close();
+                bottomProvincesRef.current?.close();
+
+                break;
+
+            default:
+                console.warn('Unknown bottom sheet address type');
         }
     };
     const handleClose = (type) => {
@@ -146,28 +230,73 @@ const SearchScreen = () => {
                 console.warn('Unknown bottom sheet type');
         }
     };
-  
+    const handleAddressClose = (type) => {
+        switch (type) {
+            case AddressEnum.PROVINCE:
+                bottomProvincesRef.current?.close();
+                break;
+            case AddressEnum.DISTRICT:
+                bottomDistrictsRef.current?.close();
+                break;
+            case AddressEnum.WARD:
+                bottomWardsRef.current?.close();
+                break;
+
+            default:
+                console.warn('Unknown bottom sheet address type');
+        }
+    };
+
 
     const handleAddressSelected = (address) => {
-        setSelectedAddress(`${address.province}, ${address.district},${address.ward}`);
+        setSelectedProvince(address.province)
+        setSelectedDistrict(address.district)
+        setSelectedWard(address.ward)
+
         handleClose(BottomSheetType.ADDRESS);
     };
     const handlePriceSelected = (price) => {
-        setSelectedPrice(`${price.min} - ${price.max}`);
+        setMinPrice(parseStringToFloat(price.min))
+        setMaxPrice(parseStringToFloat(price.max))
+
 
         handleClose(BottomSheetType.PRICE);
 
     };
     const handleAcreageSelected = (acreage) => {
-        setSelectedAcreage(`${acreage.min} - ${acreage.max}`);
+        setMinAcreage(parseStringToFloat(acreage.min))
+        setMaxAcreage(parseStringToFloat(acreage.max))
         handleClose(BottomSheetType.ACREAGE);
 
     };
-    const handleTypeSelected = (type) => {
-        setSelectedType(type);
+    const handleTypeSelected = (newType) => {
+        setType(newType)
         handleClose(BottomSheetType.TYPE);
 
     };
+    const handleProvinceSelected = (item) => {
+        let selectProvince = item
+
+        setProvince(selectProvince)
+        setDistrict(noneDistrict)
+        setWard(noneWard)
+        handleAddressClose(AddressEnum.PROVINCE)
+
+    }
+    const handleDistrictSelected = (item) => {
+
+        setDistrict(item)
+        setWard(noneWard)
+
+        handleAddressClose(AddressEnum.DISTRICT)
+
+    }
+    const handleWardSelected = (item) => {
+
+        setWard(item)
+        handleAddressClose(AddressEnum.WARD)
+
+    }
     const handleSortChange = (value) => {
         setSortBy(value);
         // Optional: close bottom sheet after selection
@@ -197,6 +326,7 @@ const SearchScreen = () => {
                     {renderFilterButton(
                         'Area',
                         selectedAddress,
+                        // () => handleOpen(BottomSheetType.ADDRESS),
                         () => handleOpen(BottomSheetType.ADDRESS),
                         'location-outline'
                     )}
@@ -248,6 +378,69 @@ const SearchScreen = () => {
             </View>
         )
     }
+    React.useEffect(() => {
+        if (selectedProvince.code === "-1") {
+            setSelectedAddress("Toàn quốc")
+        } else if (selectedDistrict.code === "-1" && selectedProvince.code !== "-1") {
+            setSelectedAddress(`${selectedProvince.name}`)
+        } else if (selectedWard.code === "-1" && selectedDistrict.code !== "-1" && selectedProvince.code !== "-1") {
+            setSelectedAddress(`${selectedProvince.name}, ${selectedDistrict.name}`)
+        } else {
+            setSelectedAddress(`${selectedProvince.name}, ${selectedDistrict.name},${selectedWard.name}`);
+        }
+    }, [selectedProvince, selectedDistrict, selectedWard])
+    React.useEffect(() => {
+        if (minPrice === 0 && maxPrice === 0) {
+            setSelectedPrice(`Mọi giá`);
+        } else if (minPrice === 0) {
+
+            setSelectedPrice(`< ${maxPrice}`);
+        } else if (maxPrice === 0) {
+            setSelectedPrice(`> ${minPrice}`);
+
+        } else {
+
+            setSelectedPrice(`${minPrice} - ${maxPrice}`);
+        }
+
+
+    }, [minPrice, maxPrice])
+    React.useEffect(() => {
+        if (minAcreage === 0 && maxAcreage === 0) {
+            setSelectedAcreage(`Mọi Diện tích`);
+        } else if (minAcreage === 0) {
+
+            setSelectedAcreage(`< ${maxAcreage}`);
+        } else if (maxAcreage === 0) {
+            setSelectedAcreage(`> ${minAcreage}`);
+
+        } else {
+
+            setSelectedAcreage(`${minAcreage} - ${maxAcreage}`);
+
+        }
+
+    }, [minAcreage, maxAcreage])
+    React.useEffect(() => {
+        console.log("the loai", type)
+        switch (type) {
+            case TypeEnum.ALL:
+                setSelectedType("Tất cả");
+                break
+            case TypeEnum.POSTFORRENT:
+                setSelectedType("Cho thuê");
+                break
+            case TypeEnum.POSTWANT:
+                setSelectedType("Muốn thuê");
+                break
+            default:
+                setSelectedType("Tất cả");
+
+
+        }
+
+
+    }, [type])
     return (
         <View style={styles.container}>
 
@@ -258,6 +451,14 @@ const SearchScreen = () => {
             <BottomViewAddress
                 ref={bottomAddressRef}
                 onSelectAddress={handleAddressSelected}
+                onOpenProvince={handleAddressOpen}
+                onOpenDistrict={handleAddressOpen}
+                onOpenWard={handleAddressOpen}
+                addressEnum={AddressEnum}
+                province={province}
+                district={district}
+                ward={ward}
+
             />
             <BottomViewPrice
                 ref={bottomPriceRef}
@@ -271,7 +472,22 @@ const SearchScreen = () => {
                 ref={bottomTypeRef}
                 onSelectType={handleTypeSelected}
             />
-           
+            <Provinces
+                ref={bottomProvincesRef}
+                onSelectProvince={handleProvinceSelected}
+            />
+            <Districts
+                ref={bottomDistrictsRef}
+                onSelectDistrict={handleDistrictSelected}
+                selectedProvince={province}
+            />
+            <Wards
+                ref={bottomWardsRef}
+                onSelectWard={handleWardSelected}
+                selectedDistrict={district}
+                selectedProvince={province}
+
+            />
         </View>
     );
 };

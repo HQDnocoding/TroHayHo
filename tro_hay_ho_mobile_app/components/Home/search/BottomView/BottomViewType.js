@@ -2,12 +2,7 @@ import React, { useCallback, useMemo, useRef, forwardRef, useImperativeHandle, u
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { RadioButton } from 'react-native-paper';
-
-const TypeEnum = {
-    ALL: "tất cả",
-    POSTWANT: "Muốn thuê",
-    POSTFORRENT: "Cho thuê" 
-};
+import {TypeEnum} from '../SearchScreen'
 
 const BottomViewType = forwardRef((props, ref) => {
     const bottomSheetRef = useRef(null);
@@ -49,7 +44,7 @@ const BottomViewType = forwardRef((props, ref) => {
             }}
         >
             <BottomSheetView style={styles.contentContainer}>
-                <Text>Chọn loại bài đăng:</Text>
+                <Text style={{margin:10,fontSize:20}}>Chọn loại bài đăng</Text>
                 <RadioButton.Group onValueChange={newValue => setType(newValue)} value={type}>
                     <View style={styles.radioContainer}>
                         <RadioButton value={TypeEnum.ALL} />
