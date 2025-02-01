@@ -33,6 +33,7 @@ import Map from './components/PostCreating/Map';
 import PickedImages from './components/PostCreating/PickedImages';
 import ImagePickerComponent from './components/User/test';
 import PhoneSignIn from './components/User/Test2';
+import PostWantCreating from './components/PostCreating/PostWantCreating';
 
 
 export default function App() {
@@ -147,7 +148,7 @@ export default function App() {
                                 <MyDispatchContext.Provider value={dispatch}>
                                     <MyAppNavigator />
                                     <RequestLoginDialog />
-                                    {/* <PhoneSignIn/> */}
+                                    {/* <PostCreatingForm/> */}
                                 </MyDispatchContext.Provider>
                             </MyUserContext.Provider>
                         </RequestLoginDialogProvider >

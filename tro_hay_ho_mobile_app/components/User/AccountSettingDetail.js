@@ -31,7 +31,7 @@ const AccountSettingDetail = () => {
         try {
             console.log("send");
             const formData = new FormData();
-            formData.append("phone_number", phone);
+            formData.append("phone_number", formatPhoneNumber(phone));
             const res = await APIs.post(endpoints['send-otp'], formData,
                 {
                     headers: {

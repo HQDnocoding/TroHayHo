@@ -6,7 +6,6 @@ from .models import User,PostWant,PostForRent,District,Province,Ward,Role,Addres
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_filter = ['role']
     search_fields = ['username','phone']
     list_display = ['username','first_name','last_name','phone','is_active']
 

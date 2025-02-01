@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, Text, View } from "react-native";
 import { Button, HelperText, RadioButton, TextInput } from "react-native-paper";
 import LoginStyles from "../../styles/dat/LoginStyles";
@@ -8,6 +8,15 @@ import APIs, { endpoints } from "../../configs/APIs";
 
 const Register = ({ navigation }) => {
 
+    const [roles, setRoles] = useState([])
+    const loadRole = async () => {
+        const roles = await APIs.get(endpoints['roles']);
+        setRoles(roles.data);
+    }
+
+    useEffect(() => {
+        loadRole();
+    }, []);
 
     const [user, setUser] = useState({});
 
@@ -53,6 +62,7 @@ const Register = ({ navigation }) => {
         setUser({ ...user, [field]: value });
     }
 
+
     const register = async () => {
         try {
             print("ok")
@@ -66,12 +76,19 @@ const Register = ({ navigation }) => {
                     if (key !== 'confirm') {
                         form.append(key, user[key]);
                     }
-                
-                const role = await APIs.get(`${endpoints['role']}?roleName=${checked}`);
 
-                console.log('role', "dddd"+role.data['id']+"oooo")
-                form.append('avatar', "")
-                form.append("role", role.data['id'])
+
+                form.append("avatar", "");
+                form.append("phone", "");
+                console.log("groups", checked);
+                form.append("groups", checked);
+                console.log(roles)
+                // roles.forEach(r => {
+                //     if (r.name === checked) {
+                //         form.append('groups',r.id)
+                //     }
+                // })
+                console.log(form);
 
                 setLoading(true);
                 try {
@@ -154,7 +171,7 @@ const Register = ({ navigation }) => {
                             color="#FFC11A"
                             value={Role.NGUOI_THUE_TRO}
                             status={checked === Role.NGUOI_THUE_TRO ? 'checked' : 'unchecked'}
-                            onPress={() =>  setChecked(Role.NGUOI_THUE_TRO)}
+                            onPress={() => setChecked(Role.NGUOI_THUE_TRO)}
                         />
                         <Text>Người thuê trọ</Text>
                     </View>
@@ -164,7 +181,7 @@ const Register = ({ navigation }) => {
                             color="#FFC11A"
                             value={Role.CHU_TRO}
                             status={checked === Role.CHU_TRO ? 'checked' : 'unchecked'}
-                            onPress={() =>  setChecked(Role.CHU_TRO)}
+                            onPress={() => setChecked(Role.CHU_TRO)}
                         />
                         <Text>Chủ trọ</Text>
                     </View>

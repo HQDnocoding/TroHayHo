@@ -1,30 +1,39 @@
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 import { Button, Dialog, Portal, TextInput } from "react-native-paper";
 import { verifyOTP } from "../../utils/FireBaseAuth";
-import APIs, { endpoints } from "../../configs/APIs";
+import APIs, { authAPIs, endpoints } from "../../configs/APIs";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const OTPauth = ({ isVisible, setVisible, onVerified, confirmation, phone }) => {
 
     const [otp, setOtp] = useState('');
-
+    const [enable, setEnable] = useState(false);
     //twilio
     const verify = async () => {
 
-        const formData=new FormData()
-        formData.append("phone_number",phone);
-        formData.append("otp_code",otp);
+
+        const formData = new FormData();
+        formData.append("phone_number", phone);
+        formData.append("otp_code", otp);
 
         try {
-            const res = APIs.post(endpoints['verify-otp'], formData,
+            const token = await AsyncStorage.getItem("access_token");
+            const res = await authAPIs(token).post(endpoints['verify-otp'], formData,
                 {
-                headers:{
-                    "Content-Type":"multipart/form-data",
-                },
-                    
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+
                 }
             )
+            if (res.ok) {
+                Alert.alert("", "Xác thực thành công!");
+            }else{
+                Alert.alert("","Xác thực thất bại!");
+            }
+
         } catch (e) {
             console.error(e);
         } finally {
@@ -50,7 +59,7 @@ const OTPauth = ({ isVisible, setVisible, onVerified, confirmation, phone }) => 
             console.error(ex);
         } finally {
             hideDialog();
-            setOtp(null);
+            setOtp('');
         }
 
     };
@@ -66,9 +75,11 @@ const OTPauth = ({ isVisible, setVisible, onVerified, confirmation, phone }) => 
                             style={{}}
                             mode="outlined"
                             value={otp}
+
                             onChangeText={setOtp}
                             keyboardType="number-pad"
                             maxLength={6}
+
                         />
                     </Dialog.Content>
                     <Dialog.Actions>

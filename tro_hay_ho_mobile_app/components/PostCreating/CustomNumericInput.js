@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
-const CustomNumericInput = ({ min = 0, max = 99999999999, step = 10000, initialValue = 0, setPostValues, price }) => {
+const CustomNumericInput = ({ min = 0, max = 99999999999, step = 10000, initialValue = 0, setPostValues, flag ,price}) => {
     const [value, setValue] = useState(initialValue);
-
+    const flag1 = flag
 
     useEffect(() => {
-        setPostValues((prev) => ({
-            ...prev,
-            price: value,
-        }));
-    },[value]);
+        if (flag1 == true) {
+            // console.log(1)
+            setPostValues(value);
+        } else
+            setPostValues((prev) => ({
+                ...prev,
+                price: value,
+            }));
+    }, [value]);
 
     const increase = () => {
         if (value + step <= max) {
