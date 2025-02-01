@@ -21,7 +21,7 @@ export const endpoints = {
     'register': '/users/',
     'google-login': '/google-login/',
     'favourite-posts': '/users/favorites/',
-    'role': '/roles/',
+    'roles': '/roles/',
     'address': '/addresses/',
     'getListPostWant': '/post-wants/',
     'getListPostForRent': '/post-for-rents/',

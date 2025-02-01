@@ -1,13 +1,14 @@
 import React, { useCallback, useMemo, useRef, forwardRef, useImperativeHandle, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,Keyboard } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Keyboard } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { TextInput } from 'react-native-paper';
+import { myYellow } from '../../../../utils/MyValues';
 
 
 const BottomViewPrice = forwardRef((props, ref) => {
     const bottomSheetRef = useRef(null);
-    const snapPoints = useMemo(() => ['25%', '50%',], []);
+    const snapPoints = useMemo(() => ['25%', '60%', "90%"], []);
     const [minPrice, setMinPrice] = useState(0)
     const [maxPrice, setMaxPrice] = useState(0)
 
@@ -33,7 +34,17 @@ const BottomViewPrice = forwardRef((props, ref) => {
         if (props.onSelectPrice) {
             props.onSelectPrice(price);
         }
-    }, [maxPrice,minPrice,props.onSelectPrice]);
+    }, [maxPrice, minPrice, props.onSelectPrice]);
+    const handleUnSelect = useCallback(() => {
+        Keyboard.dismiss();
+        let price = {
+            min: "0",
+            max: "0",
+        }
+        if (props.onSelectPrice) {
+            props.onSelectPrice(price);
+        }
+    }, [maxPrice, minPrice, props.onSelectPrice]);
 
     return (
         <BottomSheet
@@ -44,13 +55,13 @@ const BottomViewPrice = forwardRef((props, ref) => {
             enablePanDownToClose={true}
             handleIndicatorStyle={{ backgroundColor: 'white' }}
             handleStyle={{
-              borderTopRightRadius: 8,
-              borderTopLeftRadius: 8,
-              backgroundColor: "rgb(255, 215, 121)"
+                borderTopRightRadius: 8,
+                borderTopLeftRadius: 8,
+                backgroundColor: "rgb(255, 215, 121)"
             }}
         >
             <BottomSheetView style={styles.contentContainer}>
-                <Text style={{margin:10,fontSize:20}}>Giá</Text>
+                <Text style={{ margin: 10, fontSize: 20 }}>Giá</Text>
                 <TextInput
                     label="Giá tối thiểu"
                     value={minPrice}
@@ -65,12 +76,21 @@ const BottomViewPrice = forwardRef((props, ref) => {
                     keyboardType="numeric"
                     style={styles.input}
                 />
-                <TouchableOpacity
-                    onPress={handleSelectPrice}
-                    style={styles.button}
-                >
-                    <Text>Lọc giá</Text>
-                </TouchableOpacity>
+                <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around', }}>
+                    <TouchableOpacity
+                        onPress={handleSelectPrice}
+                        style={styles.button}
+                    >
+                        <Text>Lọc giá</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={handleUnSelect}
+                        style={styles.buttonNegative}
+                    >
+                        <Text style={{ color: 'black' }}>Bỏ chọn</Text>
+                    </TouchableOpacity>
+                </View>
+
             </BottomSheetView>
         </BottomSheet>
     );
@@ -86,10 +106,17 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         marginBottom: 10,
-        backgroundColor:'rgb(255, 255, 255)'
+        backgroundColor: 'rgb(255, 255, 255)'
     },
     button: {
-        backgroundColor: '#EEEEEE',
+        backgroundColor: "rgb(255, 215, 121)",
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 10
+    }, buttonNegative: {
+        borderColor: myYellow,
+        borderWidth: 0.8,
+        backgroundColor: "rgb(255, 255, 255)",
         padding: 10,
         borderRadius: 8,
         marginTop: 10

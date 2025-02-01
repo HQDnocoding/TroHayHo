@@ -2,6 +2,7 @@ import random
 from datetime import timedelta
 import secrets
 
+from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -141,34 +142,16 @@ class UserViewSet(ViewSet,CreateAPIView):
     
     
 
-class RoleViewSet(ViewSet, RetrieveAPIView, ):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-    
-    
 
-    def list(self, request):
-
-        name = self.request.query_params.get('roleName', None)
-        id = self.request.query_params.get('pk', None)
-        query = self.queryset
-
-        if name:
-            query = query.filter(role_name=name).first()
-
-        if id:
-            query = query.filter(id=id)
-
-        print(Response(self.serializer_class(query).data).data['id'])
-
-        return Response(self.serializer_class(query).data)
 
 class PostWantViewSet(ModelViewSet):
     queryset = PostWant.objects.filter(active=True)
     serializer_class = PostWantSerializer
     pagination_class = ItemPaginator
-    
+    parser_classes = [MultiPartParser,JSONParser ]
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
     
     @action(methods=['get','post'],url_path='comments',detail=True)
     def get_comments(self,request,pk):
@@ -190,6 +173,7 @@ class PostWantViewSet(ModelViewSet):
 
 
 class PostForRentViewSet(ModelViewSet):
+    queryset = PostForRent.objects.filter(active=True)
     serializer_class = PostForRentSerializer
     pagination_class = ItemPaginator
     parser_classes = [MultiPartParser,JSONParser ]
@@ -439,3 +423,11 @@ class PostImageView(ModelViewSet):
             serializer.save(post=post, image=image)
         except PostForRent.DoesNotExist:
             return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+ALLOWED_GROUPS = ["Chủ trọ", "Người thuê trọ"]
+class AvailableGroupsView(ModelViewSet):
+    permission_classes = [permissions.AllowAny]
+    queryset = Group.objects.filter(name__in=ALLOWED_GROUPS)
+    serializer_class = GroupSerializer
+

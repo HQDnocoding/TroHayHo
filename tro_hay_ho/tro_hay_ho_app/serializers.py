@@ -1,32 +1,41 @@
 from zoneinfo import available_timezones
 
+from django.contrib.auth.models import Group
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from .models import *
 
 
 
-class RoleSerializer(ModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
-        model= Role
-        fields='__all__'
-        
+        model = Group
+        fields = ['id','name']
 
 class UserSerializer(ModelSerializer):
-    avatar = serializers.ImageField(required=False)
-    phone=serializers.CharField(required=False)
-    # role=RoleSerializer()
+    groups = serializers.SlugRelatedField(
+        queryset=Group.objects.all(),
+        slug_field='name'  ,
+        many=True
+    )
+    
     def create(self, validated_data):
+        print(validated_data)
+        group_name = validated_data.pop('groups')
+        print(group_name)
         user = User(**validated_data)
         user.set_password(user.password)
-
+        group = Group.objects.get(name=group_name.name)
+       
+        user.save()
+        user.groups.add(group)
         user.save()
         return user
 
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'avatar', 'password','role','phone','date_joined']
+        fields = ['id', 'username', 'first_name', 'last_name', 'avatar', 'password','phone','date_joined','groups']
 
         extra_kwargs = {
             'password': {
@@ -105,14 +114,23 @@ class PostForRentSerializer(ModelSerializer):
     
 class PostWantSerializer(ModelSerializer):
     user=UserSerializer(read_only=True)
-    address=AddressSerializer(read_only=True)
+    address=AddressSerializer()
     type = serializers.SerializerMethodField()
+    
+    
     class Meta:
         model = PostWant
         fields='__all__'
     def get_type(self, obj):
         return 'PostWant'
         
+    def create(self, validated_data):
+        address_data=validated_data.pop('address',None)
+        if address_data:
+            address,created=Address.objects.get_or_create(**address_data)
+            validated_data['address']=address
+        return super().create(validated_data)
+    
 class PostSerializer(ModelSerializer):
     user=UserSerializer(read_only=True)
     post_image=PostImageSerializer(many=True, source='images', read_only=True)
@@ -154,9 +172,12 @@ class FavouritePostSerializer(serializers.ModelSerializer):
         fields = ['id', 'created_date', 'updated_date', 'active', 'user', 'post']
 
 
+
+
 class PostImageSerializer(serializers.ModelSerializer):
     image=serializers.ImageField()
     post = serializers.PrimaryKeyRelatedField(  queryset=Post.objects.all(), required=False)
     class Meta:
         model=PostImage
         fields='__all__'
+

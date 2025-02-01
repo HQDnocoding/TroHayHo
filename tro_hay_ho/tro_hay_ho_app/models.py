@@ -30,13 +30,11 @@ class User(AbstractUser):
     """Người dùng"""
     phone = models.CharField(max_length=15, blank=True, null=True)
     avatar = CloudinaryField('avatar', null=True)
-
-    role = models.ForeignKey('Role', on_delete=models.SET_NULL, related_name='users', related_query_name='user',
-                             null=True)
     following = models.ManyToManyField('User', symmetrical=False, related_name='followers', through='Following')
     conversation = models.ManyToManyField('self', symmetrical=True, through='Conversation')
     notification_details = models.ManyToManyField('User', symmetrical=False, related_name='notifications',
                                                   through='DetailNotification')
+
     class Meta:
         db_table = 'user'
 
@@ -89,15 +87,15 @@ class Post(BaseModel):
     title = models.TextField(null=False)
     description = models.TextField(null=True, blank=True)
     price = models.FloatField(null=True, blank=True, default=0)
-    is_show=models.BooleanField(null=True,blank=True,default=True)
+    is_show = models.BooleanField(null=True, blank=True, default=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='posts', related_query_name='post')
     address = models.ForeignKey('Address', on_delete=models.CASCADE, related_name='posts', related_query_name='post',
                                 null=models.SET_NULL)
 
     def __str__(self):
         return f"{self.title} ----id: {str(self.id)}"
-    
-    
+
+
 class FavoritePost(BaseModel):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='saved_posts')
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='saved_by_users')
@@ -107,7 +105,7 @@ class FavoritePost(BaseModel):
 
     def __str__(self):
         return f"{self.user.username} saved {self.post.title} "
-    
+
     def get_post_images(self):
         return self.post.images.all()
 
@@ -126,7 +124,7 @@ class PostForRent(Post):
     phone_contact = models.CharField(max_length=15, null=False)
     name_agent = models.CharField(max_length=100, null=False)
     verified = models.BooleanField(default=True, null=False)
-    
+
     class Meta:
         db_table = 'post_for_rent'
 
@@ -140,7 +138,7 @@ class PostImage(BaseModel):
 
     @property
     def get_url(self):
-        if self.image:  
+        if self.image:
             return self.image.url
         return None
 
@@ -152,7 +150,7 @@ class Comment(BaseModel):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='comments', related_query_name='comment')
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='comments', related_query_name='comment')
     replied_comment = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='comments',
-                                        related_query_name='comment', null=True,blank=True)
+                                        related_query_name='comment', null=True, blank=True)
 
     def __str__(self):
         return self.content
@@ -200,7 +198,8 @@ class Location(BaseModel):
 class Notification(BaseModel):
     title = models.TextField(null=False)
     content = models.TextField(null=False)
-    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='notifications', related_query_name='notification')
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='notifications',
+                             related_query_name='notification')
     sender = models.ForeignKey('User', on_delete=models.CASCADE, related_name='sent_notifications')
 
     def __str__(self):
@@ -222,6 +221,7 @@ class AdministrativeRegion(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class DetailNotification(BaseModel):
     receiver = models.ForeignKey('User', on_delete=models.CASCADE, related_name='received_notifications')

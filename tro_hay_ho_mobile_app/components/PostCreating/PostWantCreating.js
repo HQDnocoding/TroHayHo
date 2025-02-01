@@ -11,19 +11,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomNumericInput from "./CustomNumericInput";
 
 
-const PostForRentCreating = () => {
+const PostWantCreating = () => {
     const navigation = useNavigation();
-    const route = useRoute();
-    const [imageList, setImageList] = useState([]);
-    const convertToImageObjects = () => {
-        const imageObjects = imageList.map((image) => ({
-            uri: image.uri,
-            name: image.fileName,
-            type: image.type,
-        }));
-        console.log(imageObjects);
-        return imageObjects;
-    };
+
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [pId, setPId] = useState(null);
@@ -34,22 +24,22 @@ const PostForRentCreating = () => {
     const sheetRef = useRef(null);
     const sheetRef2 = useRef(null);
     const sheetRef3 = useRef(null);
-    const sheetRefMap = useRef(null);
     const snapPoints = useMemo(() => ["1%", "50%", "50%"], []);
     const snapPoints2 = useMemo(() => ["1%", "50%", "50%"], []);
     const snapPoints3 = useMemo(() => ["1%", "50%", "50%"], []);
-    const snapPointsMap = useMemo(() => ["1%", "80%", "80%"], []);
     const [snackBarText, setSnackBarText] = useState(null);
-    const [price, setPrice] = useState(0);
     const [visible, setVisible] = useState(false);
 
+    const [price, setPrice] = useState(0);
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(0);
 
 
     const onDismissSnackBar = () => setVisible(false);
     const user = useContext(MyUserContext);
     const createPost = async () => {
 
-        console.log("click");
+        console.log(postValues.price);
 
         if (user !== null) {
             console.log("click2")
@@ -65,27 +55,11 @@ const PostForRentCreating = () => {
                 setSnackBarText("Vui lòng điền địa chỉ chi tiết");
                 setVisible(!visible);
             }
-            else if (postValues.acreage == '' || postValues.title == '' ||
-                postValues.description == '' || postValues.name_agent == ''
-                || postValues.price == '' || postValues.max_number_of_people == ''
+            else if (postValues.title == '' ||
+                postValues.description == '' || minPrice == ''
+                || price == '' || maxPrice == ''
             ) {
                 setSnackBarText("Vui lòng điền đầy đủ thông tin");
-                setVisible(!visible);
-            }
-            else if (!/^\d+$/.test(postValues.acreage)) {
-                setSnackBarText("Vui lòng điền đúng giá trị diện tích là số nguyên");
-                setVisible(!visible);
-            }
-            else if (!/^\d+$/.test(postValues.max_number_of_people)) {
-                setSnackBarText("Vui lòng điền đúng giá trị số người ở tối đa là số nguyên");
-                setVisible(!visible);
-            }
-            else if (!/^\d+$/.test(postValues.acreage)) {
-                setSnackBarText("Vui lòng điền đúng giá trị giá cho thuê là số");
-                setVisible(!visible);
-            }
-            else if (imageList.length < 1 || imageList.length === 0) {
-                setSnackBarText("Vui lòng thêm hình ảnh về nơi muốn cho thuê");
                 setVisible(!visible);
             }
             else {
@@ -100,115 +74,59 @@ const PostForRentCreating = () => {
                             : '',
                     };
 
-
-                    const imageDict = convertToImageObjects();
-
                     const jsonData = {
                         "title": postValues.title,
-                        "acreage": postValues.acreage,
-                        "max_number_of_people": postValues.max_number_of_people,
-                        "price": postValues.price,
+                        "price": price,
+                        "price_range_max": maxPrice,
+                        "price_range_min": minPrice,
                         "description": postValues.description,
-                        "name_agent": postValues.name_agent,
                         "address": payload,
-                        // "post_image": imageDict,
                         "phone_contact": user.phone || "0",
                     };
 
                     const formData = new FormData();
 
                     formData.append('title', jsonData.title);
-                    formData.append('acreage', jsonData.acreage);
-                    formData.append('max_number_of_people', jsonData.max_number_of_people);
-                    formData.append('price', jsonData.price);
+                    formData.append('price', price);
+                    formData.append('price_range_min', minPrice);
+                    formData.append('price_range_max', maxPrice);
                     formData.append('description', jsonData.description);
-                    formData.append('name_agent', jsonData.name_agent);
                     formData.append('phone_contact', jsonData.phone_contact);
-
-                    // formData.append("address[specified_address]", payload.specified_address);
-                    // formData.append("address[coordinates]",payload.coordinates);
-                    // formData.append("address[province]", payload.province);
-                    // formData.append("address[district]", payload.district);
-                    // formData.append("address[ward]", payload.ward);
-
-
                     formData.append("address", payload)
-
-                    // jsonData.post_image.forEach((image, index) => {
-                    //     formData.append(`post_image`, {
-                    //         uri: image.uri,
-                    //         type: image.type,
-                    //         name: image.fileName || `image_${Date.now()}_${index}.jpg`,
-                    //     });
-                    // });
-
-
 
                     const token = await AsyncStorage.getItem("access_token");
 
                     console.log("form", formData);
-                    console.log("json", jsonData);
                     console.log("token", token);
 
 
-                    const res = await authAPIs(token).post(endpoints['getListPostForRent'], jsonData,
+                    const res = await authAPIs(token).post(endpoints['getListPostWant'], jsonData,
                         {
                             headers: {
-                                'Content-Type': 'application/json',
-
+                                'Content-Type': 'application/json;',
                             },
                         }
                     );
-
-                    console.log(res.data);
-
-                    imageDict.forEach(image => uploadImage(image, res.data.id));
-
+                    console.log(res);
 
 
                 } catch (ex) {
                     console.error(ex);
                 } finally {
-                        setPrice(0);
-                        setPostValues({ description: '', title: '' ,acreage:'',max_number_of_people:'',name_agent:'',price:''});
-                        setLocation({ district: '', province: '', ward: '' });
-                        setDistricts('');
-                        setData({ coordinates: '', district: '', province: '', specified_address: '', ward: '' })
-                        setProvinces('');
-                        setWards('');
-                        setImageList([]);
+                    setPrice(0);
+                    setMaxPrice(0);
+                    setMaxPrice(0);
+                    setPostValues({ description: '', title: '' });
+                    setLocation({ district: '', province: '', ward: '' });
+                    setDistricts('');
+                    setData({ coordinates: '', district: '', province: '', specified_address: '', ward: '' })
+                    setProvinces('');
+                    setWards('');
                 }
             }
         }
     }
 
-    const uploadImage = async (image, id) => {
-        const formData = new FormData();
-        formData.append('image', {
-            uri: image.uri,
-            type: image.type,
-            name: image.name || `image_${Date.now()}.jpg`,
-        });
-
-        formData.append('post', id); // Giả sử post ID là 1, bạn cần thay đổi giá trị này
-        console.log("pp", formData);
-        try {
-            const response = await APIs.post(endpoints['image'], formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            console.log(response)
-            if (response.ok) {
-                Alert.alert('Upload thành công', 'Ảnh đã được tải lên');
-            } else {
-                Alert.alert('Lỗi', result.message || 'Có lỗi xảy ra');
-            }
-        } catch (error) {
-            console.error('Upload error:', error);
-        }
-    };
 
     const [data, setData] = useState({
         specified_address: '', coordinates: '',
@@ -216,8 +134,7 @@ const PostForRentCreating = () => {
     });
 
     const [postValues, setPostValues] = useState({
-        title: '', description: '', price: '', acreage: '',
-        max_number_of_people: '', name_agent: '',
+        title: '', description: ''
     });
 
     const handleSheetChange = useCallback((index) => {
@@ -237,7 +154,6 @@ const PostForRentCreating = () => {
 
     const loadDistricts = async ({ id }) => {
         try {
-
             const res = await APIs.get(endpoints["provinces-districts"](`${id}`));
             setDistricts(res.data);
         } catch (e) {
@@ -262,35 +178,28 @@ const PostForRentCreating = () => {
 
 
     const handleSnapPress = useCallback((index) => {
-
         sheetRef.current?.snapToIndex(index);
     }, []);
 
 
     const handleSnapPress2 = useCallback((index) => {
-
         sheetRef2.current?.snapToIndex(index);
     }, []);
 
 
     const handleSnapPress3 = useCallback((index) => {
-
         sheetRef3.current?.snapToIndex(index);
     }, []);
 
 
     const handlePressProvince = ({ id }) => {
-
-
         setPId(id);
-
         loadDistricts({ id: id });
         handleSnapPress2(2);
     }
 
 
     const handlePressDistricts = ({ id }) => {
-
         setDId(id);
         loadWards({ dId: id });
         handleSnapPress3(2);
@@ -371,7 +280,6 @@ const PostForRentCreating = () => {
     }, [postValues])
 
     useFocusEffect(
-
         useCallback(() => {
             console.log("dosodos");
             const getData = async () => {
@@ -383,7 +291,6 @@ const PostForRentCreating = () => {
             getData();
         }, [])
     );
-
     return (
         <View style={{ flex: 1 }}>
             <FlatList
@@ -395,6 +302,7 @@ const PostForRentCreating = () => {
                         <TextInput style={styles.input} mode="outlined"
                             label={"Tên bài đăng"}
                             outlineColor="#CAC4D0"
+                            value={postValues.title}
                             onChange={(newText) => {
                                 const textValue = newText.nativeEvent.text;
                                 setPostValues((prev) => ({
@@ -411,6 +319,7 @@ const PostForRentCreating = () => {
                             outlineColor="#CAC4D0"
                             label={"Mô tả"}
                             multiline={true}
+                            value={postValues.description}
                             onChange={(newText) => {
                                 const textValue = newText.nativeEvent.text;
                                 setPostValues((prev) => ({
@@ -421,57 +330,26 @@ const PostForRentCreating = () => {
                             placeholderTextColor="#CAC4D0"
                             activeOutlineColor="#FFBA00"></TextInput>
                     </View>
-                    <View style={styles.flexRow}>
-                        <TextInput style={styles.input} mode="outlined"
-                            outlineColor="#CAC4D0"
-                            label={"Tên người đại diện bên cho thuê"}
-                            multiline={true}
-                            onChange={(newText) => {
-                                const textValue = newText.nativeEvent.text;
-                                setPostValues((prev) => ({
-                                    ...prev,
-                                    name_agent: textValue,
-                                }));
-                            }}
-                            placeholderTextColor="#CAC4D0"
-                            activeOutlineColor="#FFBA00"></TextInput>
-                    </View>
-                    <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
-                        <Text style={styles.label}>Thông tin diện tích, giá cả</Text>
-                    </View>
-                    <View style={styles.flexRow}>
-                        <TextInput style={styles.input} mode="outlined"
-                            outlineColor="#CAC4D0"
-                            label={"Số người ở tối đa"}
 
-                            placeholderTextColor="#CAC4D0"
-                            onChange={(newText) => {
-                                const textValue = newText.nativeEvent.text;
-                                setPostValues((prev) => ({
-                                    ...prev,
-                                    max_number_of_people: textValue,
-                                }));
-                            }}
-                            activeOutlineColor="#FFBA00" keyboardType="numeric" inputMode="numeric" />
+                    <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
+                        <Text style={styles.label}>Giá cả</Text>
+                    </View>
+
+                    <View style={styles.flexRow}>
+                        <Text style={{ fontSize: 16, marginHorizontal: 20, flex: 1 }}>Giá tối thiểu</Text>
+                        <CustomNumericInput price={maxPrice} setPostValues={setMinPrice} flag={true} />
+                        <Text style={{ fontSize: 16, marginStart: 10 }}>VNĐ</Text>
+
                     </View>
                     <View style={styles.flexRow}>
-                        <TextInput style={styles.input} mode="outlined"
-                            outlineColor="#CAC4D0"
-                            label={"Diện tích"}
-                            keyboardType="number-pad"
-                            onChange={(newText) => {
-                                const textValue = newText.nativeEvent.text;
-                                setPostValues((prev) => ({
-                                    ...prev,
-                                    acreage: textValue,
-                                }));
-                            }}
-                            placeholderTextColor="#CAC4D0"
-                            activeOutlineColor="#FFBA00" />
+                        <Text style={{ fontSize: 16, marginHorizontal: 20, flex: 1 }}>Giá tối đa</Text>
+                        <CustomNumericInput price={minPrice} setPostValues={setMaxPrice} flag={true} />
+                        <Text style={{ fontSize: 16, marginStart: 10 }}>VNĐ</Text>
+
                     </View>
                     <View style={styles.flexRow}>
-                        <Text style={{ fontSize: 16, marginHorizontal: 20 }}>Giá cho thuê</Text>
-                        <CustomNumericInput price={price} setPostValues={setPostValues} flag={false} />
+                        <Text style={{ fontSize: 16, marginHorizontal: 20, flex: 1 }}>Giá mong muốn</Text>
+                        <CustomNumericInput price={price} setPostValues={setPrice} flag={true} />
                         <Text style={{ fontSize: 16, marginStart: 10 }}>VNĐ</Text>
 
                     </View>
@@ -496,7 +374,7 @@ const PostForRentCreating = () => {
                     <View style={styles.flexRow}>
                         <TextInput style={styles.input} mode="outlined"
                             outlineColor="#CAC4D0"
-
+                            value={data.specified_address}
                             label={"Số nhà, Tên đường"}
                             onChange={(newText) => {
                                 // Lấy giá trị từ sự kiện trước khi sử dụng
@@ -524,11 +402,6 @@ const PostForRentCreating = () => {
 
                         </View>
                     </TouchableWithoutFeedback>
-
-                    <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
-                        <Text style={styles.label}>Hình ảnh</Text>
-                    </View>
-                    <PickedImages imageList={imageList} setImageList={setImageList} />
 
                     <Button onPress={createPost} style={{ marginHorizontal: 'auto', marginVertical: 10, backgroundColor: "#ff7b00", width: 200, paddingVertical: 10, borderRadius: 10 }}><Text style={{ color: "white", fontSize: 20 }}>Đăng tin</Text></Button>
                     <Snackbar visible={visible}
@@ -588,8 +461,8 @@ const PostForRentCreating = () => {
 
 
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -638,4 +511,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default PostForRentCreating;
+export default PostWantCreating;

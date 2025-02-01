@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, Button, TouchableWithoutFeedback, FlatList, Ref
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Feather, Ionicons } from '@expo/vector-icons';
+import { MD3LightTheme, PaperProvider } from 'react-native-paper';
+
 import PostCard from './PostCard';
 import { myYellow } from '../../../utils/MyValues';
 import BottomViewAddress from './BottomView/BottomViewAddress';
@@ -15,6 +17,9 @@ import Wards from './BottomView/Address/Wards';
 import { parseStringToFloat } from '../../../utils/MyFunctions';
 import { endpointsDucFilter } from '../../../configs/UrlFilter';
 import APIs from '../../../configs/APIs';
+import { Searchbar } from 'react-native-paper';
+import myTheme from '../../../general/MyTheme';
+
 const CustomRadioButton = ({ selected, onSelect }) => {
     const [animation] = useState(new Animated.Value(selected === 'newest' ? 0 : 1));
 
@@ -130,6 +135,9 @@ export const SearchScreen = () => {
     const [maxPrice, setMaxPrice] = useState(0)
     //loai bai dang
     const [type, setType] = useState(TypeEnum.ALL);
+    //timkiem
+    const [title, setTitle] = useState("");
+
 
     const bottomAddressRef = useRef(null);
     const bottomPriceRef = useRef(null);
@@ -254,7 +262,10 @@ export const SearchScreen = () => {
         }
     };
 
-
+    const handleChangeText =useCallback( (text) => {
+        setTitle(text);
+        console.info(text);
+    },[]);
     const handleAddressSelected = (address) => {
         setSelectedProvince(address.province)
         setSelectedDistrict(address.district)
@@ -373,6 +384,15 @@ export const SearchScreen = () => {
             url.is_newest(1)
 
         }
+
+        if(title.trim()!==""){
+            url.kw_title(title.trim())
+        }else{
+            url.params.delete('kw_title');
+
+        }
+
+
         let finalUrl = url.build()
         return finalUrl
     }
@@ -398,22 +418,21 @@ export const SearchScreen = () => {
             }
 
         } catch (error) {
-            console.warn("loi lay post", error," page ", page, " url ",urlFilter)
+            console.warn("loi lay post", error, " page ", page, " url ", urlFilter)
             setPage(0)
         } finally {
             setLoading(false)
         }
 
     }
-    const loadMore=()=>{
-        if(page>0)
-        {
+    const loadMore = () => {
+        if (page > 0) {
 
-            setPage(page+1)
+            setPage(page + 1)
         }
     }
     const handleFilter = () => {
-        console.info('save ', getUrlFilter())
+        console.info('save ', getUrlFilter(), " ", title)
         setAllPost([])
         setLoading(true)
         setUrlFilter(getUrlFilter())
@@ -439,65 +458,68 @@ export const SearchScreen = () => {
             // </View>
         )
     }
-    const flatListHeader = () => {
+    const flatListHeader  = useMemo(() => {
         return (
-            <View style={styles.mainContent}>
-
-                <View style={styles.rowLine}>
-                    {renderFilterButton(
-                        'Area',
-                        selectedAddress,
-                        // () => handleOpen(BottomSheetType.ADDRESS),
-                        () => handleOpen(BottomSheetType.ADDRESS),
-                        'location-outline'
-                    )}
-                </View>
-                <View style={styles.rowLine}>
-                    {renderFilterButton(
-                        'Acreage',
-                        selectedAcreage,
-                        () => handleOpen(BottomSheetType.ACREAGE),
-                        'speedometer-outline'
-                    )}
-                </View>
-                <View style={styles.rowLine}>
-                    {renderFilterButton(
-                        'Price',
-                        selectedPrice,
-                        () => handleOpen(BottomSheetType.PRICE),
-                        'funnel-outline'
-                    )}
-
-                    {renderFilterButton(
-                        'Type',
-                        selectedType,
-                        () => handleOpen(BottomSheetType.TYPE),
-                        "construct-outline"
-                    )}
-                </View>
-                <Text style={styles.bottomSheetTitle}>Sắp xếp theo</Text>
-                <CustomRadioButton
-                    selected={sortBy}
-                    onSelect={handleSortChange}
-                />
-                <TouchableOpacity onPress={handleFilter}>
-                    <View style={{
-                        backgroundColor: myYellow,
-                        padding: 10,
-                        margin: 10,
-                        width: 100,
-                        borderRadius: 10,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
-                        <Text style={{ fontSize: 18, fontWeight: 500 }}>Lọc</Text>
+            <PaperProvider theme={myTheme}>
+                <View style={styles.mainContent}>
+                    <Searchbar style={styles.searchbar} value={title} onChangeText={handleChangeText} />
+                    <View style={styles.rowLine}>
+                        {renderFilterButton(
+                            'Area',
+                            selectedAddress,
+                            // () => handleOpen(BottomSheetType.ADDRESS),
+                            () => handleOpen(BottomSheetType.ADDRESS),
+                            'location-outline'
+                        )}
                     </View>
-                </TouchableOpacity>
-                <View style={{ borderBottomColor: 'gray', width: "100%", height: 1, borderBottomWidth: 1, marginVertical: 20 }}></View>
+                    <View style={styles.rowLine}>
+                        {renderFilterButton(
+                            'Acreage',
+                            selectedAcreage,
+                            () => handleOpen(BottomSheetType.ACREAGE),
+                            'speedometer-outline'
+                        )}
+                    </View>
+                    <View style={styles.rowLine}>
+                        {renderFilterButton(
+                            'Price',
+                            selectedPrice,
+                            () => handleOpen(BottomSheetType.PRICE),
+                            'funnel-outline'
+                        )}
 
-            </View>
+                        {renderFilterButton(
+                            'Type',
+                            selectedType,
+                            () => handleOpen(BottomSheetType.TYPE),
+                            "construct-outline"
+                        )}
+                    </View>
+                    <Text style={styles.bottomSheetTitle}>Sắp xếp theo</Text>
+                    <CustomRadioButton
+                        selected={sortBy}
+                        onSelect={handleSortChange}
+                    />
+                    <TouchableOpacity onPress={handleFilter}>
+                        <View style={{
+                            backgroundColor: myYellow,
+                            padding: 10,
+                            margin: 10,
+                            width: 100,
+                            borderRadius: 10,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            <Text style={{ fontSize: 18, fontWeight: 500 }}>Lọc</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <View style={{ borderBottomColor: 'gray', width: "100%", height: 1, borderBottomWidth: 1, marginVertical: 20 }}></View>
+
+                </View>
+            </PaperProvider>
+
         )
-    }
+    },[title, handleChangeText, selectedAddress, selectedAcreage, selectedPrice, selectedType, sortBy, handleSortChange, handleFilter])
     React.useEffect(() => {
         if (selectedProvince.code === "-1") {
             setSelectedAddress("Toàn quốc")
@@ -561,7 +583,7 @@ export const SearchScreen = () => {
 
     }, [type])
     React.useEffect(() => {
-        if(page>0){
+        if (page > 0) {
 
             loadAllPost()
         }
@@ -576,11 +598,11 @@ export const SearchScreen = () => {
                 renderItem={renderItemPost}
                 data={allPost}
                 onEndReachedThreshold={0.5}
-                ListHeaderComponent={flatListHeader} 
-                ListFooterComponent= {loading &&<ActivityIndicator animating={loading} />}
-                />
+                ListHeaderComponent={flatListHeader}
+                ListFooterComponent={loading && <ActivityIndicator animating={loading} />}
+            />
 
-               
+
 
             <BottomViewAddress
                 ref={bottomAddressRef}
@@ -631,12 +653,18 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white',
-        paddingBottom:20,
+        paddingBottom: 20,
     },
     mainContent: {
         flex: 1,
         justifyContent: 'start',
         alignItems: 'start',
+    }, searchbar: {
+        backgroundColor: 'rgb(243, 243, 243)',
+        borderRadius: 8,
+        borderWidth: 0.8,
+        borderColor: 'gray',
+        margin: 10,
     },
     greetingText: {
         fontSize: 24,

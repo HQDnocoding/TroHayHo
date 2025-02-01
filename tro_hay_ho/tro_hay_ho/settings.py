@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'cloudinary_storage',
     'corsheaders',
-    'phone_verify',
 ]
 
 
@@ -193,6 +192,7 @@ def verify_firebase_token(id_token):
     except Exception:
         return None  # Token không hợp lệ
     
+
 
 
 

@@ -5,6 +5,6 @@ export const Tab=createBottomTabNavigator();
 export const Stack = createNativeStackNavigator();
 
 export const Role=Object.freeze({
-    CHU_TRO:'chu_tro',
-    NGUOI_THUE_TRO:'nguoi_thue_tro'
+    CHU_TRO:'Chủ trọ',
+    NGUOI_THUE_TRO:'Người thuê trọ'
 })

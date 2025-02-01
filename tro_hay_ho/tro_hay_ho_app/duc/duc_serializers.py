@@ -58,7 +58,10 @@ class MessageSerializer(ModelSerializer):
 class BasicUserInfoSerializer(ModelSerializer):
     avatar = serializers.ImageField(required=False)
     phone = serializers.CharField(required=False)
-    role = RoleSerializer
+    groups =  serializers.SerializerMethodField()
+    
+    def get_groups(self, obj): 
+        return [group.name for group in obj.groups.all()] 
 
     def create(self, validated_data):
         user = User(**validated_data)

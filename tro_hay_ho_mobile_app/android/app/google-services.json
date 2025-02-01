@@ -1,0 +1,70 @@
+{
+  "project_info": {
+    "project_number": "1094159227138",
+    "project_id": "my-project-448616",
+    "storage_bucket": "my-project-448616.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1094159227138:android:e63ed6d4809908e7aa8a1b",
+        "android_client_info": {
+          "package_name": "com.hqd112004.tro_hay_ho_mobile_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1094159227138-fefrgothuistj18gcf2l3il094dco94n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hqd112004.tro_hay_ho_mobile_app",
+            "certificate_hash": "e75e8124f22f4b7e45f5daa47c6cf16397aea199"
+          }
+        },
+        {
+          "client_id": "1094159227138-k83jojv18rnoi1vo1tdfoeh2nhi62kd5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hqd112004.tro_hay_ho_mobile_app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "1094159227138-sc3o9jcjlc5qf4u175vl1nali6trsljp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hqd112004.tro_hay_ho_mobile_app",
+            "certificate_hash": "cd64382b99eba0475fff160fa3c1a35eed76f5ae"
+          }
+        },
+        {
+          "client_id": "1094159227138-u3isc116sfnerqsjhvm132ikr6mtpfkd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO2qci7Ux4LSXuiQsZSOBeSWyHWhmPNDY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1094159227138-04u2vu85jblo2vemrqv68bmihh0jmlau.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1094159227138-lvlg2n85bnu91f8vahfifbclhgiroqls.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hqd112004.tro_hay_ho_mobile_app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

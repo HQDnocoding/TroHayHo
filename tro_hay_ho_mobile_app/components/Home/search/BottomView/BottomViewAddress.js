@@ -22,7 +22,7 @@ const renderFilterButton = (label, value, onPress) => {
 const BottomViewAddress = forwardRef((props, ref) => {
 
     const bottomSheetRef = useRef(null);
-    const snapPoints = useMemo(() => ['25%', '50%'], []);
+    const snapPoints = useMemo(() => ['25%', '50%',"90%"], []);
     useImperativeHandle(ref, () => ({
         open: () => {
             bottomSheetRef.current?.snapToIndex(1);
