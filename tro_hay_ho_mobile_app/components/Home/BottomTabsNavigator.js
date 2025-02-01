@@ -6,7 +6,7 @@ import PostManagementStackNavigator from "../PostManagement/PostManagementStackN
 import { Tab } from "../../general/General";
 import HomeStackNavigator from "./HomeStackNavigator";
 import { useNavigation } from "@react-navigation/native";
-import React,{ useContext } from "react";
+import React, { useContext } from "react";
 import { MyUserContext } from "../../configs/UserContexts";
 import { TouchableOpacity } from "react-native";
 import { useRequestLoginDialog } from "../../utils/RequestLoginDialogContext";
@@ -15,8 +15,8 @@ import { useRequestLoginDialog } from "../../utils/RequestLoginDialogContext";
 
 const BottomTabsNavigator = () => {
   const navigate = useNavigation()
-  const currentUser=useContext(MyUserContext)
-  const {showDialog} = useRequestLoginDialog()
+  const currentUser = useContext(MyUserContext)
+  const { showDialog } = useRequestLoginDialog()
 
   return (
     <Tab.Navigator screenOptions={({ route }) => ({
@@ -70,7 +70,20 @@ const BottomTabsNavigator = () => {
           )
         }}
       />
-      <Tab.Screen name="post-creating" component={PostCreatingStackNavigator} options={{headerShown:false, title: 'Đăng tin' }} />
+      <Tab.Screen name="post-creating" component={PostCreatingStackNavigator} options={{
+        headerShown: false, title: 'Đăng tin', tabBarButton: (props) => (
+          <TouchableOpacity
+            {...props}
+            onPress={() => {
+              if (currentUser) {
+                props.onPress();
+              } else {
+                showDialog()
+              }
+            }}
+          />
+        )
+      }} />
       <Tab.Screen name="account" component={AccountStackNavigator} options={{ headerShown: false, title: 'Tài khoản' }} />
 
     </Tab.Navigator>
