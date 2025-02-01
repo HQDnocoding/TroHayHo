@@ -1,13 +1,14 @@
 import React, { useCallback, useMemo, useRef, forwardRef, useImperativeHandle, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,Keyboard } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Keyboard } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { TextInput } from 'react-native-paper';
+import { myYellow } from '../../../../utils/MyValues';
 
 
 const BottomViewAcreage = forwardRef((props, ref) => {
     const bottomSheetRef = useRef(null);
-    const snapPoints = useMemo(() => ['25%', '50%',], []);
+    const snapPoints = useMemo(() => ['25%', '60%',"90%"], []);
     const [minAcreage, setMinAcreage] = useState(0)
     const [maxAcreage, setMaxAcreage] = useState(0)
 
@@ -33,8 +34,17 @@ const BottomViewAcreage = forwardRef((props, ref) => {
         if (props.onSelectAcreage) {
             props.onSelectAcreage(acreage);
         }
-    }, [maxAcreage,minAcreage,props.onSelectAcreage]);
-
+    }, [maxAcreage, minAcreage, props.onSelectAcreage]);
+    const handleUnSelect = useCallback(() => {
+        Keyboard.dismiss();
+        let acreage = {
+            min: "0",
+            max: "0",
+        }
+        if (props.onSelectAcreage) {
+            props.onSelectAcreage(acreage);
+        }
+    }, [maxAcreage, minAcreage, props.onSelectAcreage]);
     return (
         <BottomSheet
             ref={bottomSheetRef}
@@ -44,13 +54,13 @@ const BottomViewAcreage = forwardRef((props, ref) => {
             enablePanDownToClose={true}
             handleIndicatorStyle={{ backgroundColor: 'white' }}
             handleStyle={{
-              borderTopRightRadius: 8,
-              borderTopLeftRadius: 8,
-              backgroundColor: "rgb(255, 215, 121)"
+                borderTopRightRadius: 8,
+                borderTopLeftRadius: 8,
+                backgroundColor: "rgb(255, 215, 121)"
             }}
         >
             <BottomSheetView style={styles.contentContainer}>
-                <Text style={{margin:10,fontSize:20}}>Diện tích</Text>
+                <Text style={{ margin: 10, fontSize: 20 }}>Diện tích</Text>
                 <TextInput
                     label="Diện tích tối thiểu"
                     value={minAcreage}
@@ -65,12 +75,21 @@ const BottomViewAcreage = forwardRef((props, ref) => {
                     keyboardType="numeric"
                     style={styles.input}
                 />
-                <TouchableOpacity
-                    onPress={handleSelectAcreage}
-                    style={styles.button}
-                >
-                    <Text>Lọc diện tích</Text>
-                </TouchableOpacity>
+                <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around', }}>
+                    <TouchableOpacity
+                        onPress={handleSelectAcreage}
+                        style={styles.button}
+                    >
+                        <Text>Lọc diện tích</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={handleUnSelect}
+                        style={styles.buttonNegative}
+                    >
+                        <Text style={{ color: 'black' }}>Bỏ chọn</Text>
+                    </TouchableOpacity>
+                </View>
+
             </BottomSheetView>
         </BottomSheet>
     );
@@ -86,10 +105,17 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         marginBottom: 10,
-        backgroundColor:'white'
+        backgroundColor: 'white'
     },
     button: {
-        backgroundColor: '#EEEEEE',
+        backgroundColor: "rgb(255, 215, 121)",
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 10
+    }, buttonNegative: {
+        borderColor: myYellow,
+        borderWidth: 0.8,
+        backgroundColor: "rgb(255, 255, 255)",
         padding: 10,
         borderRadius: 8,
         marginTop: 10
@@ -104,7 +130,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#DDDDDD',
         marginRight: 8,
-        backgroundColor: 'white',
+        backgroundColor: "rgb(255, 215, 121)",
         justifyContent: 'space-between',
     },
     sortButton: {

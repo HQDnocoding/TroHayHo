@@ -13,7 +13,7 @@ from ..models import User, Role
 from ..serializers import *
 from .duc_serializers import *
 from django.db.models import Q
-
+from django.db.models.functions import Lower
 
 class ConversationViewSet(ModelViewSet):
     serializer_class = ConsersationSerializer
@@ -419,7 +419,9 @@ class PostParentViewSet(ModelViewSet):
             queryset = queryset.filter(address__ward=ward_code)
 
         if kw_title:
-            queryset = queryset.filter(title__icontains=kw_title)
+            queryset = queryset.annotate(lower_title=Lower('title')).filter(
+                lower_title__icontains=kw_title.lower()
+            )
 
         return queryset
     def get_object(self):
