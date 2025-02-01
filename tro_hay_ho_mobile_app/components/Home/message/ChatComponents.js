@@ -29,7 +29,19 @@ const ChatImage = ({ message, isOutgoing }) => {
     </View>
   );
 };
+const ChatPost = ({ message, isOutgoing }) => {
+  return (
+    <View style={[styles.messageContainer,isOutgoing?styles.outgoing:styles.incoming ]}>
+      <Image
+        source={{ uri: sampleImage }}
+        style={styles.messageImage}
+      />
 
+
+      <Text style={styles.timestamp}>{formatTimeAgo( message.created_at)}</Text>
+    </View>
+  );
+};
 // ChatInput.js
 const ChatInput = ({ onSend }) => {
   const [message,setMessage]=React.useState("")

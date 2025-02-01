@@ -65,8 +65,13 @@ const createTextMessage = async (conversationId, userIdsend, textMessage) => {
     const conversationLastMessRef = ref(db, `conversations/${conversationId}/last_message`)
     await update(conversationLastMessRef, message)
 
-    const conversationTimeRef = ref(db, `conversations/${conversationId}/updated_at`)
-    await update(conversationTimeRef, serverTimestamp())
+    const conversationTimeRef = ref(db, `conversations/${conversationId}`)
+    await update(conversationTimeRef, {updated_at:serverTimestamp()})
+    //cai lai cuoc tro truyen de khi tao moi tin nhan thi cuoc tro chuyen se update theo
+    const userConversationRef = ref(db, `users/${userIdsend}/conversations`)
+    await update(userConversationRef, {[conversationId]:false})
+    await update(userConversationRef, {[conversationId]:true})
+
 }
 const getMessages=(conversationId,callback)=>{
     const messagesRef = ref(db, `messages/${conversationId}`)

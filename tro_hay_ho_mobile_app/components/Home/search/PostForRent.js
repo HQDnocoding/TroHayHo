@@ -7,31 +7,41 @@ import { formatTimeAgo } from '../../../utils/TimeFormat';
 import { formatPrice } from '../../../utils/Formatter';
 import { MyUserContext } from '../../../configs/UserContexts';
 import APIs, { endpointsDuc } from '../../../configs/APIs';
+import { useNavigation } from '@react-navigation/native';
 
 const PostForRent = ({ item }) => {
+    const nav = useNavigation()
+    const handleToRote=()=>{
+        if(item!==null){
+            let routeName='post_for_rent' 
+            let params={
+                postId: item.id,
+                 coordinates: item.address.coordinates }
+            nav.navigate(routeName,params)
+        }
+    }
 
-   
     return (
 
         <View style={styles.card} >
             <View style={styles.imageContainer}>
                 <Image
-                    source={{ uri: item && item.post_image &&item.post_image[0]  ?item.post_image[0].image: sampleImage }}
+                    source={{ uri: item && item.post_image && item.post_image[0] ? item.post_image[0].image : sampleImage }}
                     style={styles.image}
                     resizeMode="cover"
                 />
             </View>
             <View style={styles.contentContainer}>
                 <View style={styles.header}>
-                    <TouchableNativeFeedback >
+                    <TouchableNativeFeedback onPress={handleToRote}>
                         <View>
-                            <Text style={styles.title} numberOfLines={2}>{item?item.title:""}</Text>
+                            <Text style={styles.title} numberOfLines={2}>{item ? item.title : ""}</Text>
+                            <Text style={styles.priceRed}>{item ? item.price : ""} đ/tháng</Text>
+                            <Text style={styles.acreage}>Diện tích: {item ? item.acreage : ""} m2</Text>
 
                         </View>
                     </TouchableNativeFeedback>
-                    <Text style={styles.priceRed}>{item? item.price:""} đ/tháng</Text>
 
-                    <Text style={styles.acreage}>Diện tích: {item? item.acreage:""} m2</Text>
                 </View>
             </View>
 
