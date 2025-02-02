@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-n_43$u^ws23_-lzo!&l(h13y3oqgb02f(s%q05(&_u4u33!1p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.1.196","192.168.129.238", "192.168.1.11", "192.168.1.10", "192.168.1.253", "10.100.60.24","127.0.0.1","192.168.103.238"]
+ALLOWED_HOSTS = ["https://hqd2004.pythonanywhere.com/",  "192.168.1.196","192.168.129.238", "192.168.1.11", "192.168.1.10", "192.168.1.253", "10.100.60.24","127.0.0.1","192.168.103.238"]
 # 192.168.129.238
 # Application definition
 
@@ -177,6 +177,8 @@ cloudinary.config(
     secure=True
 )
 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 client_id = '0R6hMr4Zhgl9LeXoWrxDNSTkLgpZymmtLJeINUFN'
 client_secret = 'AG1n41T3umckBclAVuc97nNwW0YJTqxpDUanvjS2yju0kxLpwSp88FtuOZesCxm2jmPhwREN2wpHHq8xdztMEsBDUYGWaMnDPDS6vLG7o851KmYvrESeBeI8sGvYzsgw'
 
@@ -192,7 +194,6 @@ def verify_firebase_token(id_token):
     except Exception:
         return None  # Token không hợp lệ
     
-
 
 
 
