@@ -83,8 +83,8 @@ class UserViewSet(ViewSet,CreateAPIView):
         page=paginator.paginate_queryset(following,request)
         
         if page is not None:
-            return paginator.get_paginated_response(FollowingSerializer(page,many=True).data)
-        serializer = FollowingSerializer(following, many=True) 
+            return paginator.get_paginated_response(FollowerSerializer(page,many=True).data)
+        serializer = FollowerSerializer(following, many=True) 
         return Response(serializer.data)
         
     

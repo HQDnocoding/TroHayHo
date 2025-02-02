@@ -9,8 +9,8 @@ const HomeScreen = () => <Home />;
 const FollowingScreen = () => <FollowingHome />;
 const myInitialLayout = {
     width: Dimensions.get('window').width,
-  };
-  
+};
+
 
 const HomeTabNavigator = () => {
     const [index, setIndex] = useState(0);
@@ -34,7 +34,7 @@ const HomeTabNavigator = () => {
             indicatorStyle={{ backgroundColor: '#FFBA00' }}
             style={{ backgroundColor: 'white' }}
             labelStyle={{ fontSize: 14, fontWeight: 'bold' }}
-        
+
         />
     );
 
@@ -45,7 +45,7 @@ const HomeTabNavigator = () => {
             onIndexChange={setIndex}
             initialLayout={myInitialLayout}
             renderTabBar={renderTabBar}
-            
+
         />
     );
 };

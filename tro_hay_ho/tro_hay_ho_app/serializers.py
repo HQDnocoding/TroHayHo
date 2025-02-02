@@ -52,7 +52,8 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'avatar', 'password','phone','date_joined','groups','following_relations','follower_relations']
+        fields = ['id', 'username', 'first_name', 'last_name', 
+                  'avatar', 'password','phone','date_joined','groups']
 
         extra_kwargs = {
             'password': {
@@ -61,10 +62,20 @@ class UserSerializer(ModelSerializer):
         }
 
 
-class FollowingSerializer(ModelSerializer):
+class FollowerSerializer(ModelSerializer):
+    # followed=UserSerializer()
+    follower=UserSerializer()
     class Meta:
         model=Following
-        fields='__all__'
+        fields=['follower']
+        
+        
+class FollowingSerializer(ModelSerializer):
+    followed=UserSerializer()
+    # follower=UserSerializer()
+    class Meta:
+        model=Following
+        fields=['followed']
 
 
 class WardSerializer(ModelSerializer):

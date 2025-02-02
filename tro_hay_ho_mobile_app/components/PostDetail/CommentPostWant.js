@@ -55,11 +55,6 @@ const CommentScreen = ({ postId, routName }) => {
         }
     }, []);
 
-    // useEffect(() => {
-    //     let timer = setTimeout(() => loadComment(), 500);
-    //     return () => clearTimeout(timer);
-    // }, [page]);
-
     const loadMoreButton = () => {
         if (page > 0 && !loading) {
             return (

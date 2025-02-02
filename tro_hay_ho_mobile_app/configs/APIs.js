@@ -20,6 +20,8 @@ export const endpoints = {
     'send-otp': '/users/send-otp/',
     'verify-otp': '/users/verify-otp/',
     'change-password': '/users/change-password/',
+    'follow-me': '/users/follow-me/',
+    'following': '/users/following/',
     'register': '/users/',
     'google-login': '/google-login/',
     'favourite-posts': '/users/favorites/',
@@ -34,7 +36,8 @@ export const endpoints = {
     'pfr-comment': (postId) => `/post-for-rents/${postId}/comments/`,
     'provinces': '/provinces/',
     'provinces-districts': (provinceId) => `/provinces/${provinceId}/districts/`,
-    'provinces-districts-wards': (provinceId, districtId) => `/provinces/${provinceId}/districts/${districtId}/wards/`
+    'provinces-districts-wards': (provinceId, districtId) => `/provinces/${provinceId}/districts/${districtId}/wards/`,
+    
 }
 export const endpointsDuc = {
     'getListPostWantShow': '/post-wants-show/',

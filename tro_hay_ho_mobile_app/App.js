@@ -34,6 +34,7 @@ import PickedImages from './components/PostCreating/PickedImages';
 import ImagePickerComponent from './components/User/test';
 import PhoneSignIn from './components/User/Test2';
 import PostWantCreating from './components/PostCreating/PostWantCreating';
+import FollowingTabScreenNavigator from './components/User/FollowingTabScreen';
 
 
 export default function App() {
@@ -133,6 +134,14 @@ export default function App() {
                         backgroundColor: '#FFBA00',
                     }
                 }} />
+                <Stack.Screen
+                name='following-list' component={FollowingTabScreenNavigator}
+                options={{
+                    title: "", headerStyle: {
+                        backgroundColor: '#FFBA00',
+                    }
+                }}
+                />
 
             </Stack.Navigator>
         )

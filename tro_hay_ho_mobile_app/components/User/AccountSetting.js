@@ -1,9 +1,9 @@
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import AccountUserStyle from "../../styles/dat/AccountUserStyle";
 import ItemSetting from "./ItemSetting";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MyDispatchContext, MyUserContext } from "../../configs/UserContexts";
-import APIs, { endpoints } from "../../configs/APIs";
+import APIs, { authAPIs, endpoints } from "../../configs/APIs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
@@ -11,9 +11,58 @@ const AccountSetting = ({ navigation }) => {
 
     const user = useContext(MyUserContext);
     const dispatch = useContext(MyDispatchContext);
+    const [token, setToken] = useState(0);
+    const [followCount, setFollowCount] = useState({ following: 0, follower: 0 })
+
+    const loadToken = async () => {
+        const tk = await AsyncStorage.getItem("access_token")
+        setToken(tk);
+    }
+
+    useEffect(() => {
+        if (user !== null) {
+            loadToken();
+        }
+    }, [user])
+
+
 
     console.log('user value:', user);
 
+    const loadFollowMe = async () => {
+        try {
+            console.log("token", token);
+            const res = await authAPIs(token).get(endpoints['follow-me']);
+            console.log(res)
+
+            if (res.status == 200) {
+                setFollowCount(prv => ({ ...prv, follower: res.data.count }))
+
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    const loadFollowing = async () => {
+        try {
+            const res = await authAPIs(token).get(endpoints['following']);
+            console.log(res)
+
+            if (res.status == 200) {
+                setFollowCount(prv => ({ ...prv, following: res.data.count }))
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    useEffect(() => {
+        if (user !== null && token != 0) {
+            loadFollowMe();
+            loadFollowing();
+        }
+    }, [token]);
 
     const signOut = async () => {
         try {
@@ -71,8 +120,8 @@ const AccountSetting = ({ navigation }) => {
                                 <Text style={AccountUserStyle.info} > {user?.first_name} {user?.last_name}</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity>
-                                <Text style={AccountUserStyle.followers}>0 Người theo dõi | 0 Đang theo dõi</Text>
+                            <TouchableOpacity onPress={()=>{navigation.navigate('following-list')}}>
+                                <Text style={AccountUserStyle.followers}>{followCount.follower} Người theo dõi | {followCount.following} Đang theo dõi</Text>
                             </TouchableOpacity>
                         </View>
                     </>
