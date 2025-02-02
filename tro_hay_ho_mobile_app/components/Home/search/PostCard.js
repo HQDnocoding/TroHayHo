@@ -1,20 +1,28 @@
-import { Text, View, StyleSheet, Image } from "react-native"
+import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native"
 import PostForRent from "./PostForRent"
 import PostWant from "./PostWant"
 import { myYellow, sampleAvatar, sampleImage } from "../../../utils/MyValues"
 import { formatTimeAgo } from "../../../utils/TimeFormat"
 import APIs, { endpointsDuc } from "../../../configs/APIs"
 import React, { useState } from "react"
+import { useNavigation } from "@react-navigation/native"
 
 const PostCard = ({ item }) => {
     const [post, setPost] = useState(null)
-
+    const nav=useNavigation()
 
 
     const loadPost = async () => {
         const res = await APIs.get(endpointsDuc.getPostParent(item.id))
         if (res.data) {
             setPost(res.data)
+        }
+    }
+    const handleToRote=()=>{
+        if(post!==null){
+
+            const infoUser=post.user
+            nav.navigate('profile_user', {infoUser})
         }
     }
     React.useEffect(() => {
@@ -25,32 +33,35 @@ const PostCard = ({ item }) => {
     return (
         <View style={styles.card}>
             <View style={styles.header}>
-                <View style={styles.imageContainer}>
-                    <Image
-                        source={{ uri: post&&post.user&&post.user.avatar  ? post.user.avatar : sampleAvatar }}
-                        style={styles.image}
-                        resizeMode="cover"
-                    />
-                </View>
+                <TouchableOpacity onPress={handleToRote}>
+                    <View style={styles.imageContainer}>
+                        <Image
+                            source={{ uri: post && post.user && post.user.avatar ? post.user.avatar : sampleAvatar }}
+                            style={styles.image}
+                            resizeMode="cover"
+                        />
+                    </View>
+                </TouchableOpacity>
+
                 <View style={{ marginStart: 10 }}>
-                    <Text style={{ fontWeight: 700 }}>{post&&post.user?post.user.last_name:""} {post&&post.user?post.user.first_name:""}</Text>
-                    <Text style={{ fontSize: 12 }}>{post?formatTimeAgo(post.created_date):""}</Text>
+                    <Text style={{ fontWeight: 700 }}>{post && post.user ? post.user.last_name : ""} {post && post.user ? post.user.first_name : ""}</Text>
+                    <Text style={{ fontSize: 12 }}>{post ? formatTimeAgo(post.created_date) : ""}</Text>
 
                 </View>
             </View>
             <View style={styles.address}>
-                <Text numberOfLines={2}>{post?post.address.ward.full_name:""},{post?post.address.district.full_name:""},{post?post.address.province.full_name:""}</Text>
+                <Text numberOfLines={2}>{post ? post.address.ward.full_name : ""},{post ? post.address.district.full_name : ""},{post ? post.address.province.full_name : ""}</Text>
             </View>
-            {post&&<>
+            {post && <>
                 {post.type && post.type.toLowerCase() === 'postforrent' ? <>
-                <PostForRent item={post} />
+                    <PostForRent item={post} />
 
-            </> : <>
-                <PostWant item={post} />
+                </> : <>
+                    <PostWant item={post} />
 
+                </>}
             </>}
-            </>}
-           
+
         </View>
     )
 }
@@ -84,12 +95,12 @@ const styles = StyleSheet.create({
     }, header: {
         alignItems: 'center',
         flexDirection: 'row',
-    }, address: { 
-        marginVertical: 5, 
-        padding: 10, 
+    }, address: {
+        marginVertical: 5,
+        padding: 10,
         backgroundColor: "rgb(255, 220, 159)",
-        borderRadius:10,
-        
+        borderRadius: 10,
+
     }
 })
 export default PostCard

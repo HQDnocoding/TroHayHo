@@ -9,16 +9,17 @@ import PostManagementHidden from "./PostManagementHidden";
 import APIs, { endpointsDuc } from '../../configs/APIs';
 import { MyUserContext } from '../../configs/UserContexts';
 import { role_id_chu_tro, tempUser2 } from '../../utils/MyValues';
+import { Role } from '../../general/General';
 
 
 export default function PostManagementTabNavigator() {
-  const layout = useWindowDimensions();
-  const [index, setIndex] = React.useState(0);
+    const layout = useWindowDimensions();
+    const [index, setIndex] = React.useState(0);
 
 
-  ////////////Show--/////////////
+    ////////////Show--/////////////
 
-  const currentUser = React.useContext(MyUserContext)
+    const currentUser = React.useContext(MyUserContext)
     const [postShow, setPostShow] = React.useState([])
 
     const [loadingShow, setLoadingShow] = React.useState(false);
@@ -35,30 +36,33 @@ export default function PostManagementTabNavigator() {
                     let url;
                     let res;
                     let updatePostResults
-                    if (currentUser.role === role_id_chu_tro)//chu tro
-                    {
-                        url = `${endpointsDuc['getListPostForRentByUserId'](currentUser.id)}?page=${pageShow}`
-                        res = await APIs.get(url)
-                        const postResults = res.data.results
-                        updatePostResults = postResults.map((item) => {
-                            return {
-                                isPostWant: false,
-                                ...item
-                            }
-                        })
-                    } else {
-                        //nguoi thue
-                        url = `${endpointsDuc['getListPostWantByUserId'](currentUser.id)}?page=${pageShow}`
-                        res = await APIs.get(url)
-                        const postResults = res.data.results
-                        updatePostResults = postResults.map((item) => {
-                            return {
-                                isPostWant: true,
-                                ...item
-                            }
-                        })
+                    if (currentUser.groups && currentUser.groups.length > 0) {
+
+                        if (currentUser.groups[0] === Role.CHU_TRO)//chu tro
+                        {
+                            url = `${endpointsDuc['getListPostForRentByUserId'](currentUser.id)}?page=${pageShow}`
+                            res = await APIs.get(url)
+                            const postResults = res.data.results
+                            updatePostResults = postResults.map((item) => {
+                                return {
+                                    isPostWant: false,
+                                    ...item
+                                }
+                            })
+                        } else {
+                            //nguoi thue
+                            url = `${endpointsDuc['getListPostWantByUserId'](currentUser.id)}?page=${pageShow}`
+                            res = await APIs.get(url)
+                            const postResults = res.data.results
+                            updatePostResults = postResults.map((item) => {
+                                return {
+                                    isPostWant: true,
+                                    ...item
+                                }
+                            })
+                        }
                     }
-                    console.info("pm nẽt",postShow)
+                    console.info("pm nẽt", postShow)
 
                     if (pageShow > 1) {
                         setPostShow(prev => [...prev, ...updatePostResults])
@@ -82,9 +86,9 @@ export default function PostManagementTabNavigator() {
             }
     }
     const loadMoreShow = () => {
-      console.info("pm",pageShow)
+        console.info("pm", pageShow)
 
-      if (!loadingShow && pageShow > 0) {
+        if (!loadingShow && pageShow > 0) {
             setPageShow(pageShow + 1)
         }
 
@@ -94,18 +98,18 @@ export default function PostManagementTabNavigator() {
 
     }
     const handleUpdateListShow = () => {
-      console.info("an",pageShow)
-      setPageHide(1)
-      setPageShow(1)
+        console.info("an", pageShow)
+        setPageHide(1)
+        setPageShow(1)
     };
     React.useEffect(() => {
 
         loadPostShow()
     }, [pageShow])
-  
-  //////////////////////////
-  /////////////Hide////////////
-  const [postHide, setPostHide] = React.useState([])
+
+    //////////////////////////
+    /////////////Hide////////////
+    const [postHide, setPostHide] = React.useState([])
 
     const [loadingHide, setLoadingHide] = React.useState(false);
     const [pageHide, setPageHide] = React.useState(1);
@@ -120,28 +124,32 @@ export default function PostManagementTabNavigator() {
                     let url;
                     let res;
                     let updatePostResults
-                    if (currentUser.role === role_id_chu_tro)//chu tro
-                    {
-                        url = `${endpointsDuc['getListHidePostForRentByUserId'](currentUser.id)}?page=${pageHide}`
-                        res = await APIs.get(url)
-                        const postResults = res.data.results
-                        updatePostResults = postResults.map((item) => {
-                            return {
-                                isPostWant: false,
-                                ...item
-                            }
-                        })
-                    } else {
-                        //nguoi thue
-                        url = `${endpointsDuc['getListHidePostWantByUserId'](currentUser.id)}?page=${pageHide}`
-                        res = await APIs.get(url)
-                        const postResults = res.data.results
-                        updatePostResults = postResults.map((item) => {
-                            return {
-                                isPostWant: true,
-                                ...item
-                            }
-                        })
+                    if (currentUser.groups && currentUser.groups.length > 0) {
+
+                        if (currentUser.groups[0] === Role.CHU_TRO)//chu tro
+                        {
+                            
+                            url = `${endpointsDuc['getListHidePostForRentByUserId'](currentUser.id)}?page=${pageHide}`
+                            res = await APIs.get(url)
+                            const postResults = res.data.results
+                            updatePostResults = postResults.map((item) => {
+                                return {
+                                    isPostWant: false,
+                                    ...item
+                                }
+                            })
+                        } else {
+                            //nguoi thue
+                            url = `${endpointsDuc['getListHidePostWantByUserId'](currentUser.id)}?page=${pageHide}`
+                            res = await APIs.get(url)
+                            const postResults = res.data.results
+                            updatePostResults = postResults.map((item) => {
+                                return {
+                                    isPostWant: true,
+                                    ...item
+                                }
+                            })
+                        }
                     }
 
                     if (pageHide > 1) {
@@ -166,7 +174,7 @@ export default function PostManagementTabNavigator() {
             }
     }
     const loadMoreHide = () => {
-        if (!loadMoreHide&& pageHide > 0) {
+        if (!loadMoreHide && pageHide > 0) {
             setPageHide(pageHide + 1)
         }
 
@@ -180,73 +188,73 @@ export default function PostManagementTabNavigator() {
         loadPostHide()
     }, [pageHide])
 
-  /////////////////////////
-  const Showing = () => (<PostManagementShowing  handleUpdateList={handleUpdateListShow} post={postShow} loading={loadingShow} refresh={refreshShow} loadMore={loadMoreShow}/>);
-  const Approval = () => (<PostManagementPendingApproval />);
-  const Hidden = () => (<PostManagementHidden  handleUpdateList={handleUpdateListShow} post={postHide} loading={loadingHide} refresh={refreshHide} loadMore={loadMoreHide} />);
+    /////////////////////////
+    const Showing = () => (<PostManagementShowing handleUpdateList={handleUpdateListShow} post={postShow} loading={loadingShow} refresh={refreshShow} loadMore={loadMoreShow} />);
+    const Approval = () => (<PostManagementPendingApproval />);
+    const Hidden = () => (<PostManagementHidden handleUpdateList={handleUpdateListShow} post={postHide} loading={loadingHide} refresh={refreshHide} loadMore={loadMoreHide} />);
 
-  const renderScene = SceneMap({
+    const renderScene = SceneMap({
 
-    first: Showing,
-    // second: Hidden,
-    three: Hidden,
+        first: Showing,
+        // second: Hidden,
+        three: Hidden,
 
-  });
+    });
 
-  const routes = [
-    { key: 'first', title: `Đang hiện thị (${postShow.length})`  },
-    { key: 'three', title: `Đang ẩn (${postHide.length})` },
+    const routes = [
+        { key: 'first', title: `Đang hiện thị (${postShow.length})` },
+        { key: 'three', title: `Đang ẩn (${postHide.length})` },
 
-  ];
-  // { key: 'second', title: 'Chờ phê duyệt (0)' },
+    ];
+    // { key: 'second', title: 'Chờ phê duyệt (0)' },
 
-  const renderTabBar = props => (
-    <TabBar
-      {...props}
-      // scrollEnabled={true}
-      style={styles.tabBar}
-      labelStyle={styles.label}
-      // tabStyle={styles.tab}
-      indicatorStyle={styles.indicator}
-      activeColor={'#000000'}
-      inactiveColor={'#9d9d9d'}
-      
-    // gap={20}
-    />
-  );
+    const renderTabBar = props => (
+        <TabBar
+            {...props}
+            // scrollEnabled={true}
+            style={styles.tabBar}
+            labelStyle={styles.label}
+            // tabStyle={styles.tab}
+            indicatorStyle={styles.indicator}
+            activeColor={'#000000'}
+            inactiveColor={'#9d9d9d'}
 
-  return (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      onIndexChange={setIndex}
-      initialLayout={{ width: layout.width }}
-      renderTabBar={renderTabBar}
-    />
-  );
+        // gap={20}
+        />
+    );
+
+    return (
+        <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{ width: layout.width }}
+            renderTabBar={renderTabBar}
+        />
+    );
 }
 
 const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: '#ffffff',
-    elevation: 0,
-    shadowOpacity: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  label: {
-    color: '#666',
-    fontSize: 14,
-    textTransform: 'none',
-  },
-  tab: {
-    width: 'auto',
-    minWidth: 120,
-    paddingHorizontal: 15,
-    color: 'black',
-  },
-  indicator: {
-    backgroundColor: '#000000',
-    height: 2,
-  },
+    tabBar: {
+        backgroundColor: '#ffffff',
+        elevation: 0,
+        shadowOpacity: 0,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+    },
+    label: {
+        color: '#666',
+        fontSize: 14,
+        textTransform: 'none',
+    },
+    tab: {
+        width: 'auto',
+        minWidth: 120,
+        paddingHorizontal: 15,
+        color: 'black',
+    },
+    indicator: {
+        backgroundColor: '#000000',
+        height: 2,
+    },
 });

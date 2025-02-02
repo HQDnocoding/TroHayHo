@@ -7,23 +7,33 @@ import { formatTimeAgo } from '../../../utils/TimeFormat';
 import { formatPrice } from '../../../utils/Formatter';
 import { MyUserContext } from '../../../configs/UserContexts';
 import APIs, { endpointsDuc } from '../../../configs/APIs';
+import { useNavigation } from '@react-navigation/native';
 
 const PostWant = ({ item }) => {
+    const nav = useNavigation()
+    const handleToRote=()=>{
+        if(item!==null){
+            let routeName='post_want' 
+            let params={
+                postId: item.id,
+                 coordinates: item.address.coordinates }
+            nav.navigate(routeName,params)
+        }
+    }
 
-   
     return (
-        
+
         <View style={styles.card} >
             <View style={styles.contentContainer}>
                 <View style={styles.header}>
-                    <TouchableNativeFeedback >
+                    <TouchableNativeFeedback onPress={handleToRote}>
                         <View>
-                            <Text style={styles.title} numberOfLines={2}>{ item ? item.title:""}</Text>
+                            <Text style={styles.title} numberOfLines={2}>{item ? item.title : ""}</Text>
+                            <Text style={styles.priceGreen}>Giá mong muốn {item ? item.price : ""} đ/tháng</Text>
+                            <Text style={styles.priceMinMax}>Có thể xem xét từ:{item ? item.price_range_min : ''}-{item ? item.price_range_max : ''} đ/tháng</Text>
 
                         </View>
                     </TouchableNativeFeedback>
-                    <Text style={styles.priceGreen}>Giá mong muốn {item ?item.price:""} đ/tháng</Text>
-                    <Text style={styles.priceMinMax}>Có thể xem xét từ:{item ?item.price_range_min:''}-{item ?item.price_range_max:''} đ/tháng</Text>
                 </View>
             </View>
         </View>

@@ -72,7 +72,7 @@ class BasicUserInfoSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'avatar', 'role', 'phone', 'date_joined']
+        fields = ['id', 'first_name', 'last_name', 'avatar', 'groups', 'phone', 'date_joined']
 
         extra_kwargs = {
             'password': {
