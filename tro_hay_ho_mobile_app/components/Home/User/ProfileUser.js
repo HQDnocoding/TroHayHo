@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { RequestLoginDialogContext, useRequestLoginDialog } from '../../../utils/RequestLoginDialogContext';
 import PostCard from '../duc/post/PostCard';
 import { getInfoPostFavoriteOfUser } from '../../../utils/MyFunctions';
+import { Role } from '../../../general/General';
 
 const ProfileUser = ({ navigation, route }) => {
     const currentUser = useContext(MyUserContext)
@@ -32,38 +33,42 @@ const ProfileUser = ({ navigation, route }) => {
         if (page > 0) {
             setLoading(true)
             if (infoUser !== null) {
+                console.log("profile user", infoUser)
 
                 try {
 
                     let url;
                     let res;
                     let updatePostResults
-                    if (infoUser.role === role_id_chu_tro)//chu tro
-                    {
-
-                        url = `${endpointsDuc['getListPostForRentByUserId'](infoUser.id)}?page=${page}`
-                        res = await APIs.get(url)
-                        const postResults = res.data.results
-                        updatePostResults = postResults.map((item) => {
-                            return {
-                                type: 'PostForRent',
-                                ...item
-                            }
-                        })
-                    } else {
-
-                        //nguoi thue
-                        url = `${endpointsDuc['getListPostWantByUserId'](infoUser.id)}?page=${page}`
-
-                        res = await APIs.get(url)
-                        const postResults = res.data.results
-                        updatePostResults = postResults.map((item) => {
-                            return {
-                                type: 'PostWant',
-                                ...item
-                            }
-                        })
+                    if (infoUser.groups && infoUser.groups.length > 0) {
+                        if (infoUser.groups[0] === Role.CHU_TRO)//chu tro
+                        {
+    
+                            url = `${endpointsDuc['getListPostForRentByUserId'](infoUser.id)}?page=${page}`
+                            res = await APIs.get(url)
+                            const postResults = res.data.results
+                            updatePostResults = postResults.map((item) => {
+                                return {
+                                    type: 'PostForRent',
+                                    ...item
+                                }
+                            })
+                        } else {
+    
+                            //nguoi thue
+                            url = `${endpointsDuc['getListPostWantByUserId'](infoUser.id)}?page=${page}`
+    
+                            res = await APIs.get(url)
+                            const postResults = res.data.results
+                            updatePostResults = postResults.map((item) => {
+                                return {
+                                    type: 'PostWant',
+                                    ...item
+                                }
+                            })
+                        }
                     }
+                   
 
                     if (page > 1) {
                         setPost(prev => [...prev, ...updatePostResults])
