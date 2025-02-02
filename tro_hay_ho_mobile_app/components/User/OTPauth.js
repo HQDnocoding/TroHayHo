@@ -6,10 +6,10 @@ import APIs, { authAPIs, endpoints } from "../../configs/APIs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
-const OTPauth = ({ isVisible, setVisible, onVerified, confirmation, phone }) => {
+const OTPauth = ({ isVisible, setVisible, phone, token }) => {
 
     const [otp, setOtp] = useState('');
-    const [enable, setEnable] = useState(false);
+    // const [enable, setEnable] = useState(false);
     //twilio
     const verify = async () => {
 
@@ -19,7 +19,6 @@ const OTPauth = ({ isVisible, setVisible, onVerified, confirmation, phone }) => 
         formData.append("otp_code", otp);
 
         try {
-            const token = await AsyncStorage.getItem("access_token");
             const res = await authAPIs(token).post(endpoints['verify-otp'], formData,
                 {
                     headers: {
@@ -28,10 +27,10 @@ const OTPauth = ({ isVisible, setVisible, onVerified, confirmation, phone }) => 
 
                 }
             )
-            if (res.ok) {
+            if (res.status===200) {
                 Alert.alert("", "Xác thực thành công!");
-            }else{
-                Alert.alert("","Xác thực thất bại!");
+            } else {
+                Alert.alert("", "Xác thực thất bại!");
             }
 
         } catch (e) {
@@ -45,24 +44,24 @@ const OTPauth = ({ isVisible, setVisible, onVerified, confirmation, phone }) => 
 
     const hideDialog = () => { setVisible(false); setOtp(null) }
 
-    const handleVerifyOTP = async () => {
+    // const handleVerifyOTP = async () => {
 
-        try {
-            const user = await verifyOTP(confirmation, otp);
-            if (user) {
-                const idToken = await user.getIdToken(); // Lấy Firebase Token
-                onVerified(phone, idToken); // Gửi số điện thoại và token lên Django
-            } else {
-                Alert.alert("OTP không hợp lệ, vui lòng thử lại.");
-            }
-        } catch (ex) {
-            console.error(ex);
-        } finally {
-            hideDialog();
-            setOtp('');
-        }
+    //     try {
+    //         const user = await verifyOTP(confirmation, otp);
+    //         if (user) {
+    //             const idToken = await user.getIdToken(); // Lấy Firebase Token
+    //             onVerified(phone, idToken); // Gửi số điện thoại và token lên Django
+    //         } else {
+    //             Alert.alert("OTP không hợp lệ, vui lòng thử lại.");
+    //         }
+    //     } catch (ex) {
+    //         console.error(ex);
+    //     } finally {
+    //         hideDialog();
+    //         setOtp('');
+    //     }
 
-    };
+    // };
 
     return (
         <View>

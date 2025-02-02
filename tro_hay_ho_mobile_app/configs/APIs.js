@@ -7,6 +7,7 @@ import axios from "axios";
 // const BASE_URL="http://192.168.1.55:8000/"
 // const BASE_URL="http://192.168.1.12:8000/"
 //const BASE_URL="http://192.168.103.238:8000/"
+// const BASE_URL = "https://hqd2004.pythonanywhere.com/"
 const BASE_URL = "http://192.168.1.11:8000/"
 // const BASE_URL = "http://192.168.1.196:8000/"
 
@@ -15,9 +16,10 @@ const BASE_URL = "http://192.168.1.11:8000/"
 export const endpoints = {
     'login': '/o/token/',
     'current-user': '/users/current-user/',
-    'add-phone-number':'/users/add-phone-number/',
-    'send-otp':'/users/send-otp/',
-    'verify-otp':'/users/verify-otp/',
+    'add-phone-number': '/users/add-phone-number/',
+    'send-otp': '/users/send-otp/',
+    'verify-otp': '/users/verify-otp/',
+    'change-password': '/users/change-password/',
     'register': '/users/',
     'google-login': '/google-login/',
     'favourite-posts': '/users/favorites/',

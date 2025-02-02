@@ -8,6 +8,7 @@ import { sendOTP, verifyOTP } from "../../utils/FireBaseAuth"
 import OTPauth from "./OTPauth"
 import APIs, { authAPIs, endpoints } from "../../configs/APIs"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import ChangePassWord from "./ChangePassword"
 
 
 
@@ -16,6 +17,19 @@ const AccountSettingDetail = () => {
     const [isSwitchOn, setIsSwitchOn] = useState(false);
     const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
     const [visibleDialog, setVisibleDialog] = useState(false);
+    const [visibleChangePW, setVisibleChangePw] = useState(false);
+
+    const [token, setToken] = useState();
+
+
+    const loadToken = async () => {
+        const tk = await AsyncStorage.getItem("access_token");
+        setToken(tk);
+    }
+
+    useEffect(() => {
+        loadToken();
+    }, []);
 
     const handleChange = (text) => {
 
@@ -24,7 +38,6 @@ const AccountSettingDetail = () => {
 
         setIsChanged(text.text === user.phone);
     }
-
 
     //twilio
     const sendOTP = async () => {
@@ -42,45 +55,46 @@ const AccountSettingDetail = () => {
             console.error(e);
         }
     }
-
-
     const [phone, setPhone] = useState(user.phone);
     const [isChanged, setIsChanged] = useState(false);
-    const [confirmation, setConfirmation] = useState(null);
+    // const [confirmation, setConfirmation] = useState(null);
 
-    const handleSendOTP = async () => {
-        const confirmationResult = await sendOTP(phone);
-        if (confirmationResult) {
-            setConfirmation(confirmationResult);
-            Alert.alert("Mã OTP đã gửi đến số điện thoại của bạn.");
-        }
-        console.log("po1", confirmationResult);
-    };
+    // const handleSendOTP = async () => {
+    //     const confirmationResult = await sendOTP(phone);
+    //     if (confirmationResult) {
+    //         setConfirmation(confirmationResult);
+    //         Alert.alert("Mã OTP đã gửi đến số điện thoại của bạn.");
+    //     }
+    //     console.log("po1", confirmationResult);
+    // };
 
     const handleOnPressSave = () => {
         setVisibleDialog(true);
     }
-
-    const sendPhoneNumbertoServer = async (phoneNumber, idToken) => {
-        const token = await AsyncStorage.getItem("access_token");
-        const formData = new FormData();
-        formData.append("phone_number", phoneNumber);
-        formData.append("id_token", idToken)
-
-        await authAPIs(token).post(endpoints['add-phone-number'], formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                }
-            }).then(response => response.json())
-            .then(data => console.log("Server Response:", data))
-            .catch(error => console.error("Lỗi gửi số điện thoại:", error));
+    const handlePressPwDialog = () => {
+        setVisibleChangePw(true);
     }
+
+    // const sendPhoneNumbertoServer = async (phoneNumber, idToken) => {
+    //     const token = await AsyncStorage.getItem("access_token");
+    //     const formData = new FormData();
+    //     formData.append("phone_number", phoneNumber);
+    //     formData.append("id_token", idToken)
+
+    //     await authAPIs(token).post(endpoints['add-phone-number'], formData,
+    //         {
+    //             headers: {
+    //                 "Content-Type": "multipart/form-data",
+    //             }
+    //         }).then(response => response.json())
+    //         .then(data => console.log("Server Response:", data))
+    //         .catch(error => console.error("Lỗi gửi số điện thoại:", error));
+    // }
     return (
         <ScrollView style={AccountSettingDetailStyle.container}>
+            <ChangePassWord isVisible={visibleChangePW} setIsVisible={setVisibleChangePw} token={token} />
 
-            <OTPauth isVisible={visibleDialog} setVisible={setVisibleDialog} onVerified={sendPhoneNumbertoServer}
-                confirmation={confirmation} phone={phone} />
+            <OTPauth isVisible={visibleDialog} setVisible={setVisibleDialog} phone={phone} token={token} />
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={AccountSettingDetailStyle.section}>
                 <Text style={{ fontSize: 18, fontWeight: 700 }}>Thông tin cá nhân</Text>
                 <Text style={AccountSettingDetailStyle.labelInput}>Tên</Text>
@@ -100,7 +114,7 @@ const AccountSettingDetail = () => {
                     right={<TextInput.Icon disabled={isChanged} icon={"content-save"} onPress={() => {
                         handleOnPressSave();
                         sendOTP();
-                    }} />}>{user.phone}</TextInput>
+                    }} />}></TextInput>
                 <View style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
                     <Text style={{ lineHeight: 76 }}>Cho phép người khác liên lạc qua điện thoại</Text>
                     <Switch style={{ lineHeight: 76 }} value={isSwitchOn} onValueChange={onToggleSwitch} color="#FFBA00" />
@@ -109,24 +123,13 @@ const AccountSettingDetail = () => {
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={AccountSettingDetailStyle.section}>
                 <Text style={{ fontSize: 18, fontWeight: 700 }}>Cài đặt tài khoản</Text>
                 <Text style={AccountSettingDetailStyle.labelInput}>Mật khẩu</Text>
-                <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
-                    secureTextEntry={true}
-                    right={<TextInput.Icon icon={'arrow-right-drop-circle-outline'} />}
-                    activeOutlineColor="#FFBA00" >{user.password}</TextInput>
-                <Text style={AccountSettingDetailStyle.labelInput}>Liên kết tài khoản</Text>
-
-                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderRadius: 4, backgroundColor: 'white' }}>
-                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', lineHeight: 50, padding: 10 }}>
-                        <Image style={{ width: 30, height: 30 }} source={require('../../assets/google-logo.png')} resizeMode="contain" />
-                        <Text style={AccountSettingDetailStyle.labelInput}>Google</Text>
-                    </View>
-                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', lineHeight: 50, padding: 10 }}>
-                        <TouchableOpacity>
-                            <Text style={AccountSettingDetailStyle.connect}>Kết nối</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                </View>
+                <TouchableOpacity onPress={() => { handlePressPwDialog() }} activeOpacity={0.7}>
+                    <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
+                        secureTextEntry={true}
+                        editable={false}
+                        right={<TextInput.Icon icon={'arrow-right-drop-circle-outline'} onPress={() => { handlePressPwDialog }} />}
+                        activeOutlineColor="#FFBA00" >******************</TextInput>
+                </TouchableOpacity>
             </KeyboardAvoidingView>
             <View style={AccountSettingDetailStyle.section}>
                 <Text style={{ fontSize: 18, fontWeight: 700 }}>Khác</Text>

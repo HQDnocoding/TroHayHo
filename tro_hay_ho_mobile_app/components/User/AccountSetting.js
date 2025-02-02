@@ -11,18 +11,17 @@ const AccountSetting = ({ navigation }) => {
 
     const user = useContext(MyUserContext);
     const dispatch = useContext(MyDispatchContext);
-    const [role, setRole] = useState(null)
 
     console.log('user value:', user);
 
 
-const signOut = async () => {
+    const signOut = async () => {
         try {
-          await GoogleSignin.signOut();
+            await GoogleSignin.signOut();
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
-      };
+    };
 
 
     const logout = async () => {
@@ -44,7 +43,7 @@ const signOut = async () => {
                 {user === null ? (
                     <>
                         <Image
-                            source={require('../../assets/45_donald_trump.png')}
+                            source={require('../../assets/noavatar.png')}
                             style={AccountUserStyle.avatar}
                         />
                         <View style={AccountUserStyle.loginRegister}>
@@ -61,7 +60,7 @@ const signOut = async () => {
                     <><View style={AccountUserStyle.headerRow1}>
                         <TouchableOpacity>
                             <Image
-                                source={require('../../assets/45_donald_trump.png')}
+                                source={{ uri: user.avatar }}
                                 style={AccountUserStyle.avatar}
                             />
                         </TouchableOpacity>

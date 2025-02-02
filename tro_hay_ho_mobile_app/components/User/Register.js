@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, Text, View } from "react-native";
-import { Button, HelperText, RadioButton, TextInput } from "react-native-paper";
+import { Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, HelperText, IconButton, RadioButton, TextInput } from "react-native-paper";
 import LoginStyles from "../../styles/dat/LoginStyles";
 import { Role } from "../../general/General";
 import APIs, { endpoints } from "../../configs/APIs";
+import PickedImages from "../PostCreating/PickedImages";
+import { launchImageLibrary } from "react-native-image-picker";
 
 
 const Register = ({ navigation }) => {
+
 
     const [roles, setRoles] = useState([])
     const loadRole = async () => {
@@ -62,6 +65,39 @@ const Register = ({ navigation }) => {
         setUser({ ...user, [field]: value });
     }
 
+    const openImageLibrary = async () => {
+        console.log("Chọn ảnh...");
+        try {
+            const res = await launchImageLibrary(
+                {
+                    mediaType: "photo", // Chỉ chọn ảnh
+                    selectionLimit: 1, // Cho phép chọn nhiều ảnh
+                }
+            );
+
+            if (res.didCancel) {
+                console.log("Người dùng hủy chọn ảnh");
+            } else if (res.errorCode) {
+                Alert.alert("Lỗi", res.errorMessage);
+            } else {
+                setImg(res.assets[0]);
+                console.log(res);
+            }
+            setPicked(true);
+        } catch (ex) {
+            console.log(ex);
+        }
+
+    };
+
+    const removeImage = () => {
+        console.log("ok")
+        setImg('');
+        setPicked(false);
+    };
+
+    const [picked, setPicked] = useState(false);
+    const [img, setImg] = useState(null);
 
     const register = async () => {
         try {
@@ -78,7 +114,11 @@ const Register = ({ navigation }) => {
                     }
 
 
-                form.append("avatar", "");
+                form.append("avatar", {
+                    'name': img.fileName,
+                    'type': img.type,
+                    'uri': img.uri
+                });
                 form.append("phone", "");
                 console.log("groups", checked);
                 form.append("groups", checked);
@@ -97,12 +137,21 @@ const Register = ({ navigation }) => {
                             'Content-Type': 'multipart/form-data'
                         }
                     });
-                    console.info(res.data)
-                    navigation.navigate("login");
-                } catch (ex) {
-                    console.error(ex);
+                    console.info(res.data);
+                } catch (error) {
+                    if (error.response) {
+                        console.error('Error response:', error.response.data);
+                        console.error('Status:', error.response.status);
+                        console.error('Headers:', error.response.headers);
+                    } else if (error.request) {
+                        console.error('Error request:', error.request);
+                    } else {
+                        console.error('Error message:', error.message);
+                    }
                 } finally {
                     setLoading(false);
+                    navigation.navigate("login");
+
                 }
             }
         } catch (e) {
@@ -162,8 +211,8 @@ const Register = ({ navigation }) => {
                     activeOutlineColor="#FFBA00"
                     style={LoginStyles.textInput} placeholder={users['confirm'].title}
                     value={user['confirm']} onChangeText={t => change(t, 'confirm')} />
-                <Text style={{ paddingStart: 10 }}>Bạn sử dụng ứng dụng với vai trò ?:</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', padding: 10 }}>
+                <Text style={{ paddingStart: 20 }}>Bạn sử dụng ứng dụng với vai trò ?:</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', padding: 10, marginStart: 14 }}>
 
 
                     <View style={{ flexDirection: 'column', width: 100 }} >
@@ -185,6 +234,37 @@ const Register = ({ navigation }) => {
                         />
                         <Text>Chủ trọ</Text>
                     </View>
+
+                </View>
+                <View style={{ flexDirection: 'row', width: 100, marginStart: 30, alignItems: 'center' }}>
+                    <Text>Chọn avatar</Text>
+                    {picked === false ?
+                        <TouchableOpacity onPress={openImageLibrary}>
+                            <Image source={require('../../assets/noavatar.png')} style={{ width: 120, height: 120, borderRadius: 100, marginHorizontal: 20 }} />
+                        </TouchableOpacity>
+                        : <View style={{
+                            marginHorizontal: 4, position: 'relative',
+                            backgroundColor: '#F5F5F5', borderRadius: 100, padding: 10, height: 120,
+                            width: 120, alignItems: 'center', justifyContent: 'center',
+                            elevation: 1
+                        }}>
+                            <Image source={{ uri: img?.uri }} style={styles.image} />
+                            <IconButton
+                                style={{
+                                    position: 'absolute',
+                                    top: -16,
+                                    right: -10,
+                                    borderRadius: 12,
+                                    padding: 5,
+                                }}
+                                icon={"sticker-remove"}
+                                iconColor="black"
+                                onPress={removeImage}
+                            />
+                        </View>
+                    }
+
+
                 </View>
                 <Button style={{ margin: 15, borderRadius: 5, backgroundColor: '#FFBA00' }} loading={loading} mode="contained" onPress={register}>ĐĂNG KÝ</Button>
             </KeyboardAvoidingView>
@@ -194,7 +274,22 @@ const Register = ({ navigation }) => {
 
 
 
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        marginTop: 10,
+        flexDirection: 'row'
+    },
 
+    image: {
+        elevation: 1,
+        width: 120,
+        height: 120,
+        margin: 2,
+        borderRadius: 100,
+        resizeMode: 'contain'
+    },
+});
 
 
 
