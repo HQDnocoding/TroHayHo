@@ -53,6 +53,7 @@ class Following(BaseModel):
         db_table = 'following'
         unique_together = ['follower', 'followed']
         
+        
     def save(self, *args, **kwargs):
         if self.follower == self.followed:
             raise ValueError("A user cannot follow themselves.")

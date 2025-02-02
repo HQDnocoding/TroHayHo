@@ -69,11 +69,39 @@ class UserViewSet(ViewSet,CreateAPIView):
 
         return [permissions.AllowAny()]
 
-    @action(methods=['get'], url_path='current-user', detail=False)
+    @action(methods=['get','post'], url_path='current-user', detail=False)
     def get_current_user(self, request):
         return Response(UserSerializer(request.user).data)
     
-    @action(methods=['get'], url_path='favorites', detail=False)
+    
+    @action(methods=['get','post'],url_path='follow-me',detail=False)
+    def get_follow_me(self,request):
+        user=request.user
+        following=user.follower_relations.all()
+        
+        paginator=self.pagination_class()
+        page=paginator.paginate_queryset(following,request)
+        
+        if page is not None:
+            return paginator.get_paginated_response(FollowingSerializer(page,many=True).data)
+        serializer = FollowingSerializer(following, many=True) 
+        return Response(serializer.data)
+        
+    
+    @action(methods=['get','post'],url_path='following',detail=False)
+    def get_following(self,request):
+        user=request.user
+        follower=user.following_relations.all()
+        
+        paginator=self.pagination_class()
+        page=paginator.paginate_queryset(follower,request)
+        
+        if page is not None:
+            return paginator.get_paginated_response(FollowingSerializer(page,many=True).data)
+        serializer = FollowingSerializer(follower, many=True) 
+        return Response(serializer.data)
+    
+    @action(methods=['get','post'], url_path='favorites', detail=False)
     def get_favorites(self, request):
 
         user = request.user  
@@ -441,3 +469,6 @@ class AvailableGroupsView(ModelViewSet):
     queryset = Group.objects.filter(name__in=ALLOWED_GROUPS)
     serializer_class = GroupSerializer
 
+class FollowingView(ModelViewSet):
+    serializer_class=FollowingSerializer
+    queryset=Following.objects.filter(active=True)
