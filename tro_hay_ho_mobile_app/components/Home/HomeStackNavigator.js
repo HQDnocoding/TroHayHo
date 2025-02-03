@@ -1,8 +1,8 @@
 import { Stack } from "../../general/General";
 import { IconButton, Searchbar, Modal, Portal, Provider, Icon } from "react-native-paper";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
-import { useState, useContext, useRef } from 'react';
-import { FontAwesome, Entypo, MaterialIcons } from '@expo/vector-icons';
+import { View, StyleSheet, TouchableOpacity,Text } from "react-native";
+import { useState,useContext } from 'react';
+import { FontAwesome, Entypo,MaterialIcons  } from '@expo/vector-icons';
 import Home from "./Home";
 import NotificationScreen from "./notification/NotificationScreen";
 import ConversationScreen from "./conversation/ConversationScreen";
@@ -19,19 +19,19 @@ import { BottomSendToFollowedContextProvider, useBottomSendToFollowedContext } f
 
 const HomeStackNavigator = () => {
 
-    const { showDialog } = useRequestLoginDialog()
-    const nav = useNavigation()
+    const {showDialog} = useRequestLoginDialog()
+
+    const nav= useNavigation()
     const currentUser = useContext(MyUserContext)
 
-
-    const handleToSearch = () => {
+    const handleToSearch=()=>{
         console.log("home seact")
         nav.navigate('search')
     }
-    const handleToRoute = (routeName) => {
-        if (currentUser !== null) {
+    const handleToRoute=(routeName)=>{
+        if (currentUser!==null){
             nav.navigate(routeName)
-        } else {
+        }else{
             showDialog()
         }
     }
@@ -105,19 +105,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         elevation: 0,
         borderRadius: 20,
-        alignItems: 'center',
-        flexDirection: 'row',
+        alignItems:'center',
+        flexDirection:'row',
 
 
     },
-    iconSearch: {
-        marginLeft: 10,
+    iconSearch:{
+        marginLeft:10,
 
     },
     searchInput: {
         fontSize: 14,
         minHeight: 0,
-        marginLeft: 10,
+        marginLeft:10,
     },
     modalContainer: {
         backgroundColor: 'white',

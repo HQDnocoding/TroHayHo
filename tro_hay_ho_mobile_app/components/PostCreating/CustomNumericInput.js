@@ -5,6 +5,8 @@ const CustomNumericInput = ({ min = 0, max = 99999999999, step = 10000, initialV
     const [value, setValue] = useState(initialValue);
     const flag1 = flag
 
+
+
     useEffect(() => {
         if (flag1 == true) {
             // console.log(1)

@@ -154,7 +154,7 @@ const PostWantCreating = () => {
 
     const loadDistricts = async ({ id }) => {
         try {
-            const res = await APIs.get(endpoints["provinces-districts"](`${id}`));
+            const res = await APIs.get(endpoints["provinces-districts"](id));
             setDistricts(res.data);
         } catch (e) {
             console.error(e);
