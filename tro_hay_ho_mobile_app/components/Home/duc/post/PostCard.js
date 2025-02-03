@@ -11,10 +11,12 @@ import PostForRent from './PostForRent';
 import React from 'react';
 import APIs, { endpointsDuc } from '../../../../configs/APIs';
 import { useRequestLoginDialog } from '../../../../utils/RequestLoginDialogContext';
+import { useBottomSendToFollowedContext } from '../../../../utils/BottomSendToFollowedContext';
 
 const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
     const nav = useNavigation()
     const { showDialog } = useRequestLoginDialog()
+    const { openBottomSheet, assignPost } = useBottomSendToFollowedContext();
 
     const [isSave, setIsSave] = React.useState(false)
     const infoUser = item.user
@@ -56,6 +58,16 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
         } else if (item.type === 'PostForRent') {
             let routeName = 'post_for_rent'
             nav.navigate(routeName, params)
+        }
+    }
+    const handleOpenBottomSheet=()=>{
+        if(currentUser)
+        {
+            assignPost(item)
+            openBottomSheet()
+
+        }else{
+            showDialog()
         }
     }
     React.useEffect(() => {
@@ -124,7 +136,7 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
 
 
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton}>
+                    <TouchableOpacity style={styles.actionButton} onPress={handleOpenBottomSheet}>
                         <Icon source="share-variant-outline" size={20} />
                         <Text style={styles.actionText}>Chia sẻ</Text>
                     </TouchableOpacity>
