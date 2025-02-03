@@ -16,6 +16,8 @@ r.register('provinces', ProvinceViewSet, basename='province')
 r.register('districts', DistrictViewSet, basename='district')
 r.register('wards', WardViewSet, basename='ward')
 r.register('images', PostImageView, basename='image')
+r.register('follows',FollowingView,basename='follow')
+
 # ================== duc========================
 r.register('user-conversations', duc_views.UserConversationViewSet, basename='user-conversations')
 r.register('conversation-messages', duc_views.ConversationMessageViewSet, basename='conversation-messages')

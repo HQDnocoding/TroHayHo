@@ -1,4 +1,5 @@
 import random
+import re
 from datetime import timedelta
 import secrets
 
@@ -37,7 +38,22 @@ from tro_hay_ho.settings import verify_firebase_token
 
 # from tro_hay_ho.settings import verify_firebase_token
 
+    
+def is_valid_password(password):
+    if len(password) < 6:
+        return "Mật khẩu phải có ít nhất 6 ký tự."
 
+    if " " in password:
+        return "Mật khẩu không được chứa khoảng trắng."
+
+    if not re.search(r"[A-Z]", password):
+        return "Mật khẩu phải có ít nhất một chữ in hoa."
+
+    if not re.search(r"[0-9]", password):
+        return "Mật khẩu phải có ít nhất một chữ số."
+
+    return "Mật khẩu hợp lệ!"
+    
 
 class UserViewSet(ViewSet,CreateAPIView):
     queryset = User.objects.filter(is_active=True)
@@ -45,7 +61,7 @@ class UserViewSet(ViewSet,CreateAPIView):
     parser_classes = [MultiPartParser, ]
     pagination_class = ItemPaginator
     
-     
+
     
     def get_permissions(self):
         if self.action in ['get_current_user','get_favorites']:
@@ -53,11 +69,39 @@ class UserViewSet(ViewSet,CreateAPIView):
 
         return [permissions.AllowAny()]
 
-    @action(methods=['get'], url_path='current-user', detail=False)
+    @action(methods=['get','post'], url_path='current-user', detail=False)
     def get_current_user(self, request):
         return Response(UserSerializer(request.user).data)
     
-    @action(methods=['get'], url_path='favorites', detail=False)
+    
+    @action(methods=['get','post'],url_path='follow-me',detail=False)
+    def get_follow_me(self,request):
+        user=request.user
+        following=user.follower_relations.all()
+        
+        paginator=self.pagination_class()
+        page=paginator.paginate_queryset(following,request)
+        
+        if page is not None:
+            return paginator.get_paginated_response(FollowerSerializer(page,many=True).data)
+        serializer = FollowerSerializer(following, many=True) 
+        return Response(serializer.data)
+        
+    
+    @action(methods=['get','post'],url_path='following',detail=False)
+    def get_following(self,request):
+        user=request.user
+        follower=user.following_relations.all()
+        
+        paginator=self.pagination_class()
+        page=paginator.paginate_queryset(follower,request)
+        
+        if page is not None:
+            return paginator.get_paginated_response(FollowingSerializer(page,many=True).data)
+        serializer = FollowingSerializer(follower, many=True) 
+        return Response(serializer.data)
+    
+    @action(methods=['get','post'], url_path='favorites', detail=False)
     def get_favorites(self, request):
 
         user = request.user  
@@ -70,6 +114,34 @@ class UserViewSet(ViewSet,CreateAPIView):
         serializer = FavouritePostSerializer(favorite_posts, many=True) 
         return Response(serializer.data)
 
+    
+    @action(methods=['post'],url_path='change-password',detail=False)
+    def change_password(self,request):
+        user=request.user
+        old_password=request.data.get('old_password')
+        new_password=request.data.get('new_password')
+        confirm_password=request.data.get('confirm_password')
+
+        if not old_password or not new_password or not confirm_password:
+            return Response({"error": "Vui lòng nhập đầy đủ thông tin."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        check=is_valid_password(new_password)
+        if(check!="Mật khẩu hợp lệ!"):
+             return Response({"error": check}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not user.check_password(old_password):
+            return Response({"error": "Mật khẩu cũ không đúng"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not new_password==confirm_password:
+            return Response({"error":"Không khớp mật khẩu mới"},status=status.HTTP_400_BAD_REQUEST)
+        
+        user.set_password(new_password)
+        user.save()
+        
+        return Response({"message": "Đổi mật khẩu thành công"}, status=status.HTTP_200_OK)
+
+   
+        
 
     @action(methods=['post'], url_path='add-phone-number', detail=False)
     def add_phone_number(self, request):
@@ -281,16 +353,26 @@ class GoogleLoginView(APIView):
                 google_token,
                 requests.Request()
             )
-            print(1)
+            print(idinfo)
             # Lấy thông tin từ Google
             email = idinfo.get("email")
-            name = idinfo.get("name")
+            fname = idinfo.get("given_name")
+            lname=idinfo.get("family_name")
+            avatar=idinfo.get('picture')
             if not email:
                 return Response({"error": "Invalid Google token"}, status=status.HTTP_400_BAD_REQUEST)
             
             # Tìm hoặc tạo người dùng
-            user, created = User.objects.get_or_create(username=email, defaults={"first_name": name})
-
+            user, created = User.objects.get_or_create(username=email,
+                                                       defaults=
+                                                       {"first_name": fname,
+                                                        "last_name":lname,
+                                                        "email":email,
+                                                        "avatar":avatar})
+            
+            group = Group.objects.get(name="Người thuê trọ")
+            if not user.groups.filter(id=group.id).exists():  
+                user.groups.add(group)
             # Tạo OAuth2 Token
             application = Application.objects.get(client_id="0R6hMr4Zhgl9LeXoWrxDNSTkLgpZymmtLJeINUFN")  # Ứng dụng của bạn
             access_token = AccessToken.objects.create(
@@ -300,12 +382,6 @@ class GoogleLoginView(APIView):
                 expires=now() + timedelta(seconds=3600),
                 scope='read write'
             )
-            # refresh_token = RefreshToken.objects.create(
-            #     user=user,
-            #     application=application,
-            #     token=secrets.token_urlsafe(),
-            #     access_token=access_token
-            # )
 
             return Response({
                 "access_token": access_token.token,
@@ -320,44 +396,6 @@ class GoogleLoginView(APIView):
         except ValueError:
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
         
-        
-
-class VerifyTokenView(APIView):
-    def post(self, request):
-        id_token = request.data.get("token")
-
-        if not id_token:
-            raise AuthenticationFailed("Missing idToken")
-
-        try:
-            # Xác minh idToken với Firebase
-            print(id_token)
-            decoded_token = auth.verify_id_token(id_token)
-        
-            uid = decoded_token.get("uid")
-        except Exception as e:
-            raise AuthenticationFailed("Invalid idToken")
-
-        user, created = User.objects.get_or_create(username=uid, defaults={
-            'email': decoded_token.get("email", ""),
-        })
-
-
-
-        access_token = AccessToken.objects.create(
-            user=user,
-            token=str(user.id),  # Token có thể được tùy chỉnh
-            expires=now() + timedelta(days=1)
-        )
-
-        return Response({
-            "access_token": str(access_token.token),
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-            },
-        })
         
 class ProvinceViewSet(ModelViewSet):
     queryset = Province.objects.all()
@@ -431,3 +469,6 @@ class AvailableGroupsView(ModelViewSet):
     queryset = Group.objects.filter(name__in=ALLOWED_GROUPS)
     serializer_class = GroupSerializer
 
+class FollowingView(ModelViewSet):
+    serializer_class=FollowingSerializer
+    queryset=Following.objects.filter(active=True)

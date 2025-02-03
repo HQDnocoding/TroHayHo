@@ -13,11 +13,28 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ['id','name']
 
 class UserSerializer(ModelSerializer):
+    avatar=serializers.ImageField(required=False)
     groups = serializers.SlugRelatedField(
         queryset=Group.objects.all(),
         slug_field='name'  ,
         many=True
-    )
+    ) 
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        print(data['avatar'])
+        print(instance.avatar)
+        data['avatar'] = instance.avatar.url if instance.avatar else ''
+        return data
+    
+    def validate_username(self, value):
+        if len(value) < 6:
+            raise serializers.ValidationError("Username phải có ít nhất 6 ký tự.")
+
+        if " " in value:
+            raise serializers.ValidationError("Username không được chứa khoảng trắng.")
+
+        return value
     
     def create(self, validated_data):
         print(validated_data)
@@ -25,7 +42,7 @@ class UserSerializer(ModelSerializer):
         print(group_name)
         user = User(**validated_data)
         user.set_password(user.password)
-        group = Group.objects.get(name=group_name.name)
+        group = Group.objects.get(name=group_name[0])
        
         user.save()
         user.groups.add(group)
@@ -35,7 +52,8 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'avatar', 'password','phone','date_joined','groups']
+        fields = ['id', 'username', 'first_name', 'last_name', 
+                  'avatar', 'password','phone','date_joined','groups']
 
         extra_kwargs = {
             'password': {
@@ -44,6 +62,20 @@ class UserSerializer(ModelSerializer):
         }
 
 
+class FollowerSerializer(ModelSerializer):
+    # followed=UserSerializer()
+    follower=UserSerializer()
+    class Meta:
+        model=Following
+        fields=['follower']
+        
+        
+class FollowingSerializer(ModelSerializer):
+    followed=UserSerializer()
+    # follower=UserSerializer()
+    class Meta:
+        model=Following
+        fields=['followed']
 
 
 class WardSerializer(ModelSerializer):

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { MyDispatchContext } from "../../configs/UserContexts";
-import { Image, KeyboardAvoidingView, Platform, TouchableOpacity, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, TouchableOpacity, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import APIs, { authAPIs, endpoints } from "../../configs/APIs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -52,6 +52,7 @@ const Login = () => {
             if (e.response) {
                 console.log("Status:", e.response.status);
                 console.log("Data:", e.response.data);
+                Alert.alert("","Mật khẩu hoặc tên tài khoản không chính xác")
             } else {
                 console.error("Error Message:", e.message);
             }

@@ -28,6 +28,7 @@ class Role(BaseModel):
 
 class User(AbstractUser):
     """Người dùng"""
+    
     phone = models.CharField(max_length=15, blank=True, null=True)
     avatar = CloudinaryField('avatar', null=True)
     following = models.ManyToManyField('User', symmetrical=False, related_name='followers', through='Following')
@@ -50,7 +51,19 @@ class Following(BaseModel):
 
     class Meta:
         db_table = 'following'
+        unique_together = ['follower', 'followed']
+        
+        
+    def save(self, *args, **kwargs):
+        if self.follower == self.followed:
+            raise ValueError("A user cannot follow themselves.")
+        if not self.pk: 
+            super().save(*args, **kwargs)
+        else:
+            super().save(update_fields=['follower', 'followed'], *args, **kwargs)
+        return {"message": "Followed successfully!"}
 
+    
     def __str__(self):
         return f"{self.follower.username} follows {self.followed.username}"
 
@@ -207,8 +220,20 @@ class Notification(BaseModel):
 
     class Meta:
         db_table = 'notification'
+        
 
+class DetailNotification(BaseModel):
+    receiver = models.ForeignKey('User', on_delete=models.CASCADE, related_name='received_notifications')
+    notification = models.ForeignKey('Notification', on_delete=models.CASCADE, related_name='details')
+    is_read = models.BooleanField(default=False, null=False)
 
+    def __str__(self):
+        return f"Notification to {self.receiver.username}: {self.notification.title}"
+
+    class Meta:
+        db_table = 'detail_notification'
+        
+        
 class AdministrativeRegion(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -223,16 +248,7 @@ class AdministrativeRegion(models.Model):
         return self.name
 
 
-class DetailNotification(BaseModel):
-    receiver = models.ForeignKey('User', on_delete=models.CASCADE, related_name='received_notifications')
-    notification = models.ForeignKey('Notification', on_delete=models.CASCADE, related_name='details')
-    is_read = models.BooleanField(default=False, null=False)
 
-    def __str__(self):
-        return f"Notification to {self.receiver.username}: {self.notification.title}"
-
-    class Meta:
-        db_table = 'detail_notification'
 
 
 class AdministrativeUnit(models.Model):
