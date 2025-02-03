@@ -35,6 +35,7 @@ import ImagePickerComponent from './components/User/test';
 import PhoneSignIn from './components/User/Test2';
 import PostWantCreating from './components/PostCreating/PostWantCreating';
 import FollowingTabScreenNavigator from './components/User/FollowingTabScreen';
+import { BottomSendToFollowedContextProvider } from './utils/BottomSendToFollowedContext';
 
 
 export default function App() {
@@ -127,20 +128,20 @@ export default function App() {
                         headerStyle: {
                             backgroundColor: '#FFBA00',
                         }
-                    }}/>
-                
+                    }} />
+
                 <Stack.Screen name='map' component={Map} options={{
                     title: "Chọn vị trí", headerStyle: {
                         backgroundColor: '#FFBA00',
                     }
                 }} />
                 <Stack.Screen
-                name='following-list' component={FollowingTabScreenNavigator}
-                options={{
-                    title: "", headerStyle: {
-                        backgroundColor: '#FFBA00',
-                    }
-                }}
+                    name='following-list' component={FollowingTabScreenNavigator}
+                    options={{
+                        title: "", headerStyle: {
+                            backgroundColor: '#FFBA00',
+                        }
+                    }}
                 />
 
             </Stack.Navigator>
@@ -155,9 +156,13 @@ export default function App() {
                         <RequestLoginDialogProvider>
                             <MyUserContext.Provider value={user}>
                                 <MyDispatchContext.Provider value={dispatch}>
-                                    <MyAppNavigator />
-                                    <RequestLoginDialog />
-                                    {/* <PostCreatingForm/> */}
+                                    <BottomSendToFollowedContextProvider>
+
+
+                                        <MyAppNavigator />
+                                        <RequestLoginDialog />
+                                        {/* <PostCreatingForm/> */}
+                                    </BottomSendToFollowedContextProvider>
                                 </MyDispatchContext.Provider>
                             </MyUserContext.Provider>
                         </RequestLoginDialogProvider >

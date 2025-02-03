@@ -159,9 +159,12 @@ const FollowingHome = () => {
 
 
   const renderItemPost = ({ item }) => {
-
+    const new_item={
+      ...item,
+      user:item.user.id
+    }
     return (
-      <PostCard key={item.id} item={item} dataPostFav={postFav} currentUser={currentUser} />
+      <PostCard key={item.id} item={new_item} dataPostFav={postFav} currentUser={currentUser} />
 
     )
 

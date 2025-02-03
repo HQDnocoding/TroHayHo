@@ -14,47 +14,44 @@ import PostCard from './duc/post/PostCard';
 
 
 const Home = () => {
-    let currentUser
-    const [visibleModelAddress, setVisibleModelAddress] = React.useState(false)
+    let currentUser = useContext(MyUserContext)
 
-    const [postWant, setPostWant] = React.useState([])
-    const [postForRent, setPostForRent] = React.useState([])
+
     const [loading, setLoading] = React.useState(false);
-    const [pageWant, setPageWant] = React.useState(1);
-    const [pageForRent, setPageForRent] = React.useState(1);
+    const [page, setPage] = React.useState(1);
     const [allPosts, setAllPosts] = React.useState([]);
     const [postFav, setPostFav] = React.useState([]);
 
 
-    const loadCurrentUser = () => {
-        currentUser = useContext(MyUserContext)
+   
+    const loadPost = async () => {
 
-    }
-    loadCurrentUser()
-    const loadPostWant = async () => {
-
-        if (pageWant > 0) {
+        if (page > 0) {
             setLoading(true)
             try {
-                let url = `${endpointsDuc.getListPostWantShow}?page=${pageWant}`
+                let url = `${endpointsDuc.getListPostParent}?page=${page}`
                 let res = await APIs.get(url)
 
-                const newPosts = res.data.results.map(post => ({ ...post, type: 'PostWant' }));
-                // setAllPosts(prevPosts => [...prevPosts, ...newPosts]);
-                setAllPosts(prev => {
-                    const existingIds = new Set(prev.map(post => post.id))
-                    const filteredPosts = newPosts.filter(post => !existingIds.has(post.id))
-                    return [...prev, ...filteredPosts]
-                })
+                const newPosts = res.data.results
+                if(page===1){
+                    setAllPosts(newPosts)
+                }else{
+                    setAllPosts(prev => {
+                        const existingIds = new Set(prev.map(post => post.id))
+                        const filteredPosts = newPosts.filter(post => !existingIds.has(post.id))
+                        return [...prev, ...filteredPosts]
+                    })
+                }
+                
                 if (res.data.next === null) {
-                    setPageWant(0)
+                    setPage(0)
                 }
             } catch (error) {
                 if (error) {
                     // Xử lý lỗi 404: Dừng việc tăng giá trị pageWant
-                    setPageWant(0);
+                    setPage(0);
                
-                    console.warn("Error loading posts want:", error, " == at page: ", pageWant);
+                    console.warn("Error loading posts :", error, " == at page: ", page);
                 }
 
             } finally {
@@ -64,38 +61,7 @@ const Home = () => {
         }
 
     }
-    const loadPostForRent = async () => {
 
-
-        if (pageForRent > 0) {
-            setLoading(true)
-
-            try {
-                let url = `${endpointsDuc.getListPostForRentShow}?page=${pageForRent}`
-                let res = await APIs.get(url)
-                const newPosts = res.data.results.map(post => ({ ...post, type: 'PostForRent' }));
-                // xu ly trung lap du lieu
-                setAllPosts(prev => {
-                    const existingIds = new Set(prev.map(post => post.id))
-                    const filteredPosts = newPosts.filter(post => !existingIds.has(post.id))
-                    return [...prev, ...filteredPosts]
-                })
-                if (res.data.next === null) {
-                    setPageForRent(0)
-                }
-            } catch (error) {
-                if (error) {
-                    // Xử lý lỗi 404: Dừng việc tăng giá trị pageForRent
-                    setPageForRent(0);
-                
-                    console.warn("Error loading posts for rent:", error, " == at page: ", pageForRent);
-                }
-            } finally {
-                setLoading(false)
-
-            }
-        }
-    }
     const loadInfoFavoriteOfCurrentUser = async () => {
         if (currentUser !== null) {
             try {
@@ -107,41 +73,26 @@ const Home = () => {
         }
 
     }
-    const showModel = () => {
-        setVisibleModelAddress(true)
-    }
-    const hideModel = () => {
-        setVisibleModelAddress(false)
-    }
 
     const loadMore = () => {
-        if (pageWant > 0) {
-            setPageWant(pageWant + 1)
+        if (page > 0) {
+            setPage(page + 1)
         }
-        if (pageForRent > 0) {
-            setPageForRent(pageForRent + 1)
-        }
+       
     }
 
     const refresh = () => {
-        setAllPosts([])
-        setPageForRent(1)
-        setPageWant(1)
+        setPage(1)
 
     }
-    React.useEffect(() => {
-        if (currentUser !== null) {
-            loadInfoFavoriteOfCurrentUser()
-        }
-        loadPostForRent()
-    }, [pageForRent])
+
 
     React.useEffect(() => {
         if (currentUser !== null) {
             loadInfoFavoriteOfCurrentUser()
         }
-        loadPostWant()
-    }, [pageWant])
+        loadPost()
+    }, [page])
 
 
     const renderItemPost = ({ item }) => {
@@ -175,7 +126,6 @@ const Home = () => {
                     onEndReached={loadMore}
                     ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
                 />
-                <AddressDialog visible={visibleModelAddress} onClose={hideModel} />
 
            
 

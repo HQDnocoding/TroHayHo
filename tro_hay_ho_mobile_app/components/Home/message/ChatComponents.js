@@ -5,6 +5,7 @@ import { POST_FOR_RENT, POST_WANT, sampleAvatar, sampleImage } from '../../../ut
 import { formatTimeAgo } from '../../../utils/TimeFormat';
 import APIs, { endpointsDuc } from '../../../configs/APIs';
 import { useNavigation } from '@react-navigation/native';
+import { getFullName } from '../../../utils/MyFunctions';
 const ChatMessage = ({ message, isOutgoing }) => {
   return (
     <View style={[styles.messageContainer, isOutgoing ? styles.endSide : styles.startSide]}>
@@ -93,7 +94,7 @@ const ChatPost = ({ message, isOutgoing }) => {
               source={{ uri: post.user.avatar ? post.user.avatar : sampleAvatar }}
               style={styles.messageAvatar}
             />
-            <Text style={styles.textNameUser}>{post.user.last_name} {post.user.first_name}</Text>
+            <Text style={styles.textNameUser}>{getFullName(post.user.last_name,post.user.first_name)}</Text>
           </View>
         </TouchableOpacity>
 

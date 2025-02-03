@@ -43,11 +43,11 @@ const createConversation = async (userId1, userId2) => {
     })
     const user1Ref = ref(db, `users/${userId1}/conversations`)
     await update(user1Ref, {
-        [`${idKey}`]: true
+        [`${idKey}`]: serverTimestamp()
     })
     const user2Ref = ref(db, `users/${userId2}/conversations`)
     await update(user2Ref, {
-        [`${idKey}`]: true
+        [`${idKey}`]: serverTimestamp()
     })
 
     return idKey
@@ -73,11 +73,12 @@ const createTextMessage = async (conversationId, userIdsend, textMessage) => {
     await update(conversationTimeRef, {updated_at:serverTimestamp()})
     //cai lai cuoc tro truyen de khi tao moi tin nhan thi cuoc tro chuyen se update theo
     const userConversationRef = ref(db, `users/${userIdsend}/conversations`)
-    await update(userConversationRef, {[conversationId]:false})
-    await update(userConversationRef, {[conversationId]:true})
+    await update(userConversationRef, {[conversationId]:serverTimestamp()})
+    await update(userConversationRef, {[conversationId]:serverTimestamp()})
 
 }
-const createPostMessage = async (conversationId, userIdsend, postId,typePost) => {
+const createPostMessage = async (conversationId, userIdsend,userIdRecive, postId,typePost) => {
+
     const messageRef = push(ref(db, `messages/${conversationId}`))
     const messageId = messageRef.key
     const message = {
@@ -89,8 +90,10 @@ const createPostMessage = async (conversationId, userIdsend, postId,typePost) =>
         "type_post":typePost
         
     }
+
     //tao message moi
     await set(messageRef, message)
+
     //update lai last message
     const conversationLastMessRef = ref(db, `conversations/${conversationId}/last_message`)
     await update(conversationLastMessRef, message)
@@ -98,9 +101,13 @@ const createPostMessage = async (conversationId, userIdsend, postId,typePost) =>
     const conversationTimeRef = ref(db, `conversations/${conversationId}`)
     await update(conversationTimeRef, {updated_at:serverTimestamp()})
     //cai lai cuoc tro truyen de khi tao moi tin nhan thi cuoc tro chuyen se update theo
+
     const userConversationRef = ref(db, `users/${userIdsend}/conversations`)
-    await update(userConversationRef, {[conversationId]:false})
-    await update(userConversationRef, {[conversationId]:true})
+    await update(userConversationRef, {[conversationId]:serverTimestamp()})
+
+    const user2ConversationRef = ref(db, `users/${userIdRecive}/conversations`)
+    await update(user2ConversationRef, {[conversationId]:serverTimestamp()})
+
 
 }
 const getMessages=(conversationId,callback)=>{
@@ -122,14 +129,18 @@ const getMessages=(conversationId,callback)=>{
         unsubscribe()
     }
 }
-const getUserConversations=(userId,callback)=>{
+const getUserConversations= (userId,callback)=>{
     const userConversationRef=ref(db,`users/${userId}/conversations`)
-   
+
     
     const unsubscribe=onValue(userConversationRef,async(snapshot)=>{
-        const conversations=Object.keys( snapshot.val()||{})
+        const conversations=( snapshot.val()||{})
+        //chuyen doi sang mang va sap xep tu moi nhat den cu
+        const conversationArray = Object.entries(conversations);
+        conversationArray.sort((a, b) => b[1] - a[1]);
+        const sortedConversationIds = conversationArray.map(item => item[0]);
         const arrayConversations=[]
-        for(const conversationId of conversations){
+        for(const conversationId of sortedConversationIds){
             const detailConversationRef=ref(db,`conversations/${conversationId}`)
             const detailConversation=await get((detailConversationRef))
             if(detailConversation.exists()){
@@ -151,15 +162,15 @@ const getUserConversations=(userId,callback)=>{
 const checkExistConversation=async (userId1,userId2)=>{
 
     const idKey = [userId1, userId2].sort().join("_")
-    console.log("check id",idKey)
 
     const conversationRef = ref(db, "conversations/" + idKey)
     const conversation = await get(conversationRef)
+
     if(conversation.exists()){
         let conversationId = conversation.key
         return ({
             id:conversationId,
-            ...conversation
+            ...conversation.val()
         })
     }else{
         return null

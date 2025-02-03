@@ -13,7 +13,7 @@ import { MyUserContext } from '../../../configs/UserContexts';
 import { useNavigation } from '@react-navigation/native';
 import { RequestLoginDialogContext, useRequestLoginDialog } from '../../../utils/RequestLoginDialogContext';
 import PostCard from '../duc/post/PostCard';
-import { getInfoPostFavoriteOfUser } from '../../../utils/MyFunctions';
+import { getFullName, getInfoPostFavoriteOfUser } from '../../../utils/MyFunctions';
 import { Role } from '../../../general/General';
 
 const ProfileUser = ({ navigation, route }) => {
@@ -28,7 +28,32 @@ const ProfileUser = ({ navigation, route }) => {
     const [checkMeFollowYour, setCheckMeFollowYour] = React.useState(false)
     const [loadingFollow, setLoadingFollow] = React.useState(false)
     const [postFav, setPostFav] = React.useState([]);
+    const [countMeFollowingWho, setCountMeFollowingWho] = React.useState(0);
+    const [countWhoFollowingMe, setCountWhoFollowingMe] = React.useState(0);
+    const loadwhoFollowingMe= async()=>{
+        try{
+            const res= await APIs.get(endpointsDuc.getListWhoFollowingMe(infoUser.id))
+            if(res.data&&res.data.count){
+                setCountWhoFollowingMe(res.data.count)
+            }
+        }catch(error){
+            console.error("load whoFollowingMe ",error)
+        }finally{
 
+        }
+    }
+    const loadMeFollowingWho= async()=>{
+        try{
+            const res= await APIs.get(endpointsDuc.getListMeFollowing(infoUser.id))
+            if(res.data&&res.data.count){
+                setCountMeFollowingWho(res.data.count)
+            }
+        }catch(error){
+            console.error("load meFollowingwho ",error)
+        }finally{
+
+        }
+    }
     const loadPost = async () => {
         if (page > 0) {
             setLoading(true)
@@ -179,6 +204,8 @@ const ProfileUser = ({ navigation, route }) => {
     }
     React.useEffect(() => {
         loadCheckMeFollowYour()
+        loadMeFollowingWho()
+        loadwhoFollowingMe()
     }, [infoUser])
     React.useEffect(() => {
         if (currentUser !== null) {
@@ -202,8 +229,8 @@ const ProfileUser = ({ navigation, route }) => {
                 </View>
 
                 <View style={styles.details}>
-                    <Text style={styles.name}>{infoUser.last_name} {infoUser.first_name}</Text>
-                    <Text style={styles.id}>Được theo dõi : 23 | Đang theo dõi : 12</Text>
+                    <Text style={styles.name}>{getFullName(infoUser.last_name ,infoUser.first_name)}</Text>
+                    <Text style={styles.id}>Được theo dõi : {countWhoFollowingMe} | Đang theo dõi : {countMeFollowingWho}</Text>
                     <View style={styles.detail}>
                         <FontAwesome name={'paw'} color="#808080" size={15} />
                         <Text style={styles.detailText}>Đã tham gia : {formatDate(infoUser.date_joined)}</Text>

@@ -7,6 +7,7 @@ import { sampleAvatar } from '../../../utils/MyValues';
 import { formatTimeAgo } from '../../../utils/TimeFormat';
 import { useNavigation } from "@react-navigation/native";
 import APIs, { endpoints, endpointsDuc } from '../../../configs/APIs';
+import { getFullName } from '../../../utils/MyFunctions';
 const ConversationCard = ({ item,currentUser ,params, routeName }) => {
     console.log("conversationcard",item)
     const nav = useNavigation()
@@ -42,7 +43,7 @@ const ConversationCard = ({ item,currentUser ,params, routeName }) => {
             <View style={styles.contentContainer}>
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => nav.navigate(routeName, { item, currentUser ,partner})}>
-                        <Text style={styles.title} numberOfLines={1}>{partner.last_name} {partner.first_name}</Text>
+                        <Text style={styles.title} numberOfLines={1}>{getFullName(partner.last_name,partner.first_name)}</Text>
                         {item.last_message ? (
                             <Text numberOfLines={1}>{item.last_message.text}</Text>
                         ) : (

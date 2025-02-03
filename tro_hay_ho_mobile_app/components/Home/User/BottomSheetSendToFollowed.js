@@ -53,6 +53,7 @@ const BottomSheetSendToFollowed = forwardRef((props, ref) => {
                     } else {
                         setFollowed(prev => [...prev, res.data.results])
                     }
+                    console.log("laod follow",endpointsDuc.getListMeFollowing(currentUser.id));
 
                     if (res.data.next === null) {
                         setPage(0)
@@ -77,19 +78,24 @@ const BottomSheetSendToFollowed = forwardRef((props, ref) => {
         console.log("yes",props.post);
 
         if (currentUser !== null && props.post != null) {
+            setFollowed([])
             setPage(0); 
             setTimeout(() => setPage(1), 0);
         }
     }, [props.post])
     React.useEffect(() => {
-        console.log("non",props.post);
         if (currentUser !== null && props.post != null && page > 0) {
+            console.log("mo bottom",props.post);
+
             loadUserFollowing()
         }
     }, [page])
-    const renderItem = ({ item }) => (
-        <SharePostCard followed={item.followed} follower={item.follower} post={props.post} />
-    );
+    const renderItem = ({ item }) => {
+        return(
+
+            <SharePostCard followed={item.followed} follower={item.follower} post={props.post} sent={false} />
+        )
+    };
     //   const renderItem = useCallback(
     //     ({ item }) => (
     //       <SharePostCard/>

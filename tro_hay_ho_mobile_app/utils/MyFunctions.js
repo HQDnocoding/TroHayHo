@@ -8,4 +8,11 @@ const parseStringToFloat=(text)=>{
     const newNum=parseFloat(text.replace(/\./g, '').replace(',', '.'));
     return newNum
 }
-export {getInfoPostFavoriteOfUser,parseStringToFloat};
+const getFullName=(lastName,firstName)=>{
+    if(lastName===null)
+        lastName=""
+    if(firstName===null)
+        firstName=""
+    return `${lastName} ${firstName}`
+}
+export {getInfoPostFavoriteOfUser,parseStringToFloat,getFullName};
