@@ -196,10 +196,10 @@ def verify_firebase_token(id_token):
     
 
 
-
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "unique-snowflake",
     }
 }
+
