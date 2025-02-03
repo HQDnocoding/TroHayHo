@@ -17,6 +17,10 @@ const createUser = async (user) => {
     return user.id
 
 }
+const createConversationId=(userId1,userId2)=>{
+    const idKey = [userId1, userId2].sort().join("_")
+    return idKey
+}
 const createConversation = async (userId1, userId2) => {
     // tao conversation theo danh user1_user2 de truy xuat nhanh hon
     const idKey = [userId1, userId2].sort().join("_")
@@ -58,6 +62,32 @@ const createTextMessage = async (conversationId, userIdsend, textMessage) => {
         "sender_id": userIdsend,
         "created_at": serverTimestamp(),
         "type": "text"
+    }
+    //tao message moi
+    await set(messageRef, message)
+    //update lai last message
+    const conversationLastMessRef = ref(db, `conversations/${conversationId}/last_message`)
+    await update(conversationLastMessRef, message)
+
+    const conversationTimeRef = ref(db, `conversations/${conversationId}`)
+    await update(conversationTimeRef, {updated_at:serverTimestamp()})
+    //cai lai cuoc tro truyen de khi tao moi tin nhan thi cuoc tro chuyen se update theo
+    const userConversationRef = ref(db, `users/${userIdsend}/conversations`)
+    await update(userConversationRef, {[conversationId]:false})
+    await update(userConversationRef, {[conversationId]:true})
+
+}
+const createPostMessage = async (conversationId, userIdsend, postId,typePost) => {
+    const messageRef = push(ref(db, `messages/${conversationId}`))
+    const messageId = messageRef.key
+    const message = {
+        "text": "Chia sẻ bài viết",
+        "post_id":postId,
+        "sender_id": userIdsend,
+        "created_at": serverTimestamp(),
+        "type": "post",
+        "type_post":typePost
+        
     }
     //tao message moi
     await set(messageRef, message)
@@ -119,7 +149,10 @@ const getUserConversations=(userId,callback)=>{
 
 }
 const checkExistConversation=async (userId1,userId2)=>{
+
     const idKey = [userId1, userId2].sort().join("_")
+    console.log("check id",idKey)
+
     const conversationRef = ref(db, "conversations/" + idKey)
     const conversation = await get(conversationRef)
     if(conversation.exists()){
@@ -132,7 +165,7 @@ const checkExistConversation=async (userId1,userId2)=>{
         return null
     }
 }
-export { createConversation, createTextMessage, createUser,getMessages,getUserConversations ,checkExistConversation}
+export { createConversation, createTextMessage, createUser,getMessages,getUserConversations ,checkExistConversation,createPostMessage,createConversationId}
 // const changes = {
 //     [`conversations/${idKey}`]: {
 //         "participants": {

@@ -358,10 +358,8 @@ class NotificationViewSet(ModelViewSet):
                     msg = MIMEMultipart()
                     msg["From"] = EMAIL_HOST_USER
                     msg["To"] = follower.follower.email
-                    msg["Subject"] = f"Thông báo từ {current_user.last_name} {current_user.first_name}"
-                    msg.attach(MIMEText(
-                        f"Người bạn theo dõi là {current_user.last_name} {current_user.first_name} vừa đăng một bài viết mới.\nTiêu đề: {notification.title}",
-                        "plain"))
+                    msg["Subject"] = request.data.get('title')
+                    msg.attach(MIMEText(request.data.get('content'),"plain"))
 
                     try:
                         server.sendmail(EMAIL_HOST_USER, follower.follower.email, msg.as_string())

@@ -8,6 +8,7 @@ import { formatTimeAgo } from '../../../utils/TimeFormat';
 import { useNavigation } from "@react-navigation/native";
 import APIs, { endpoints, endpointsDuc } from '../../../configs/APIs';
 const ConversationCard = ({ item,currentUser ,params, routeName }) => {
+    console.log("conversationcard",item)
     const nav = useNavigation()
     const [partner, setPartner] = React.useState({})
     let partnerId;

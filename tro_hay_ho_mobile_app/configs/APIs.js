@@ -58,6 +58,7 @@ export const endpointsDuc = {
     'updateMeFavoritePost': (userId, postId) => `/basic-user-info/${userId}/update-me-favotite-post/${postId}/`,
     'getListFollowPostWant': (userId) => `/basic-user-info/${userId}/post-want-following/`,
     'getListFollowPostForRent': (userId) => `/basic-user-info/${userId}/post-for-rent-following/`,
+    'getListMeFollowing': (userId) => `/basic-user-info/${userId}/following/`,
     'getPostParent': (postID) => `/post-parent/${postID}/`,
     'updateDetailNotification': (userId, postId) => `/basic-user-info/${userId}/detail-notification/${postId}/`,
     'updateShowPost': (userId, postId) => `/basic-user-info/${userId}/update-post-manager/${postId}/`,

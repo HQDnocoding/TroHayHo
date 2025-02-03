@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, FlatList, RefreshControl } from "react-native";
 import React from "react";
-import { ChatMessage, ChatInput, ChatImage } from './ChatComponents';
+import { ChatMessage, ChatInput, ChatPost} from './ChatComponents';
 import { createConversation, createTextMessage, createUser, getMessages, getUserConversations } from "../../../utils/ChatFunction"
 import { Button } from "react-native-paper";
+import { TEXT } from "../../../utils/MyValues";
 
 
 const MessageScreen = ({ navigation, route }) => {
@@ -44,9 +45,16 @@ const MessageScreen = ({ navigation, route }) => {
     if (item.sender_id !== currentUser.id) {
       isOutgoing = false
     }
-    return (
-      <ChatMessage message={item} isOutgoing={isOutgoing} />
-    )
+    if(item.type===TEXT){
+      return (
+        <ChatMessage message={item} isOutgoing={isOutgoing} />
+      )
+    }else{
+      return (
+        <ChatPost message={item} isOutgoing={isOutgoing} />
+      )
+    }
+    
   }
   const footFlatList=()=>{
     return (
