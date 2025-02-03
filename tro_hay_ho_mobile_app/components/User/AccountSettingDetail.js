@@ -18,6 +18,11 @@ const AccountSettingDetail = () => {
     const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
     const [visibleDialog, setVisibleDialog] = useState(false);
     const [visibleChangePW, setVisibleChangePw] = useState(false);
+    const [email, setEmail] = useState(user.email);
+    const [isChangeEmail, setIsChangeEmail] = useState(false);
+    const [phone, setPhone] = useState(user.phone);
+    const [isChanged, setIsChanged] = useState(true);
+
 
     const [token, setToken] = useState();
 
@@ -34,9 +39,8 @@ const AccountSettingDetail = () => {
     const handleChange = (text) => {
 
         setPhone(text);
-        console.log(text);
-
-        setIsChanged(text.text === user.phone);
+        if (text.text === user.phone)
+            setIsChanged(true);
     }
 
     //twilio
@@ -55,8 +59,7 @@ const AccountSettingDetail = () => {
             console.error(e);
         }
     }
-    const [phone, setPhone] = useState(user.phone);
-    const [isChanged, setIsChanged] = useState(false);
+
     // const [confirmation, setConfirmation] = useState(null);
 
     // const handleSendOTP = async () => {
@@ -75,21 +78,6 @@ const AccountSettingDetail = () => {
         setVisibleChangePw(true);
     }
 
-    // const sendPhoneNumbertoServer = async (phoneNumber, idToken) => {
-    //     const token = await AsyncStorage.getItem("access_token");
-    //     const formData = new FormData();
-    //     formData.append("phone_number", phoneNumber);
-    //     formData.append("id_token", idToken)
-
-    //     await authAPIs(token).post(endpoints['add-phone-number'], formData,
-    //         {
-    //             headers: {
-    //                 "Content-Type": "multipart/form-data",
-    //             }
-    //         }).then(response => response.json())
-    //         .then(data => console.log("Server Response:", data))
-    //         .catch(error => console.error("Lỗi gửi số điện thoại:", error));
-    // }
     return (
         <ScrollView style={AccountSettingDetailStyle.container}>
             <ChangePassWord isVisible={visibleChangePW} setIsVisible={setVisibleChangePw} token={token} />
@@ -105,7 +93,11 @@ const AccountSettingDetail = () => {
                     activeOutlineColor="#FFBA00" >{user.last_name}</TextInput>
                 <Text style={AccountSettingDetailStyle.labelInput}>Email</Text>
                 <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
-                    activeOutlineColor="#FFBA00" >{user.email}</TextInput>
+                    activeOutlineColor="#FFBA00"
+                    right={<TextInput.Icon disabled={isChangeEmail} icon={"content-save"} onPress={() => {
+                        handleOnPressSave();
+                        sendOTP();
+                    }} />}>{user.email}</TextInput>
                 <Text style={AccountSettingDetailStyle.labelInput}>Số điện thoại</Text>
                 <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
                     activeOutlineColor="#FFBA00"

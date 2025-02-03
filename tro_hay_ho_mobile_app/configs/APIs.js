@@ -18,6 +18,7 @@ export const endpoints = {
     'current-user': '/users/current-user/',
     'add-phone-number': '/users/add-phone-number/',
     'send-otp': '/users/send-otp/',
+    'check-email':'/users/check-email/',
     'verify-otp': '/users/verify-otp/',
     'change-password': '/users/change-password/',
     'follow-me': '/users/follow-me/',

@@ -13,7 +13,6 @@ import CustomNumericInput from "./CustomNumericInput";
 
 const PostForRentCreating = () => {
     const navigation = useNavigation();
-    const route = useRoute();
     const [imageList, setImageList] = useState([]);
     const convertToImageObjects = () => {
         const imageObjects = imageList.map((image) => ({
@@ -34,16 +33,12 @@ const PostForRentCreating = () => {
     const sheetRef = useRef(null);
     const sheetRef2 = useRef(null);
     const sheetRef3 = useRef(null);
-    const sheetRefMap = useRef(null);
     const snapPoints = useMemo(() => ["1%", "50%", "50%"], []);
     const snapPoints2 = useMemo(() => ["1%", "50%", "50%"], []);
     const snapPoints3 = useMemo(() => ["1%", "50%", "50%"], []);
-    const snapPointsMap = useMemo(() => ["1%", "80%", "80%"], []);
     const [snackBarText, setSnackBarText] = useState(null);
     const [price, setPrice] = useState(0);
     const [visible, setVisible] = useState(false);
-
-
 
     const onDismissSnackBar = () => setVisible(false);
     const user = useContext(MyUserContext);
