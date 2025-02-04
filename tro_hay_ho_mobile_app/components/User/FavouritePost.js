@@ -18,8 +18,8 @@ const FavouritePost = () => {
         if (page > 0) {
             setLoading(true);
             try {
-                const token = await AsyncStorage.getItem("token");
-                const res = await authAPIs(token).get(`${endpoints['favourite-posts']}?page=${page}&page_size=2`);
+                const token = await AsyncStorage.getItem("access_token");
+                const res = await authAPIs(token).get(`${endpoints['favourite-posts']}?page=${page}`);
                 if (page > 1)
                     setFavPosts(current => [...current, ...res.data.results])
                 else
@@ -56,35 +56,31 @@ const FavouritePost = () => {
         loadFavPosts();
 
         console.log("fp", favPosts);
-    }, []);
+    }, [page]);
 
     const render = ({ item }) => {
         if (item.post.post_image.length === 0) {
-            return (<View style={{ flexDirection: 'row', marginBottom: 20 }}>
+            return (<View style={{ flexDirection: 'row', marginBottom: 10 ,paddingStart:10}}>
                 <Image source={require('../../assets/45_donald_trump.png')} style={{ width: 100, height: 100 }} />
-                <View style={{ justifyContent: 'center', marginLeft: 20 }}>
+                <View style={{ marginLeft: 20 }}>
                     <Text style={{ fontSize: 20 }}>{item.post.title}</Text>
                     <Text style={{ color: 'red' }}>{item.post.price} VNĐ</Text>
 
                 </View>
-
-
-                <Divider style={{ height: 2 }} />
             </View>
             )
         } else {
             return (<View>
-                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                <View style={{ flexDirection: 'row', marginBottom: 10,paddingStart:10}}>
                     <Image source={{ uri: item.post.post_image[0].image }}
                         style={{ width: 100, height: 100 }} />
-                    <View style={{ justifyContent: 'center', marginLeft: 20 }}>
+                    <View style={{ marginLeft: 20 }}>
 
                         <Text style={{ fontSize: 20 }}>{item.post.title}</Text>
                         <Text style={{ color: 'red' }}>{item.post.price} VNĐ</Text>
                     </View>
 
                 </View>
-                <Divider style={{ height: 2 }} />
             </View>
 
             )
@@ -94,7 +90,7 @@ const FavouritePost = () => {
 
 
     return (
-        <View style={{ paddingStart:5,paddingTop:5}}>
+        <View style={{ flex:1}}>
             <FlatList
                 data={favPosts}
                 renderItem={render}

@@ -157,7 +157,7 @@ export default function App() {
                                 <MyDispatchContext.Provider value={dispatch}>
                                     <MyAppNavigator />
                                     <RequestLoginDialog />
-                                    {/* <PostCreatingForm/> */}
+                                    {/* <Register/> */}
                                 </MyDispatchContext.Provider>
                             </MyUserContext.Provider>
                         </RequestLoginDialogProvider >

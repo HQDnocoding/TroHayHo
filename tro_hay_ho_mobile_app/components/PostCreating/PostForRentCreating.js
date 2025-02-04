@@ -159,19 +159,37 @@ const PostForRentCreating = () => {
 
                     imageDict.forEach(image => uploadImage(image, res.data.id));
 
+                    if (res.status == 201) {
+                        console.log("ok");
+                        const notiForm = new FormData();
+                        notiForm.append('title', `Tài khoản tên ${user.last_name} ${user.first_name} vừa tạo bài đăng cho thuê trọ mới`);
+                        notiForm.append('content', `Bài đăng tựa đề ${postValues.title} vừa được đăng, hãy tương tác ngay!`)
+                        notiForm.append('post', res.data.id)
+                        try {
+                            authAPIs(token).post(endpoints['notifications'], notiForm,
+                                {
+                                    headers: {
+                                        'Content-Type': 'application/json',
 
+                                    },
+                                }
+                            )
+                        } catch (ex) {
+                            console.log(ex);
+                        }
+                    }
 
                 } catch (ex) {
                     console.error(ex);
                 } finally {
-                        setPrice(0);
-                        setPostValues({ description: '', title: '' ,acreage:'',max_number_of_people:'',name_agent:'',price:''});
-                        setLocation({ district: '', province: '', ward: '' });
-                        setDistricts('');
-                        setData({ coordinates: '', district: '', province: '', specified_address: '', ward: '' })
-                        setProvinces('');
-                        setWards('');
-                        setImageList([]);
+                    setPrice(0);
+                    setPostValues({ description: '', title: '', acreage: '', max_number_of_people: '', name_agent: '', price: '' });
+                    setLocation({ district: '', province: '', ward: '' });
+                    setDistricts('');
+                    setData({ coordinates: '', district: '', province: '', specified_address: '', ward: '' })
+                    setProvinces('');
+                    setWards('');
+                    setImageList([]);
                 }
             }
         }
@@ -194,12 +212,7 @@ const PostForRentCreating = () => {
                 },
             });
 
-            console.log(response)
-            if (response.ok) {
-                Alert.alert('Upload thành công', 'Ảnh đã được tải lên');
-            } else {
-                Alert.alert('Lỗi', result.message || 'Có lỗi xảy ra');
-            }
+            console.log(response.data);
         } catch (error) {
             console.error('Upload error:', error);
         }

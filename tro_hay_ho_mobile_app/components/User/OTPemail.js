@@ -1,3 +1,6 @@
+
+
+
 import { useEffect, useState } from "react";
 import { Alert, View } from "react-native";
 import { Button, Dialog, Portal, TextInput } from "react-native-paper";
@@ -6,20 +9,17 @@ import APIs, { authAPIs, endpoints } from "../../configs/APIs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
-const OTPauth = ({ isVisible, setVisible, phone, token }) => {
+const OTPmail = ({ isVisible, setVisible, email, token }) => {
 
     const [otp, setOtp] = useState('');
-    // const [enable, setEnable] = useState(false);
-    //twilio
     const verify = async () => {
 
-
         const formData = new FormData();
-        formData.append("phone_number", phone);
-        formData.append("otp_code", otp);
+        formData.append('email', email);
+        formData.append('otp', otp);
 
         try {
-            const res = await authAPIs(token).post(endpoints['verify-otp'], formData,
+            const res = await authAPIs(token).post(endpoints['verify-otp-email'], formData,
                 {
                     headers: {
                         "Content-Type": "multipart/form-data",
@@ -27,7 +27,7 @@ const OTPauth = ({ isVisible, setVisible, phone, token }) => {
 
                 }
             )
-            if (res.status===200) {
+            if (res.status === 200) {
                 Alert.alert("", "Xác thực thành công!");
                 hideDialog();
             } else {
@@ -42,27 +42,8 @@ const OTPauth = ({ isVisible, setVisible, phone, token }) => {
         }
     }
 
-
     const hideDialog = () => { setVisible(false); setOtp(null) }
 
-    // const handleVerifyOTP = async () => {
-
-    //     try {
-    //         const user = await verifyOTP(confirmation, otp);
-    //         if (user) {
-    //             const idToken = await user.getIdToken(); // Lấy Firebase Token
-    //             onVerified(phone, idToken); // Gửi số điện thoại và token lên Django
-    //         } else {
-    //             Alert.alert("OTP không hợp lệ, vui lòng thử lại.");
-    //         }
-    //     } catch (ex) {
-    //         console.error(ex);
-    //     } finally {
-    //         hideDialog();
-    //         setOtp('');
-    //     }
-
-    // };
 
     return (
         <View>
@@ -95,4 +76,4 @@ const OTPauth = ({ isVisible, setVisible, phone, token }) => {
 }
 
 
-export default OTPauth;
+export default OTPmail;

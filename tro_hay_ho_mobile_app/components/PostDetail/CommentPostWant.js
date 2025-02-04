@@ -87,7 +87,7 @@ const CommentScreen = ({ postId, routName }) => {
         if (commentText?.trim()) {
             try {
                 setLoading(true);
-                const token = await AsyncStorage.getItem("token");
+                const token = await AsyncStorage.getItem("access_token");
                 const res = await authAPIs(token).post(endpoints[routName](postId), {
                     content: commentText,
                     replied_comment: replyToCommentId, // Trả lời comment cha nếu có
@@ -108,7 +108,7 @@ const CommentScreen = ({ postId, routName }) => {
     };
 
     const renderComment = ({ item }) => (
-        <View style={styles.commentContainer}>
+        <KeyboardAvoidingView style={styles.commentContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             {/* Avatar */}
             <Image source={{ uri: item.user.avatar }} style={styles.avatar} />
             <View style={styles.commentContent}>
@@ -141,7 +141,7 @@ const CommentScreen = ({ postId, routName }) => {
                     />
                 )}
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 
     return (
