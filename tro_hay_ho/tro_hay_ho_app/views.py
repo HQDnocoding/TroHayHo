@@ -1,4 +1,5 @@
 import base64
+import json
 import random
 import re
 import smtplib
@@ -21,7 +22,7 @@ from google.oauth2 import id_token
 from oauth2_provider.models import Application, AccessToken
 from rest_framework import permissions, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, APIException
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
 from rest_framework.permissions import IsAuthenticated
@@ -66,7 +67,7 @@ class UserViewSet(ViewSet, CreateAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
-    pagination_class = ItemPaginator
+    pagination_class = ItemSmallPaginator
 
     def get_permissions(self):
         if self.action in ['get_current_user', 'get_favorites', 'get_follow_me',
@@ -106,7 +107,7 @@ class UserViewSet(ViewSet, CreateAPIView):
         serializer = FollowingSerializer(follower, many=True)
         return Response(serializer.data)
 
-    @action(methods=['get', 'post'], url_path='favorites', detail=False)
+    @action(methods=['get', 'post'], url_path='favourites', detail=False)
     def get_favorites(self, request):
 
         user = request.user
@@ -149,6 +150,7 @@ class UserViewSet(ViewSet, CreateAPIView):
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
         phone_number = request.data.get("phone_number")
+        print(phone_number)
         if not phone_number:
             return Response({"error": "Số điện thoại không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -159,7 +161,7 @@ class UserViewSet(ViewSet, CreateAPIView):
         # Gửi OTP qua Twilio
         try:
             client.messages.create(
-                body=f"OTP: {otp}",
+                body=f"Mã OTP của bạn là: {otp}",
                 from_=TWILIO_PHONE_NUMBER,
                 to=phone_number
             )
@@ -190,24 +192,99 @@ class UserViewSet(ViewSet, CreateAPIView):
             return Response({"error": "OTP không chính xác"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], url_path='check-email', detail=False)
-    def check_edmail(self, request):
-
+    def check_email(self, request):
         email_data = request.data.get('email')
 
-        if User.objects.get(email=email_data):
+        users = User.objects.filter(email=email_data)
+
+        if users:
             return Response({"error": "Email đã tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
 
         otp = str(random.randint(100000, 999999))
         cache.set(email_data, otp, timeout=300)
 
-        send_mail(
-            subject="Mã OTP xác thực email",
-            message=f"Vui lòng nhập mã xác nhận sau: \n{otp}",
-            from_email=EMAIL_HOST_USER,
-            recipient_list=email_data
-        )
+        access_token = get_access_token()
+        auth_string = f"user={EMAIL_HOST_USER}\x01auth=Bearer {access_token}\x01\x01"
+        auth_bytes = base64.b64encode(auth_string.encode()).decode()
 
+        server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT)
+        server.ehlo()
+        server.starttls()
+        server.docmd("AUTH", "XOAUTH2 " + auth_bytes)
+
+        msg = MIMEMultipart()
+        msg["From"] = EMAIL_HOST_USER
+        msg["To"] = email_data
+        msg["Subject"] = "Ứng dụng TroHayHo gởi bạn mã OTP"
+        msg.attach(MIMEText(f"Mã xác thực của bạn là: {otp}", "plain"))
+        server.sendmail(EMAIL_HOST_USER, email_data, msg.as_string())
+
+        server.quit()
         return Response({"message": "Đã gởi mã OTP"})
+
+    @action(methods=['post'], url_path='verify-otp-email', detail=False)
+    def verify_otp_email(self, request):
+        otp = request.data.get('otp')
+        email = request.data.get('email')
+
+        cached_otp = cache.get(email)
+        if cached_otp is None:
+            return Response({"error": "OTP đã hết hạn hoặc không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
+        if cached_otp == otp:
+            user = request.user
+            user.email = email
+            user.save()
+            cache.delete(email)
+            return Response({"message": "Xác thực thành công"})
+        else:
+            return Response({"error": "OTP không chính xác"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChuTroViewSet(UserViewSet ):
+    serializer_class=ChuTroSerializer
+    parser_classes = [MultiPartParser, JSONParser]
+
+    
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        try:
+            
+            address_data=request.data.pop('address')
+            images_data=request.data.pop('image_tro')
+            
+            if len(images_data) < 3:
+                return Response({"error": "Phải có ít nhất 3 hình ảnh."}, status=status.HTTP_400_BAD_REQUEST)
+
+            
+            address_dict = json.loads(address_data[0])
+            serializer=AddressSerializer(data=address_dict)
+            if serializer.is_valid():
+                address = serializer.save()
+                chu_tro_data = request.data.copy()
+                chu_tro_data['address']=serializer.validated_data
+                chu_tro_serializer = ChuTroSerializer(data=chu_tro_data)
+                if chu_tro_serializer.is_valid():
+                    chu_tro_serializer.validated_data['is_active']=False
+                    chu_tro=chu_tro_serializer.save(address=address)
+                    for image in images_data:
+                        image_serializer=TroImageSerializer(data={'image_tro':image})
+                        if image_serializer.is_valid():
+                            image_serializer.save(chu_tro=chu_tro) 
+                        else: 
+                            pass
+                    return Response(ChuTroSerializer(chu_tro).data, status=status.HTTP_201_CREATED)
+                else: 
+                    print(chu_tro_serializer.errors)  
+                    return Response(chu_tro_serializer.errors, status=status.HTTP_400_BAD_REQUEST)                
+            else:
+                print(serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+        except Exception as e:
+            raise APIException(f"An error occurred while processing the request: {str(e)}")    
+
+
+
 
 
 class PostWantViewSet(ModelViewSet):
@@ -216,15 +293,20 @@ class PostWantViewSet(ModelViewSet):
     pagination_class = ItemPaginator
     parser_classes = [MultiPartParser, JSONParser]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+
+    def get_permissions(self):
+        if self.action in ['upadate', 'partial_update', 'destroy','create']:
+            return [permissions.IsAuthenticated(),IsOwnerPostWantOrHasPermission()]
+
+        return[permissions.AllowAny()]
+
 
     @action(methods=['get', 'post'], url_path='comments', detail=True)
     def get_comments(self, request, pk):
-        if request.method.__eq__('POST'):
+        if request.method=='POST':
             content = request.data.get('content')
-            c = Comment.objects.create(content=content, user=request.user, post=self.get_object())
-
+            c = Comment.objects.create(content=content, user=self.request.user, post=self.get_object())
+            print(c)
             return Response(CommentSerializer(c).data)
 
         else:
@@ -238,11 +320,42 @@ class PostWantViewSet(ModelViewSet):
             return Response(CommentSerializer(comments, many=True).data)
 
 
+class IsOwnerPostForRentOrHasPermission(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.method in ['POST']:
+            return ALLOWED_GROUPS[0] in request.user.groups
+
+
+        return obj.user == request.user
+
+class IsOwnerPostWantOrHasPermission(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.method in ['POST']:
+            return ALLOWED_GROUPS[1] in request.user.groups
+
+        return obj.user == request.user
+
+
+
+
+
 class PostForRentViewSet(ModelViewSet):
     queryset = PostForRent.objects.filter(active=True)
     serializer_class = PostForRentSerializer
     pagination_class = ItemPaginator
     parser_classes = [MultiPartParser, JSONParser]
+
+    def get_permissions(self):
+        if self.action in ['upadate', 'partial_update', 'destroy','create']:
+            return [permissions.IsAuthenticated(),IsOwnerPostForRentOrHasPermission()]
+
+        return[permissions.AllowAny()]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -282,9 +395,9 @@ class PostForRentViewSet(ModelViewSet):
 class AddressViewSet(ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
+    parser_classes = [MultiPartParser]
 
-    def create(self, request, *args, **kwargs):
-        print("Received Data:", request.data)
+
 
     @action(detail=False, methods=['post'], url_path='create-address')
     def create_address(self, request):
@@ -359,7 +472,7 @@ class NotificationViewSet(ModelViewSet):
                     msg["From"] = EMAIL_HOST_USER
                     msg["To"] = follower.follower.email
                     msg["Subject"] = request.data.get('title')
-                    msg.attach(MIMEText(request.data.get('content'),"plain"))
+                    msg.attach(MIMEText(request.data.get('content'), "plain"))
 
                     try:
                         server.sendmail(EMAIL_HOST_USER, follower.follower.email, msg.as_string())
@@ -381,10 +494,10 @@ class FavouritePostViewSet(ModelViewSet):
     queryset = FavoritePost.objects.filter(active=True)
     serializer_class = FavouritePostSerializer
     pagination_class = ItemSmallPaginator
-
-    def get_queryset(self):
-        return FavoritePost.objects.filter(active=True, user=self.request.user)
-
+    permission_classes = [IsOwnerPostForRentOrHasPermission,IsOwnerPostForRentOrHasPermission]
+    
+    # def get_queryset(self):
+    #     return FavoritePost.objects.filter(active=True, user=self.request.user)
 
 class GoogleLoginView(APIView):
     def post(self, request):

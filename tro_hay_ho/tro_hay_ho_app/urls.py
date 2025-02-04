@@ -7,6 +7,7 @@ from .duc import duc_views
 r = DefaultRouter()
 
 r.register('users', UserViewSet, basename='user')
+r.register('chu-tro', ChuTroViewSet, basename='chu-tro')
 r.register('roles', AvailableGroupsView, basename='role')
 
 r.register('addresses', AddressViewSet, basename='address')
@@ -33,7 +34,6 @@ r.register('detail-notification', duc_views.DetailNotificationViewSet, basename=
 # =============================================
 r.register('notifications', NotificationViewSet, basename='notifications')
 
-# r.register('users/current-user/favourite-posts/',FavouritePostViewSet,basename='favourite_post')
 r.register('comments', CommentViewSet, basename='comment')
 
 urlpatterns = [

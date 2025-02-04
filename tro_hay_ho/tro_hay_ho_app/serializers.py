@@ -1,3 +1,4 @@
+import re
 from zoneinfo import available_timezones
 
 from django.contrib.auth.models import Group
@@ -30,13 +31,31 @@ class UserSerializer(ModelSerializer):
         data['avatar'] = instance.avatar.url if instance.avatar else ''
         return data
 
-    def validate_username(self, value):
-        if len(value) < 6:
-            raise serializers.ValidationError("Username phải có ít nhất 6 ký tự.")
+    def validate_password(self, value):
+        """
+        Kiểm tra mật khẩu:
+        - Ít nhất 8 ký tự
+        - Chứa ít nhất một chữ hoa
+        - Không chứa khoảng trắng
+        """
+        if len(value) < 8:
+            raise serializers.ValidationError("Mật khẩu phải có ít nhất 8 ký tự.")
+        if not any(char.isupper() for char in value):
+            raise serializers.ValidationError("Mật khẩu phải chứa ít nhất một chữ hoa.")
+        if " " in value:
+            raise serializers.ValidationError("Mật khẩu không được chứa khoảng trắng.")
+        return value
 
+    def validate_username(self, value):
+        """
+        Kiểm tra username:
+        - Ít nhất 8 ký tự
+        - Không chứa khoảng trắng
+        """
+        if len(value) < 8:
+            raise serializers.ValidationError("Username phải có ít nhất 8 ký tự.")
         if " " in value:
             raise serializers.ValidationError("Username không được chứa khoảng trắng.")
-
         return value
 
     def create(self, validated_data):
@@ -44,6 +63,7 @@ class UserSerializer(ModelSerializer):
         group_name = validated_data.pop('groups')
         print(group_name)
         user = User(**validated_data)
+        print(user)
         user.set_password(user.password)
         group = Group.objects.get(name=group_name[0])
 
@@ -54,7 +74,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name',
+        fields = ['id', 'username', 'first_name', 'last_name','email',
                   'avatar', 'password', 'phone', 'date_joined', 'groups']
 
         extra_kwargs = {
@@ -62,24 +82,13 @@ class UserSerializer(ModelSerializer):
                 'write_only': True
             }
         }
-
-
-class FollowerSerializer(ModelSerializer):
-    # followed=UserSerializer()
-    follower = UserSerializer()
-
+        
+class AddressSerializer(ModelSerializer):
+    coordinates=serializers.CharField(required=False)
     class Meta:
-        model = Following
-        fields = ['follower']
+        model = Address
+        fields = '__all__'
 
-
-class FollowingSerializer(ModelSerializer):
-    followed = UserSerializer()
-
-    # follower=UserSerializer()
-    class Meta:
-        model = Following
-        fields = ['followed']
 
 
 class WardSerializer(ModelSerializer):
@@ -99,11 +108,94 @@ class ProvinceSerializer(ModelSerializer):
         model = Province
         fields = ['code', 'name', 'full_name']
 
-
-class AddressSerializer(ModelSerializer):
+        
+class TroImageSerializer(ModelSerializer):
+    image_tro=serializers.ImageField(required=False)
     class Meta:
-        model = Address
-        fields = '__all__'
+        model=TroImage
+        fields=['image_tro']
+        
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['image_tro'] = instance.image_tro.url if instance.image_tro else None
+        return representation
+
+class ChuTroSerializer(ModelSerializer):
+    avatar = serializers.ImageField(required=False)
+    groups = serializers.SlugRelatedField(
+        queryset=Group.objects.all(),
+        slug_field='name',
+        many=True
+    )
+    address=AddressSerializer(required=False,many=False)
+    image_tro=TroImageSerializer(many=  True,required=False)
+    is_active=serializers.BooleanField(default=False,required=False,read_only=True)
+    class Meta:
+        model=ChuTro
+        fields =  ['id', 'username', 'first_name', 'last_name','email','address',
+                  'avatar', 'password', 'phone', 'date_joined', 'groups','image_tro']
+        extra_kwargs = {
+            'password': {
+                'write_only': True
+            }
+        }
+    def validate_password(self, value):
+        """
+        Kiểm tra mật khẩu:
+        - Ít nhất 8 ký tự
+        - Chứa ít nhất một chữ hoa
+        - Không chứa khoảng trắng
+        """
+        if len(value) < 8:
+            raise serializers.ValidationError("Mật khẩu phải có ít nhất 8 ký tự.")
+        if not any(char.isupper() for char in value):
+            raise serializers.ValidationError("Mật khẩu phải chứa ít nhất một chữ hoa.")
+        if " " in value:
+            raise serializers.ValidationError("Mật khẩu không được chứa khoảng trắng.")
+        return value
+        
+    def validate_username(self, value):
+        """
+        Kiểm tra username:
+        - Ít nhất 8 ký tự
+        - Không chứa khoảng trắng
+        """
+        if len(value) < 8:
+            raise serializers.ValidationError("Username phải có ít nhất 8 ký tự.")
+        if " " in value:
+            raise serializers.ValidationError("Username không được chứa khoảng trắng.")
+        return value
+
+    def validate_phone(self, value):
+        """
+        Kiểm tra số điện thoại:
+        - Bắt đầu bằng số 0
+        - Có đúng 10 chữ số
+        - Chỉ chứa số (0-9)
+        """
+        if not re.fullmatch(r"0\d{9}", value):  # Số bắt đầu bằng 0 và có 10 chữ số
+            raise serializers.ValidationError(
+                "Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng (10 chữ số, bắt đầu bằng 0).")
+        return value
+
+class FollowerSerializer(ModelSerializer):
+    # followed=UserSerializer()
+    follower = UserSerializer()
+
+    class Meta:
+        model = Following
+        fields = ['follower']
+
+
+class FollowingSerializer(ModelSerializer):
+    followed = UserSerializer()
+
+    # follower=UserSerializer()
+    class Meta:
+        model = Following
+        fields = ['followed']
+
+
 
 
 class PostImageSerializer(ModelSerializer):
