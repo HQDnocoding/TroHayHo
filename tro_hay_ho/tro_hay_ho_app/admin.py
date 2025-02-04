@@ -19,7 +19,7 @@ from oauth2_provider.admin import AccessTokenAdmin, ApplicationAdmin, GrantAdmin
 
 from .models import (User, PostWant, PostForRent, District, Province, Ward, Role, Address,
                      PostImage, Notification, Conversation, Message, DetailNotification,
-                     Comment, Following, FavoritePost)
+                     Comment, Following, FavoritePost, ChuTro, TroImage)
 
 class MyAdminSite(AdminSite):
     site_header = "Quản lý hệ thống"
@@ -30,9 +30,6 @@ class MyAdminSite(AdminSite):
         urls = super().get_urls()
         custom_urls = [
             path('statspanel/', self.admin_view(self.stats_view), name='stats_panel'),
-from .models import User,PostWant,PostForRent,District,Province,Ward,Role,Address,PostImage,Notification\
-    ,Conversation,Message,DetailNotification,Comment,Following,FavoritePost,ChuTro, TroImage
-# Register your models here.
 
         ]
         return custom_urls + urls
