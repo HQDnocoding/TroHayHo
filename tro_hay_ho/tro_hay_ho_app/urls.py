@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import *
 from .duc import duc_views
+from .admin import custom_admin_site
 
 r = DefaultRouter()
 
@@ -39,4 +40,5 @@ r.register('comments', CommentViewSet, basename='comment')
 urlpatterns = [
     path('', include(r.urls)),
     path('google-login/', GoogleLoginView.as_view(), name='google-login'),
+    path('admin/', custom_admin_site.urls),
 ]

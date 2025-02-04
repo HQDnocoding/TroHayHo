@@ -7,15 +7,18 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.status import  HTTP_201_CREATED, HTTP_400_BAD_REQUEST,HTTP_200_OK,HTTP_404_NOT_FOUND,HTTP_500_INTERNAL_SERVER_ERROR
 from rest_framework.viewsets import ViewSet
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet,GenericViewSet,ReadOnlyModelViewSet
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin,CreateModelMixin,DestroyModelMixin
 from ..paginator import ItemPaginator, ItemSmallPaginator
 from ..models import User, Role
 from ..serializers import *
 from .duc_serializers import *
 from django.db.models import Q
 from django.db.models.functions import Lower
-
-class ConversationViewSet(ModelViewSet):
+from django.db.models.functions import TruncMonth, TruncYear, TruncQuarter,ExtractQuarter
+from django.db.models import Count
+import json
+class ConversationViewSet(ReadOnlyModelViewSet):
     serializer_class = ConsersationSerializer
     pagination_class = ItemSmallPaginator
 
@@ -24,7 +27,7 @@ class ConversationViewSet(ModelViewSet):
             .select_related('user1','user2')
 
 
-class MessageViewSet(ModelViewSet):
+class MessageViewSet(ReadOnlyModelViewSet):
     serializer_class = MessageSerializer
     pagination_class = ItemSmallPaginator
 
@@ -33,7 +36,7 @@ class MessageViewSet(ModelViewSet):
             .select_related('user')
 
 
-class UserConversationViewSet(ModelViewSet):
+class UserConversationViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     pagination_class = ItemSmallPaginator
     serializer_class = ConsersationSerializer
     queryset = Conversation.objects.filter(active=True)
@@ -56,7 +59,7 @@ class UserConversationViewSet(ModelViewSet):
         serializer = self.get_serializer(conversations, many=True)
         return Response(serializer.data)
 
-class ConversationMessageViewSet(ModelViewSet):
+class ConversationMessageViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     pagination_class = ItemSmallPaginator
     serializer_class = MessageSerializer
     queryset = Message.objects.filter(active=True)
@@ -77,7 +80,7 @@ class ConversationMessageViewSet(ModelViewSet):
         serializer = self.get_serializer(messages, many=True)
         return Response(serializer.data)
 
-class UserPostWantViewSet(ModelViewSet):
+class UserPostWantViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     pagination_class = ItemSmallPaginator
     serializer_class = PostWantSerializer
     queryset = PostWant.objects.filter( active=True)
@@ -110,7 +113,7 @@ class UserPostWantViewSet(ModelViewSet):
         return Response(serializers.data)
 
 
-class UserPostForRentViewSet(ModelViewSet):
+class UserPostForRentViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     pagination_class = ItemSmallPaginator
     serializer_class = PostForRentSerializer
     queryset = PostForRent.objects.filter( active=True)
@@ -362,7 +365,7 @@ class BasicUserInfoViewSet(ModelViewSet):
         except Exception as e:
             return Response({'error a': str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
         
-class PostParentViewSet(ModelViewSet):
+class PostParentViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     queryset = Post.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True).order_by('-created_date')
     serializer_class=PostParentSerializer
     pagination_class=ItemPaginator
@@ -449,13 +452,13 @@ class PostParentViewSet(ModelViewSet):
                 
         return super().get_serializer_class()
     
-class DetailNotificationViewSet(ModelViewSet):
+class DetailNotificationViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     queryset = DetailNotification.objects.filter(active=True).order_by('-created_date')
     serializer_class=DetailNotificationSerializer
     pagination_class=ItemSmallPaginator
     
     
-class BasicPostForRentShowViewSet(ModelViewSet):
+class BasicPostForRentShowViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     serializer_class = PostForRentSerializer
     pagination_class = ItemPaginator
     queryset = PostForRent.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True)
@@ -466,7 +469,7 @@ class BasicPostForRentShowViewSet(ModelViewSet):
             .prefetch_related('images')
             
             
-class BasicPostWantShowViewSet(ModelViewSet):
+class BasicPostWantShowViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     queryset = PostWant.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True)
     serializer_class = PostWantSerializer
     pagination_class = ItemPaginator
@@ -475,6 +478,19 @@ class BasicPostWantShowViewSet(ModelViewSet):
         return PostWant.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True) \
             .select_related('user', 'address') 
            
+class TestViewSet(ModelViewSet):
+    queryset = PostWant.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True)
+    serializer_class = PostWantSerializer
+    @action(detail=False,methods=['get'],url_path=r'test')
+    def test(self,request,pk=None):
+        e=User.objects.all().annotate(month=TruncMonth('date_joined'))\
+            .values('month')\
+        .annotate(
+        total=Count('id'),
+        active=Count('id', filter=Q(is_active=True))
+    )\
+    .order_Sby('month')
+        return Response({'error a': str(e)}, status=HTTP_200_OK)
 # class FollowViewSet(ViewSet, CreateAPIView):
 #     serializer_class = FollowSerializer
   
