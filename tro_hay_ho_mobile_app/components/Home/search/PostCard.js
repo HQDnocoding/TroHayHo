@@ -6,6 +6,7 @@ import { formatTimeAgo } from "../../../utils/TimeFormat"
 import APIs, { endpointsDuc } from "../../../configs/APIs"
 import React, { useState } from "react"
 import { useNavigation } from "@react-navigation/native"
+import { getFullName } from "../../../utils/MyFunctions"
 
 const PostCard = ({ item }) => {
     const [post, setPost] = useState(null)
@@ -44,7 +45,7 @@ const PostCard = ({ item }) => {
                 </TouchableOpacity>
 
                 <View style={{ marginStart: 10 }}>
-                    <Text style={{ fontWeight: 700 }}>{post && post.user ? post.user.last_name : ""} {post && post.user ? post.user.first_name : ""}</Text>
+                    <Text style={{ fontWeight: 700 }}>{post && post.user ? getFullName( post.user.last_name , post.user.first_name ) : ""} </Text>
                     <Text style={{ fontSize: 12 }}>{post ? formatTimeAgo(post.created_date) : ""}</Text>
 
                 </View>

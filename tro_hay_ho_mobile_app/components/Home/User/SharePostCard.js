@@ -1,26 +1,33 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { myYellow, POST_FOR_RENT, POST_WANT, sampleAvatar } from "../../../utils/MyValues"
 import { createPostMessage, createConversationId, checkExistConversation, createConversation } from "../../../utils/ChatFunction"
-const SharePostCard = ({ followed, follower, post }) => {
+import { getFullName } from "../../../utils/MyFunctions"
+import React, { useState } from "react"
+import { set } from "firebase/database"
+const SharePostCard = ({ followed, follower, post,sent }) => {
+    
+    const [isSent, setIsSent] = useState(false);
     const handleSendPost = async () => {
+        try {
+            const conversationId = createConversationId(followed.id, follower.id)
 
-        const conversationId = createConversationId(followed.id, follower.id)
-        console.log("a ",followed.id," ",follower.id)
+            const check = await checkExistConversation(followed.id, follower.id)
+            if (check === null) {
+                await createConversation(followed.id, follower.id)
+            }
 
-        const check=await checkExistConversation(followed.id, follower.id)
-        if ( check=== null) {
-            await createConversation(followed.id, follower.id)
+            let messageType = post.type.toLowerCase();
+            if (messageType === POST_WANT || messageType === POST_FOR_RENT) {
+                await createPostMessage(conversationId, follower.id, followed.id, post.id, messageType)
+
+                setIsSent(true);
+            }
+        } catch (error) {
+            console.error("Error sending post:", error);
         }
-        console.log("check ",check)
-
-        if (post.type.toLowerCase() === POST_WANT) {
-            const a = await createPostMessage(conversationId, follower.id, post.id, POST_WANT)
-        } else if ((post.type.toLowerCase() === POST_FOR_RENT)) {
-            const a = await createPostMessage(conversationId, follower.id, post.id, POST_FOR_RENT)
-        }
-        console.log("followed", followed.id, " post:", post.id)
 
     }
+    
     return (
 
         <View style={styles.container}>
@@ -30,12 +37,20 @@ const SharePostCard = ({ followed, follower, post }) => {
                     style={styles.avatar}
                 />
                 <View>
-                    <Text>{followed && followed ? followed.last_name : ""} {followed && followed ? followed.first_name : ""}</Text>
+                    <Text>{followed && followed ? getFullName(followed.last_name, followed.first_name) : ""} </Text>
                 </View>
             </View>
-            <TouchableOpacity onPress={handleSendPost}>
-                <View style={styles.btnSend}  >
-                    <Text>Gửi</Text>
+            <TouchableOpacity
+                onPress={handleSendPost}
+                disabled={isSent}
+            >
+                <View style={[
+                    styles.btnSend,
+                    isSent && styles.btnSent
+                ]}>
+                    <Text style={isSent ? styles.textSent : {}}>
+                        {isSent ? "Đã gửi" : "Gửi"}
+                    </Text>
                 </View>
             </TouchableOpacity>
         </View>
@@ -50,32 +65,37 @@ const styles = StyleSheet.create(
             padding: 10,
             alignItems: 'center',
             borderRadius: 10,
-
         },
         avatar: {
             width: 50,
             height: 50,
             objectFit: 'cover',
             borderRadius: 100,
-
-        }, header: {
+        },
+        header: {
             backgroundColor: 'rgb(235, 235, 235)',
-
             borderWidth: 1,
             borderColor: 'gray',
             borderRadius: 10,
             padding: 10,
-            justifyContent:
-                'center',
+            justifyContent: 'center',
             alignItems: 'center',
-
-        }, btnSend: {
+        },
+        btnSend: {
             marginTop: 10,
             backgroundColor: myYellow,
             width: 50,
             alignItems: 'center',
             borderRadius: 10,
             padding: 5,
+        },
+        btnSent: {
+            width: 70,
+
+            backgroundColor: 'gray',
+        },
+        textSent: {
+            color: 'white',
         }
     }
 )

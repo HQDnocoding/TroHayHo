@@ -35,6 +35,7 @@ import ImagePickerComponent from './components/User/test';
 import PhoneSignIn from './components/User/Test2';
 import PostWantCreating from './components/PostCreating/PostWantCreating';
 import FollowingTabScreenNavigator from './components/User/FollowingTabScreen';
+import { BottomSendToFollowedContextProvider } from './utils/BottomSendToFollowedContext';
 
 
 export default function App() {
@@ -155,9 +156,13 @@ export default function App() {
                         <RequestLoginDialogProvider>
                             <MyUserContext.Provider value={user}>
                                 <MyDispatchContext.Provider value={dispatch}>
-                                    <MyAppNavigator />
-                                    <RequestLoginDialog />
-                                    {/* <Register/> */}
+                                    <BottomSendToFollowedContextProvider>
+
+
+                                        <MyAppNavigator />
+                                        <RequestLoginDialog />
+                                        {/* <PostCreatingForm/> */}
+                                    </BottomSendToFollowedContextProvider>
                                 </MyDispatchContext.Provider>
                             </MyUserContext.Provider>
                         </RequestLoginDialogProvider >

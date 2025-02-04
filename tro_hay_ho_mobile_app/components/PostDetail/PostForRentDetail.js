@@ -7,6 +7,7 @@ import moment from "moment";
 import 'moment/locale/vi';
 import MapView, { Circle, Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from 'react-native-maps';
 import CommentScreen from "./CommentPostWant";
+import { getFullName } from "../../utils/MyFunctions";
 
 moment.locale('vi');
 
@@ -129,7 +130,7 @@ const PostForRentDetail = ({ route }) => {
                                 <View style={{ padding: 10, backgroundColor: '#F8F4F4', borderRadius: 20, borderWidth: 1, borderColor: '#D2D0D7' }} >
                                     <View style={{ flexDirection: 'row' }}>
                                         <Image style={{ height: 60, width: 60, marginHorizontal: 5 }} source={require('../../assets/google-logo.png')} resizeMode="contain" />
-                                        <Text style={{ fontSize: 15, marginTop: 10 }}>{post.user.last_name} {post.user.first_name}</Text>
+                                        <Text style={{ fontSize: 15, marginTop: 10 }}>{getFullName(post.user.last_name,post.user.first_name)}</Text>
                                         <Button onPress={() => { }} style={{ marginLeft: 70, justifyContent: 'center' }} textColor="#FFBA00">Theo dõi</Button>
                                     </View>
                                     <Text style={{ margin: 10 }}>Đã tham gia {moment(post.user.date_joined).fromNow()}</Text>

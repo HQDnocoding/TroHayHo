@@ -37,7 +37,6 @@ const HomeStackNavigator = () => {
     }
     return (
         <Provider>
-            <BottomSendToFollowedContextProvider>
                 <Stack.Navigator
                     screenOptions={({ navigation, route }) => ({
                         headerShown: true,
@@ -90,7 +89,7 @@ const HomeStackNavigator = () => {
 
                 </Stack.Navigator>
 
-            </BottomSendToFollowedContextProvider>
+            
 
 
         </Provider>

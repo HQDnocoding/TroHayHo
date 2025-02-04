@@ -4,6 +4,7 @@ import { HeaderBackButton } from "@react-navigation/elements";
 import React from "react";
 import MessageScreen from "./MessageScreen";
 import { sampleImage,sampleAvatar } from "../../../utils/MyValues";
+import { getFullName } from "../../../utils/MyFunctions";
 const MessageStackNavigator = ({navigation,route}) => {
     const params = route.params || {};
     const { item, currentUser,partner } = params;
@@ -25,7 +26,7 @@ const MessageStackNavigator = ({navigation,route}) => {
                                 />
                             </View>
                             <Text style={{ color: '#fff', marginLeft: 10 }}>
-                                {partnerUser?.last_name} {partnerUser?.first_name}
+                                {getFullName(partnerUser?.last_name,partnerUser?.first_name)}
                             </Text>
                         </View>
                     ) : (

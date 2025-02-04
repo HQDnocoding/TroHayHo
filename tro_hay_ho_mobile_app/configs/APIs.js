@@ -3,12 +3,12 @@ import axios from "axios";
 
 
 // ip cua Duc:http://192.168.129.238:8000/
-//const BASE_URL="http://192.168.1.253:8000/"
+const BASE_URL="http://192.168.1.253:8000/"
 // const BASE_URL="http://192.168.1.55:8000/"
 // const BASE_URL="http://192.168.1.12:8000/"
 //const BASE_URL="http://192.168.103.238:8000/"
 // const BASE_URL = "https://hqd2004.pythonanywhere.com/"
-const BASE_URL = "http://192.168.1.11:8000/"
+// const BASE_URL = "http://192.168.1.11:8000/"
 // const BASE_URL = "http://192.168.1.196:8000/"
 
 
@@ -61,7 +61,9 @@ export const endpointsDuc = {
     'getListFollowPostWant': (userId) => `/basic-user-info/${userId}/post-want-following/`,
     'getListFollowPostForRent': (userId) => `/basic-user-info/${userId}/post-for-rent-following/`,
     'getListMeFollowing': (userId) => `/basic-user-info/${userId}/following/`,
+    'getListWhoFollowingMe': (userId) => `/basic-user-info/${userId}/who-following-me/`,
     'getPostParent': (postID) => `/post-parent/${postID}/`,
+    'getListPostParent': `/post-parent/`,
     'updateDetailNotification': (userId, postId) => `/basic-user-info/${userId}/detail-notification/${postId}/`,
     'updateShowPost': (userId, postId) => `/basic-user-info/${userId}/update-post-manager/${postId}/`,
     'deleteSoftPost': (userId, postId) => `/basic-user-info/${userId}/delete-post-manager/${postId}/`,
