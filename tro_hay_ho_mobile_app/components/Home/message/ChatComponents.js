@@ -6,6 +6,7 @@ import { formatTimeAgo } from '../../../utils/TimeFormat';
 import APIs, { endpointsDuc } from '../../../configs/APIs';
 import { useNavigation } from '@react-navigation/native';
 import { getFullName } from '../../../utils/MyFunctions';
+import { FontAwesome5 } from '@expo/vector-icons';
 const ChatMessage = ({ message, isOutgoing }) => {
   return (
     <View style={[styles.messageContainer, isOutgoing ? styles.endSide : styles.startSide]}>
@@ -33,7 +34,7 @@ const ChatImage = ({ message, isOutgoing }) => {
   );
 };
 const ChatPost = ({ message, isOutgoing }) => {
-  const nav=useNavigation()
+  const nav = useNavigation()
   const [post, setPost] = React.useState(null)
   const loadPost = async () => {
     try {
@@ -48,13 +49,13 @@ const ChatPost = ({ message, isOutgoing }) => {
   }
   const handleToRoute = () => {
     if (post !== null) {
-      let routeName 
+      let routeName
       if (post.type.toLowerCase() == POST_WANT) {
-        routeName= 'post_want'
-        
+        routeName = 'post_want'
+
       } else if (post.type.toLowerCase() == POST_FOR_RENT) {
         routeName = 'post_for_rent'
-        
+
       }
       let params = {
         postId: post.id,
@@ -73,9 +74,12 @@ const ChatPost = ({ message, isOutgoing }) => {
   }, [])
   return (
     <View style={[styles.messageContainer, isOutgoing ? styles.endSide : styles.startSide]}>
-      <Text style={[styles.messageText, isOutgoing ? styles.endSideText : styles.startSideText]}>
-        {message.text}
-      </Text>
+      <View style={{flexDirection:'row' ,alignItems:'center',justifyContent:'space-around'}}>
+        <FontAwesome5 name="share" size={15} color="black" />
+        <Text style={[styles.messageText, isOutgoing ? styles.endSideText : styles.startSideText]}>
+          {message.text}
+        </Text>
+      </View>
       {post && <>
         <TouchableOpacity onPress={handleToRoute}>
           {message.type_post === POST_FOR_RENT && <>
@@ -94,7 +98,7 @@ const ChatPost = ({ message, isOutgoing }) => {
               source={{ uri: post.user.avatar ? post.user.avatar : sampleAvatar }}
               style={styles.messageAvatar}
             />
-            <Text style={styles.textNameUser}>{getFullName(post.user.last_name,post.user.first_name)}</Text>
+            <Text style={styles.textNameUser}>{getFullName(post.user.last_name, post.user.first_name)}</Text>
           </View>
         </TouchableOpacity>
 
