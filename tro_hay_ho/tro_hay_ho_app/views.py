@@ -156,6 +156,7 @@ class UserViewSet(ViewSet, CreateAPIView):
         # Tạo OTP 6 số ngẫu nhiên
         otp = str(random.randint(100000, 999999))
         cache.set(phone_number, otp, timeout=300)
+        print(phone_number)
 
         # Gửi OTP qua Twilio
         try:
@@ -243,7 +244,10 @@ class TroImageViewSet(ViewSet,CreateAPIView):
     serializer_class=TroImageSerializer
     parser_classes=[MultiPartParser]
     
-
+def convert_to_international(phone_number):
+    if phone_number.startswith("0"):
+        return "+84" + phone_number[1:]
+    return phone_number
 
 class ChuTroViewSet(UserViewSet ):
     serializer_class=ChuTroSerializer
@@ -252,11 +256,26 @@ class ChuTroViewSet(UserViewSet ):
     
     def create(self, request, *args, **kwargs):
         print(request.data)
+        
         try:
             address_data=request.data.pop('address')
             username = request.data.get("username")
             phone = request.data.get("phone")
 
+            phone_format=convert_to_international(phone)
+            print(phone_format)
+            print(phone)
+            cached_otp = cache.get(phone_format)
+            print(cached_otp)
+            otp=request.data.pop("otp")
+            print(otp)
+            
+            if cached_otp is None:
+                return Response({"error": "OTP đã hết hạn hoặc không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if cached_otp != otp[0]:
+                return Response({"error": "OTP không chính xác"}, status=status.HTTP_400_BAD_REQUEST)
+            cache.delete(phone)
             if ChuTro.objects.filter(username=username).exists():
                 return Response({"error": "Username đã tồn tại."}, status=status.HTTP_400_BAD_REQUEST)
           

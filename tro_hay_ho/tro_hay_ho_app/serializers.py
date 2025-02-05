@@ -310,16 +310,7 @@ class CommentSerializer(ModelSerializer):
 
 class FavouritePostSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)
-
+    address=AddressSerializer(read_only=True,required=False)
     class Meta:
         model = FavoritePost
-        fields = ['id', 'created_date', 'updated_date', 'active', 'user', 'post']
-
-
-class PostImageSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField()
-    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all(), required=False)
-
-    class Meta:
-        model = PostImage
-        fields = '__all__'
+        fields = ['id', 'created_date', 'updated_date', 'active', 'user', 'post','address']
