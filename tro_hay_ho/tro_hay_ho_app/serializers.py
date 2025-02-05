@@ -65,7 +65,6 @@ class UserSerializer(ModelSerializer):
         user = User(**validated_data)
         user.set_password(user.password)
         print(user)
-        user.set_password(user.password)
         group = Group.objects.get(name=group_name[0])
 
         user.save()

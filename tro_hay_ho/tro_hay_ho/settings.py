@@ -194,11 +194,11 @@ def verify_firebase_token(id_token):
         return None  # Token không hợp lệ
     
 
-
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "unique-snowflake",
     }
 }
+
 

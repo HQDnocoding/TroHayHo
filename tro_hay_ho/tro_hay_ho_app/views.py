@@ -75,6 +75,7 @@ class UserViewSet(ViewSet, CreateAPIView):
             return [permissions.IsAuthenticated()]
 
         return [permissions.AllowAny()]
+    
 
     @action(methods=['get', 'post'], url_path='current-user', detail=False)
     def get_current_user(self, request):
@@ -304,6 +305,26 @@ class ChuTroViewSet(UserViewSet ):
         except Exception as e:
             raise APIException(f"An error occurred while processing the request: {str(e)}")    
 
+class IsOwnerPostForRentOrHasPermission(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.method in ['POST']:
+            return ALLOWED_GROUPS[0] in request.user.groups
+
+
+        return obj.user == request.user
+
+class IsOwnerPostWantOrHasPermission(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.method in ['POST']:
+            return ALLOWED_GROUPS[1] in request.user.groups
+
+        return obj.user == request.user
 
 
 
@@ -314,6 +335,9 @@ class PostWantViewSet(ModelViewSet):
     pagination_class = ItemPaginator
     parser_classes = [MultiPartParser, JSONParser]
 
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def get_permissions(self):
         if self.action in ['upadate', 'partial_update', 'destroy','create']:
@@ -341,26 +365,6 @@ class PostWantViewSet(ModelViewSet):
             return Response(CommentSerializer(comments, many=True).data)
 
 
-class IsOwnerPostForRentOrHasPermission(permissions.BasePermission):
-
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        if request.method in ['POST']:
-            return ALLOWED_GROUPS[0] in request.user.groups
-
-
-        return obj.user == request.user
-
-class IsOwnerPostWantOrHasPermission(permissions.BasePermission):
-
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        if request.method in ['POST']:
-            return ALLOWED_GROUPS[1] in request.user.groups
-
-        return obj.user == request.user
 
 
 
