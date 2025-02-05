@@ -12,7 +12,7 @@ import { MyUserContext } from '../../configs/UserContexts';
 import { getInfoPostFavoriteOfUser } from '../../utils/MyFunctions';
 import PostCard from './duc/post/PostCard';
 import RequestLoginDialog from "./duc/RequestLoginDialog";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const FollowingHome = () => {
   let currentUser
   const [visibleModelAddress, setVisibleModelAddress] = React.useState(false)
@@ -24,7 +24,7 @@ const FollowingHome = () => {
   const [pageForRent, setPageForRent] = React.useState(1);
   const [allPosts, setAllPosts] = React.useState([]);
   const [postFav, setPostFav] = React.useState([]);
-
+  const [token,setToken]= React.useState(null)
 
   const loadCurrentUser = () => {
     currentUser = useContext(MyUserContext)
@@ -106,6 +106,9 @@ const FollowingHome = () => {
 
   }
   const loadInfoFavoriteOfCurrentUser = async () => {
+    const newtoken = await AsyncStorage.getItem("access_token");
+    setToken(newtoken)
+    console.log(newtoken)
     if (currentUser !== null) {
       try {
         let data = await getInfoPostFavoriteOfUser(currentUser.id)
@@ -177,6 +180,7 @@ const FollowingHome = () => {
     <View style={styles.container}>
 
       {currentUser !== null ? <>
+      
         <FlatList
           refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
           data={allPosts}

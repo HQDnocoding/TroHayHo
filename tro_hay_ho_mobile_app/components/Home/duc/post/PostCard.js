@@ -10,9 +10,10 @@ import { useNavigation } from '@react-navigation/native';
 import PostWant from './PostWant';
 import PostForRent from './PostForRent';
 import React, { useState } from 'react';
-import APIs, { endpointsDuc } from '../../../../configs/APIs';
+import APIs, { authAPIs, endpointsDuc } from '../../../../configs/APIs';
 import { useRequestLoginDialog } from '../../../../utils/RequestLoginDialogContext';
 import { useBottomSendToFollowedContext } from '../../../../utils/BottomSendToFollowedContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
 
@@ -62,8 +63,9 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
     }
     const handleClickSaveBtn = async () => {
         if (currentUser !== null) {
+            const token = await AsyncStorage.getItem("access_token");
             let url = `${endpointsDuc.updateMeFavoritePost(currentUser.id, item.id)}`
-            let res = await APIs.patch(url, data_patch_active(!isSave))
+            let res = await authAPIs(token).patch(url, data_patch_active(!isSave))
             if (res.data.active !== null) {
                 setIsSave(res.data.active)
                 console.info(isSave)
@@ -149,7 +151,7 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
 
                 {isLoadingPost ? (
                     <View style={styles.loadingContainer}>
-                        <ActivityIndicator size="large" color={myYellow} />
+                        
                     </View>
                 ) : post && <>
                     {post.type.toLowerCase() === POST_WANT ?

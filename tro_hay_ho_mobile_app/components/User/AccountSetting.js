@@ -107,7 +107,7 @@ const AccountSetting = ({ navigation }) => {
                     </>
                 ) : (
                     <><View style={AccountUserStyle.headerRow1}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => {const infoUser=user; navigation.navigate('profile_user', { infoUser })}}>
                             <Image
                                 source={{ uri: user.avatar }}
                                 style={AccountUserStyle.avatar}
@@ -116,7 +116,7 @@ const AccountSetting = ({ navigation }) => {
                         {/* <Text style={AccountUserStyle.tag}>{role}</Text> */}
                     </View>
                         <View style={AccountUserStyle.headerRow2}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => {const infoUser=user; navigation.navigate('profile_user', { infoUser })}}>
                                 <Text style={AccountUserStyle.info} > {user?.first_name} {user?.last_name}</Text>
                             </TouchableOpacity>
 
