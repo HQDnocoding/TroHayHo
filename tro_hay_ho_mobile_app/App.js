@@ -128,20 +128,20 @@ export default function App() {
                         headerStyle: {
                             backgroundColor: '#FFBA00',
                         }
-                    }} />
-
+                    }}/>
+                
                 <Stack.Screen name='map' component={Map} options={{
                     title: "Chọn vị trí", headerStyle: {
                         backgroundColor: '#FFBA00',
                     }
                 }} />
                 <Stack.Screen
-                    name='following-list' component={FollowingTabScreenNavigator}
-                    options={{
-                        title: "", headerStyle: {
-                            backgroundColor: '#FFBA00',
-                        }
-                    }}
+                name='following-list' component={FollowingTabScreenNavigator}
+                options={{
+                    title: "", headerStyle: {
+                        backgroundColor: '#FFBA00',
+                    }
+                }}
                 />
 
             </Stack.Navigator>

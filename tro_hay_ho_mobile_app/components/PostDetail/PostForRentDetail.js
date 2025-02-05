@@ -44,7 +44,7 @@ const PostForRentDetail = ({ route }) => {
 
     return (
         <View style={styles.mainContainer}>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <ScrollView contentContainerStyle={styles.scrollContainer} >
                 {post === null ? <ActivityIndicator /> :
                     <>
                         <PostImage imgs={post.post_image} />
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     footBarContainer: {
         flexDirection: 'row',
         padding: 5,
-        position: 'absolute',
+        position: 'static',
         bottom: 0,
         width: '100%',
         height: 60,

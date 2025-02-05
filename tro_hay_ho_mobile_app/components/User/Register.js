@@ -1,16 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Button, HelperText, IconButton, RadioButton, TextInput } from "react-native-paper";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, Divider, HelperText, IconButton, RadioButton, TextInput } from "react-native-paper";
 import LoginStyles from "../../styles/dat/LoginStyles";
 import { Role } from "../../general/General";
 import APIs, { endpoints } from "../../configs/APIs";
 import PickedImages from "../PostCreating/PickedImages";
 import { launchImageLibrary } from "react-native-image-picker";
+import { ScrollView } from "react-native";
+import ExtendRegister from "./ExtendRegister";
+import { FlatList } from "react-native-gesture-handler";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import PostCard from "../Home/search/PostCard";
+import { useNavigation } from "@react-navigation/native";
 
+const Register = () => {
 
-const Register = ({ navigation }) => {
-
-
+    const navigation = useNavigation
     const [roles, setRoles] = useState([])
     const loadRole = async () => {
         const roles = await APIs.get(endpoints['roles']);
@@ -23,6 +28,19 @@ const Register = ({ navigation }) => {
 
     const [user, setUser] = useState({});
 
+    const [specifiedAddress, setSpecifiedAddress] = useState(null);
+
+    const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
+
+
+    const [address, setAddress] = useState({
+        'province': null, 'district': null,
+        'ward': null, 'specified_address': null
+    })
+
+    const [phone, setPhone] = useState(null)
     const users = {
         "first_name": {
             "title": "Tên",
@@ -59,25 +77,25 @@ const Register = ({ navigation }) => {
     const [secureTE, setSecureTE] = useState(true);
     const [checked, setChecked] = useState(Role.NGUOI_THUE_TRO);
 
-
-
     const change = (value, field) => {
         setUser({ ...user, [field]: value });
     }
 
-    const openImageLibrary = async () => {
+    const openImageLibrary = async ({ limit }) => {
         console.log("Chọn ảnh...");
         try {
             const res = await launchImageLibrary(
                 {
                     mediaType: "photo", // Chỉ chọn ảnh
-                    selectionLimit: 1, // Cho phép chọn nhiều ảnh
+                    selectionLimit: limit, // Cho phép chọn nhiều ảnh
                 }
             );
 
             if (res.didCancel) {
+                picked(false)
                 console.log("Người dùng hủy chọn ảnh");
             } else if (res.errorCode) {
+                picked(false)
                 Alert.alert("Lỗi", res.errorMessage);
             } else {
                 setImg(res.assets[0]);
@@ -90,186 +108,543 @@ const Register = ({ navigation }) => {
 
     };
 
+
     const removeImage = () => {
         console.log("ok")
         setImg('');
         setPicked(false);
     };
 
+
     const [picked, setPicked] = useState(false);
     const [img, setImg] = useState(null);
+    const [images, setImages] = useState([]);
 
-    const register = async () => {
+    const registerChuTro = async () => {
         try {
-            print("ok")
-            if (user.password !== user.confirm)
-                setErr(true);
-            else {
-                setErr(false);
-                let form = new FormData();
+            if (!user.username || user.username.includes(" ") || user.username.length < 8) {
+                alert("Tên đăng nhập phải có ít nhất 8 ký tự và không chứa khoảng trắng.");
+                return;
+            }
 
-                for (let key in user)
-                    if (key !== 'confirm') {
-                        form.append(key, user[key]);
-                    }
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+            if (!user.password.match(passwordRegex)) {
+                alert("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa và số, không chứa khoảng trắng.");
+                return;
+            }
 
+            if (user.password !== user.confirm) {
+                alert("Mật khẩu nhập lại không khớp.");
+                return;
+            }
 
-                form.append("avatar", {
-                    'name': img.fileName,
-                    'type': img.type,
-                    'uri': img.uri
-                });
-                form.append("phone", "");
-                console.log("groups", checked);
-                form.append("groups", checked);
-                console.log(roles)
-                // roles.forEach(r => {
-                //     if (r.name === checked) {
-                //         form.append('groups',r.id)
-                //     }
-                // })
-                console.log(form);
+            const phoneRegex = /^(0[0-9]{9})$/;
+            if (!phone.match(phoneRegex)) {
+                alert("Số điện thoại không hợp lệ.");
+                return;
+            }
 
-                setLoading(true);
-                try {
-                    let res = await APIs.post(endpoints['register'], form, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    });
-                    console.info(res.data);
-                } catch (error) {
-                    if (error.response) {
-                        console.error('Error response:', error.response.data);
-                        console.error('Status:', error.response.status);
-                        console.error('Headers:', error.response.headers);
-                    } else if (error.request) {
-                        console.error('Error request:', error.request);
-                    } else {
-                        console.error('Error message:', error.message);
-                    }
-                } finally {
-                    setLoading(false);
-                    navigation.navigate("login");
+            if (!address.province || !address.district || !address.ward || !specifiedAddress) {
+                alert("Vui lòng nhập đầy đủ thông tin địa chỉ.");
+                return;
+            }
 
+            if (images.length < 3) {
+                alert("Bạn phải tải lên ít nhất 3 hình ảnh.");
+                return;
+            }
+
+            let form = new FormData();
+
+            for (let key in user) {
+                if (key !== 'confirm') {
+                    form.append(key, user[key]);
                 }
             }
+
+            form.append("avatar", {
+                name: img.fileName,
+                type: img.type,
+                uri: img.uri
+            });
+            form.append("phone", phone);
+            form.append("groups", checked);
+
+            images.forEach(img => form.append("image_tro", {
+                name: img.fileName,
+                type: img.type,
+                uri: img.uri
+            }));
+
+            const addressJson = JSON.stringify({
+                province: address.province,
+                district: address.district,
+                ward: address.ward,
+                specified_address: specifiedAddress
+            });
+
+            form.append("address", addressJson);
+
+            console.log("Form Data:", form);
+
+            setLoading(true);
+            try {
+                let res = await APIs.post(endpoints['register-chu-tro'], form, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Accept': '*/*'
+                    }
+                });
+                console.info(res.data);
+                if (res.status == 201) {
+                    navigation.navigate('login');
+                }
+            } catch (error) {
+                if (error.response) {
+                    console.error('Error response:', error.response.data);
+                } else if (error.request) {
+                    console.error('Error request:', error.request);
+                } else {
+                    console.error('Error message:', error.message);
+                }
+            } finally {
+                setLoading(false);
+            }
         } catch (e) {
-            console.error(e)
+            console.error(e);
         } finally {
             setLoading(false);
         }
-
-    }
-
-
-    return (
-        <View >
-            <Text style={{ fontSize: 20, fontWeight: 800, padding: 15 }}>Đăng ký</Text>
-
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-
-                <HelperText type="error" visible={err}>
-                    Mật khẩu không khớp
-                </HelperText>
+    };
 
 
+    const register = async () => {
+        try {
+            if (!user.username || user.username.includes(" ") || user.username.length < 8) {
+                Alert.alert("Tên đăng nhập phải có ít nhất 8 ký tự và không chứa khoảng trắng.");
+                return;
+            }
 
-                <TextInput mode="outlined" key={users['username'].key}
-                    outlineColor="#CAC4D0"
-                    placeholderTextColor="#CAC4D0"
-                    activeOutlineColor="#FFBA00"
-                    style={LoginStyles.textInput} placeholder={users['username'].title}
-                    value={user['username']} onChangeText={t => change(t, 'username')} />
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+            if (!user.password.match(passwordRegex)) {
+                alert("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa và số, không chứa khoảng trắng.");
+                return;
+            }
 
-                <TextInput mode="outlined" key={users['first_name'].key}
-                    outlineColor="#CAC4D0"
-                    placeholderTextColor="#CAC4D0"
-                    activeOutlineColor="#FFBA00"
-                    style={LoginStyles.textInput} placeholder={users['first_name'].title}
-                    value={user['first_name']} onChangeText={t => change(t, 'first_name')} />
+            if (user.password !== user.confirm) {
+                alert("Mật khẩu nhập lại không khớp.");
+                return;
+            }
 
-                <TextInput mode="outlined" key={users['last_name'].key}
-                    outlineColor="#CAC4D0"
-                    placeholderTextColor="#CAC4D0"
-                    activeOutlineColor="#FFBA00"
-                    style={LoginStyles.textInput} placeholder={users['last_name'].title}
-                    value={user['last_name']} onChangeText={t => change(t, 'last_name')} />
-                <TextInput mode="outlined" key={users['password'].key}
-                    secureTextEntry={true}
-                    outlineColor="#CAC4D0"
-                    placeholderTextColor="#CAC4D0"
-                    activeOutlineColor="#FFBA00"
-                    style={LoginStyles.textInput} placeholder={users['password'].title}
-                    value={user['password']} onChangeText={t => change(t, 'password')} />
+            const phoneRegex = /^(0[0-9]{9})$/;
+            if (!phone.match(phoneRegex)) {
+                alert("Số điện thoại không hợp lệ.");
+                return;
+            }
 
-                <TextInput mode="outlined" key={users['confirm'].key}
-                    secureTextEntry={secureTE}
-                    outlineColor="#CAC4D0"
-                    right={<TextInput.Icon icon={users['password'].icon} onPress={() => setSecureTE(!secureTE)} />}
-                    placeholderTextColor="#CAC4D0"
-                    activeOutlineColor="#FFBA00"
-                    style={LoginStyles.textInput} placeholder={users['confirm'].title}
-                    value={user['confirm']} onChangeText={t => change(t, 'confirm')} />
-                <Text style={{ paddingStart: 20 }}>Bạn sử dụng ứng dụng với vai trò ?:</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', padding: 10, marginStart: 14 }}>
+            if (!img || !img.uri) {
+                alert("Vui lòng chọn ảnh đại diện.");
+                return;
+            }
 
+            let form = new FormData();
 
-                    <View style={{ flexDirection: 'column', width: 100 }} >
-                        <RadioButton
-                            color="#FFC11A"
-                            value={Role.NGUOI_THUE_TRO}
-                            status={checked === Role.NGUOI_THUE_TRO ? 'checked' : 'unchecked'}
-                            onPress={() => setChecked(Role.NGUOI_THUE_TRO)}
-                        />
-                        <Text>Người thuê trọ</Text>
-                    </View>
+            for (let key in user) {
+                if (key !== 'confirm') {
+                    form.append(key, user[key]);
+                }
+            }
 
-                    <View style={{ flexDirection: 'column', width: 100 }} >
-                        <RadioButton
-                            color="#FFC11A"
-                            value={Role.CHU_TRO}
-                            status={checked === Role.CHU_TRO ? 'checked' : 'unchecked'}
-                            onPress={() => setChecked(Role.CHU_TRO)}
-                        />
-                        <Text>Chủ trọ</Text>
-                    </View>
+            form.append("avatar", {
+                name: img.fileName,
+                type: img.type,
+                uri: img.uri
+            });
 
-                </View>
-                <View style={{ flexDirection: 'row', width: 100, marginStart: 30, alignItems: 'center' }}>
-                    <Text>Chọn avatar</Text>
-                    {picked === false ?
-                        <TouchableOpacity onPress={openImageLibrary}>
-                            <Image source={require('../../assets/noavatar.png')} style={{ width: 120, height: 120, borderRadius: 100, marginHorizontal: 20 }} />
-                        </TouchableOpacity>
-                        : <View style={{
-                            marginHorizontal: 4, position: 'relative',
-                            backgroundColor: '#F5F5F5', borderRadius: 100, padding: 10, height: 120,
-                            width: 120, alignItems: 'center', justifyContent: 'center',
-                            elevation: 1
-                        }}>
-                            <Image source={{ uri: img?.uri }} style={styles.image} />
-                            <IconButton
-                                style={{
-                                    position: 'absolute',
-                                    top: -16,
-                                    right: -10,
-                                    borderRadius: 12,
-                                    padding: 5,
-                                }}
-                                icon={"sticker-remove"}
-                                iconColor="black"
-                                onPress={removeImage}
-                            />
-                        </View>
+            form.append("phone", phone);
+            form.append("groups", checked);
+
+            console.log("Form Data:", form);
+
+            setLoading(true);
+            try {
+                let res = await APIs.post(endpoints['register'], form, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
                     }
+                });
+                console.info(res.data);
+                if (res.status == 201) {
+                    navigation.navigate('login');
+                }
+            } catch (error) {
+                if (error.response) {
+                    console.error('Error response:', error.response.data);
+                } else if (error.request) {
+                    console.error('Error request:', error.request);
+                } else {
+                    console.error('Error message:', error.message);
+                }
+            } finally {
+                setLoading(false);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
-                </View>
-                <Button style={{ margin: 15, borderRadius: 5, backgroundColor: '#FFBA00' }} loading={loading} mode="contained" onPress={register}>ĐĂNG KÝ</Button>
-            </KeyboardAvoidingView>
+    const sheetRef = useRef(null);
+    const sheetRef2 = useRef(null);
+    const sheetRef3 = useRef(null);
+    const snapPoints = useMemo(() => ["50%", "75%", "80%"], []);
+    const snapPoints2 = useMemo(() => ["50%", "75%", "80%"], []);
+    const snapPoints3 = useMemo(() => ["50%", "75%", "80%"], []);
+
+
+    const handleSnapPress = useCallback((index) => {
+
+        sheetRef.current?.snapToIndex(index);
+    }, []);
+
+    const handleSnapPress2 = useCallback((index) => {
+
+        sheetRef2.current?.snapToIndex(index);
+    }, []);
+
+
+    const handleSnapPress3 = useCallback((index) => {
+
+        sheetRef3.current?.snapToIndex(index);
+    }, []);
+    // Hàm load tỉnh/thành phố
+    const loadProvinces = async () => {
+        try {
+            const res = await APIs.get(endpoints["provinces"]);
+
+            setProvinces(res.data);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    // Hàm load quận/huyện
+    const loadDistricts = async ({ id }) => {
+        try {
+            const res = await APIs.get(endpoints["provinces-districts"](`${id}`));
+
+            setDistricts(res.data);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    // Hàm load phường/xã
+    const loadWards = async ({ pId, dId }) => {
+        try {
+            const res = await APIs.get(endpoints["provinces-districts-wards"](pId, dId));
+
+            setWards(res.data);
+        } catch (ex) {
+            console.error(ex);
+        }
+    };
+
+    useEffect(() => {
+        loadProvinces();
+
+    }, []);
+
+    const renderProvinces = useCallback(({ item }) => (
+        <TouchableOpacity onPress={() => {
+            handleSelectProvince(item.code);
+        }}>
+            <View style={{ flexDirection: 'row' }}>
+
+                <Text style={{ fontSize: 15, paddingVertical: 10, paddingStart: 20 }}>{item.name}</Text>
+
+                <Divider />
+            </View>
+        </TouchableOpacity>
+    ), []);
+
+    // Xử lý khi chọn tỉnh
+    const handleSelectProvince = (provinceId) => {
+        // Reset lại huyện và xã khi chọn tỉnh mới
+        setAddress({ province: provinceId, district: null, ward: null });
+        loadDistricts({ id: provinceId });
+        setSheetVisible2(true);
+        handleSnapPress2(0);
+    };
+
+    const renderDistricts = useCallback(({ item }) => (
+        <TouchableOpacity onPress={() => {
+            handleSelectDistrict(item.code);
+        }}>
+            <View style={{ flexDirection: 'row' }}>
+
+                <Text style={{ fontSize: 15, paddingVertical: 10, paddingStart: 20 }}>{item.name}</Text>
+
+                <Divider />
+            </View>
+        </TouchableOpacity>
+    ), [districts]);
+
+    // Xử lý khi chọn huyện
+    const handleSelectDistrict = (districtId) => {
+        setAddress((prev) => ({ ...prev, district: districtId, ward: null }));
+        loadWards({ pId: address.province, dId: districtId });
+        setSheetVisible3(true);
+        handleSnapPress3(0);
+    };
+
+
+    const renderWards = useCallback(({ item }) => (
+        <TouchableOpacity onPress={() => {
+            setAddress((prev) => ({ ...prev, ward: item.code }));
+            sheetRef.current?.close();
+            sheetRef2.current?.close();
+            sheetRef3.current?.close();
+            setWards([]);
+            setDistricts([]);
+        }}>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 15, paddingVertical: 10, paddingStart: 20 }}>{item.name}</Text>
+                <Divider />
+            </View>
+        </TouchableOpacity>
+    ), [wards]);
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                disappearsOnIndex={0}
+                appearsOnIndex={1}
+            />
+        ),
+        []
+    );
+
+    const [isSheetVisible1, setSheetVisible1] = useState(false);
+    const [isSheetVisible2, setSheetVisible2] = useState(false);
+    const [isSheetVisible3, setSheetVisible3] = useState(false);
+    const handleOpenSheet = () => {
+        setSheetVisible1(true); // Hiển thị BottomSheet
+        requestAnimationFrame(() => {
+            handleSnapPress(0);
+
+        });
+    };
+
+    const [errContent, setErrContent] = useState('');
+    return (
+        <View style={{ flex: 1 }}>
+            <FlatList
+                data={[]}
+                nestedScrollEnabled={true}
+                keyExtractor={(item) => item.id.toString()}
+                ListHeaderComponent={
+                    <View style={{ flexDirection: 'column' }}>
+                        <Text style={{ fontSize: 20, fontWeight: 800, padding: 15 }}>Đăng ký</Text>
+                        <HelperText type="error" visible={err}>
+                            {err}
+                        </HelperText>
+                        <TextInput mode="outlined" key={users['username'].key}
+                            outlineColor="#CAC4D0"
+                            placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00"
+                            style={LoginStyles.textInput} placeholder={users['username'].title}
+                            value={user['username']} onChangeText={t => change(t, 'username')} />
+
+                        <TextInput mode="outlined" key={users['first_name'].key}
+                            outlineColor="#CAC4D0"
+                            placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00"
+                            style={LoginStyles.textInput} placeholder={users['first_name'].title}
+                            value={user['first_name']} onChangeText={t => change(t, 'first_name')} />
+
+                        <TextInput mode="outlined" key={users['last_name'].key}
+                            outlineColor="#CAC4D0"
+                            placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00"
+                            style={LoginStyles.textInput} placeholder={users['last_name'].title}
+                            value={user['last_name']} onChangeText={t => change(t, 'last_name')} />
+                        <TextInput mode="outlined" key={users['password'].key}
+                            secureTextEntry={true}
+                            outlineColor="#CAC4D0"
+                            placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00"
+                            style={LoginStyles.textInput} placeholder={users['password'].title}
+                            value={user['password']} onChangeText={t => change(t, 'password')} />
+
+                        <TextInput mode="outlined" key={users['confirm'].key}
+                            secureTextEntry={secureTE}
+                            outlineColor="#CAC4D0"
+                            right={<TextInput.Icon icon={users['password'].icon} onPress={() => setSecureTE(!secureTE)} />}
+                            placeholderTextColor="#CAC4D0"
+                            activeOutlineColor="#FFBA00"
+                            style={LoginStyles.textInput} placeholder={users['confirm'].title}
+                            value={user['confirm']} onChangeText={t => change(t, 'confirm')} />
+
+
+
+                        <Text style={{ paddingStart: 20 }}>Bạn sử dụng ứng dụng với vai trò ?:</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', padding: 10, marginStart: 14 }}>
+
+
+                            <View style={{ flexDirection: 'column', width: 100 }} >
+                                <RadioButton
+                                    color="#FFC11A"
+                                    value={Role.NGUOI_THUE_TRO}
+                                    status={checked === Role.NGUOI_THUE_TRO ? 'checked' : 'unchecked'}
+                                    onPress={() => setChecked(Role.NGUOI_THUE_TRO)}
+                                />
+                                <Text>Người thuê trọ</Text>
+                            </View>
+
+                            <View style={{ flexDirection: 'column', width: 100 }} >
+                                <RadioButton
+                                    color="#FFC11A"
+                                    value={Role.CHU_TRO}
+                                    status={checked === Role.CHU_TRO ? 'checked' : 'unchecked'}
+                                    onPress={() => setChecked(Role.CHU_TRO)}
+                                />
+                                <Text>Chủ trọ</Text>
+                            </View>
+
+                        </View>
+
+
+                        <View style={{ flexDirection: 'row', width: 100, marginStart: 30, alignItems: 'center', marginTop: 10 }}>
+                            <Text>Chọn avatar</Text>
+                            {picked === false ?
+                                <TouchableOpacity onPress={() => openImageLibrary({ limit: 1 })}>
+                                    <Image source={require('../../assets/noavatar.png')} style={{ width: 120, height: 120, borderRadius: 100, marginHorizontal: 20 }} />
+                                </TouchableOpacity>
+                                : <View style={{
+                                    marginHorizontal: 4, position: 'relative',
+                                    backgroundColor: '#F5F5F5', borderRadius: 100, padding: 10, height: 120,
+                                    width: 120, alignItems: 'center', justifyContent: 'center',
+                                    elevation: 1
+                                }}>
+                                    <Image source={{ uri: img?.uri }} style={styles.image} />
+                                    <IconButton
+                                        style={{
+                                            position: 'absolute',
+                                            top: -16,
+                                            right: -10,
+                                            borderRadius: 12,
+                                            padding: 5,
+                                        }}
+                                        icon={"sticker-remove"}
+                                        iconColor="black"
+                                        onPress={removeImage}
+                                    />
+                                </View>
+                            }
+                        </View>
+                        {checked === Role.CHU_TRO ? <>
+                            <TouchableOpacity onPress={() => { handleOpenSheet() }}>
+
+                                <View>
+                                    <TextInput
+                                        mode="outlined"
+                                        outlineColor="#CAC4D0"
+                                        placeholderTextColor="#CAC4D0"
+                                        activeOutlineColor="#FFBA00"
+                                        editable={false}
+                                        style={{
+                                            backgroundColor: "white",
+                                            borderColor: "#FFBA00",
+                                            margin: 15,
+                                        }}
+                                        placeholder="Địa chỉ"
+                                        value={`${address.ward ? address.ward + ', ' : ''}${address.district ? address.district + ', ' : ''}${address.province}`} F
+                                    />
+                                </View>
+                            </TouchableOpacity>
+                            <TextInput mode="outlined"
+                                outlineColor="#CAC4D0"
+                                placeholderTextColor="#CAC4D0"
+                                activeOutlineColor="#FFBA00"
+                                style={LoginStyles.textInput} placeholder="Số điện thoại"
+                                value={phone} onChangeText={t => setPhone(t)} />
+                            <TextInput mode="outlined"
+                                outlineColor="#CAC4D0"
+                                placeholderTextColor="#CAC4D0"
+                                activeOutlineColor="#FFBA00"
+                                style={LoginStyles.textInput} placeholder="Địa chỉ cụ thể (Số nhà,Tên đường)"
+                                value={specifiedAddress} onChangeText={t => setSpecifiedAddress(t)} />
+                            <PickedImages imageList={images} setImageList={setImages} />
+
+                        </> : <></>}
+
+
+                        <Button style={{ margin: 15, borderRadius: 5, backgroundColor: '#FFBA00' }}
+                            loading={loading} mode="contained"
+                            onPress={() => {
+                                if (checked === Role.CHU_TRO) registerChuTro()
+                                else register()
+                            }}>ĐĂNG KÝ</Button>
+
+                    </View>} />
+            {isSheetVisible1 &&
+                <BottomSheet
+                    ref={sheetRef}
+                    snapPoints={snapPoints}
+                    enableDynamicSizing={false}
+                    enablePanDownToClose={true}
+                    backdropComponent={renderBackdrop}
+                >
+                    <Text>Tỉnh/Thành phố</Text>
+
+                    <BottomSheetFlatList
+                        data={provinces}
+                        renderItem={renderProvinces}
+                        keyExtractor={(item) => item.code.toString()}
+                        contentContainerStyle={{ backgroundColor: 'white' }}
+                    />
+                </BottomSheet>}
+            {isSheetVisible2 &&
+                <BottomSheet
+                    ref={sheetRef2}
+                    enablePanDownToClose={true}
+                    snapPoints={snapPoints2}
+                    enableDynamicSizing={false}
+                    backdropComponent={renderBackdrop}>
+                    <Text>Quận/Huyện</Text>
+                    <BottomSheetFlatList
+                        data={districts}
+                        indicatorStyle="default"
+                        renderItem={renderDistricts}
+                        keyExtractor={(item) => item.code.toString()}
+                        contentContainerStyle={{ backgroundColor: 'white' }}
+                    />
+
+                </BottomSheet>}
+            {isSheetVisible3 &&
+                <BottomSheet
+                    ref={sheetRef3}
+                    enablePanDownToClose={true}
+                    snapPoints={snapPoints3}
+                    enableDynamicSizing={false}
+                    backdropComponent={renderBackdrop}>
+                    <Text>Xã/Phường</Text>
+                    <BottomSheetFlatList
+                        data={wards}
+                        renderItem={renderWards}
+                        keyExtractor={(item) => item.code.toString()}
+                        contentContainerStyle={{ backgroundColor: 'white' }}
+                    />
+                </BottomSheet>}
+
         </View>
+
+
     )
+
 }
 
 

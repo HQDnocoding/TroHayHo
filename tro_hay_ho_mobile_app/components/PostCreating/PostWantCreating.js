@@ -109,6 +109,24 @@ const PostWantCreating = () => {
                     );
                     console.log(res);
 
+                    if (res.status == 201) {
+                        const notiForm = new FormData();
+                        notiForm.append('title', `Tài khoản tên ${user.last_name} ${user.first_name} vừa tạo bài tìm trọ!`);
+                        notiForm.append('content', `Bài đăng tựa đề ${postValues.title} vừa được đăng, hãy tương tác ngay!`)
+                        notiForm.append('post', res.data.id)
+                        try {
+                            authAPIs(token).post(endpoints['notifications'], notiForm,
+                                {
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                }
+                            )
+                        } catch (ex) {
+                            console.log(ex);
+                        }
+                    }
+
 
                 } catch (ex) {
                     console.error(ex);
@@ -365,7 +383,10 @@ const PostWantCreating = () => {
                                 editable={false}
                                 value={`${location.ward ? location.ward + ', ' : ''}${location.district ? location.district + ', ' : ''}${location.province}`}
                                 label={"Địa chỉ"}
-                                right={<TextInput.Icon icon={'arrow-right-drop-circle-outline'} onPress={() => { handleSnapPress(1) }} />}
+                                right={<TextInput.Icon icon={'arrow-right-drop-circle-outline'} onPress={() => {
+                                    loadProvinces();
+                                    handleSnapPress(1)
+                                }} />}
                                 activeOutlineColor="#FFBA00" >
                             </TextInput>
 

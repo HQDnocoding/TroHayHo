@@ -35,13 +35,34 @@ class User(AbstractUser):
     conversation = models.ManyToManyField('self', symmetrical=True, through='Conversation')
     notification_details = models.ManyToManyField('User', symmetrical=False, related_name='notifications',
                                                   through='DetailNotification')
-
+    email= models.EmailField(blank=True,null=True)
     class Meta:
         db_table = 'user'
-
+        constraints = [
+            models.UniqueConstraint(fields=['phone'], name='unique_phone')
+        ]
     def _str_(self):
         return self.username
 
+
+class ChuTro(User):
+    address= models.ForeignKey('Address', on_delete=models.CASCADE, related_name='chu_tros', related_query_name='chu_tro',
+                                null=False)
+    class Meta:
+        db_table = 'chu_tro'
+        
+
+        
+        
+class TroImage(BaseModel):
+    image_tro=CloudinaryField('image_tro',null=True)
+    chu_tro=models.ForeignKey('ChuTro',on_delete=models.CASCADE,related_name='image_tro')
+
+    @property
+    def get_url(self):
+        if self.image_tro:
+            return self.image_tro.url
+        return None
 
 class Following(BaseModel):
     """Thông tin follwing"""
@@ -174,7 +195,7 @@ class Comment(BaseModel):
 
 class Address(BaseModel):
     specified_address = models.TextField(null=False, blank=False)
-    coordinates = models.TextField(null=False, blank=False)
+    coordinates = models.TextField(null=True, blank=False)
     province = models.ForeignKey('Province', on_delete=models.SET_NULL, null=True, related_name='provinces')
     district = models.ForeignKey('District', on_delete=models.SET_NULL, null=True, related_name='districts')
     ward = models.ForeignKey('Ward', on_delete=models.SET_NULL, null=True, related_name='wards')

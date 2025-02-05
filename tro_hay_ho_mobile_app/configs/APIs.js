@@ -18,14 +18,16 @@ export const endpoints = {
     'current-user': '/users/current-user/',
     'add-phone-number': '/users/add-phone-number/',
     'send-otp': '/users/send-otp/',
-    'check-email':'/users/check-email/',
+    'check-email': '/users/check-email/',
+    'verify-otp-email': '/users/verify-otp-email/',
     'verify-otp': '/users/verify-otp/',
     'change-password': '/users/change-password/',
     'follow-me': '/users/follow-me/',
     'following': '/users/following/',
     'register': '/users/',
+    'register-chu-tro': '/chu-tro/',
     'google-login': '/google-login/',
-    'favourite-posts': '/users/favorites/',
+    'favourite-posts': '/users/favourites/',
     'roles': '/roles/',
     'address': '/addresses/',
     'getListPostWant': '/post-wants/',
@@ -38,7 +40,7 @@ export const endpoints = {
     'provinces': '/provinces/',
     'provinces-districts': (provinceId) => `/provinces/${provinceId}/districts/`,
     'provinces-districts-wards': (provinceId, districtId) => `/provinces/${provinceId}/districts/${districtId}/wards/`,
-    
+    'notifications': '/notifications/',
 }
 export const endpointsDuc = {
     'getListPostWantShow': '/post-wants-show/',
@@ -65,8 +67,6 @@ export const endpointsDuc = {
     'updateDetailNotification': (userId, postId) => `/basic-user-info/${userId}/detail-notification/${postId}/`,
     'updateShowPost': (userId, postId) => `/basic-user-info/${userId}/update-post-manager/${postId}/`,
     'deleteSoftPost': (userId, postId) => `/basic-user-info/${userId}/delete-post-manager/${postId}/`,
-
-
 }
 
 export const authAPIs = (token) => {

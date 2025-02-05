@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { MyUserContext } from "../../configs/UserContexts"
-import { Image, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native"
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native"
 import AccountSettingDetailStyle from "../../styles/dat/AccountSettingDetailStyle"
 import { Button, Switch, TextInput } from "react-native-paper"
 import { TouchableOpacity } from "react-native"
@@ -9,6 +9,8 @@ import OTPauth from "./OTPauth"
 import APIs, { authAPIs, endpoints } from "../../configs/APIs"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import ChangePassWord from "./ChangePassword"
+import OTPmail from "./OTPemail"
+import { formatPhoneNumber } from "../../utils/Formatter"
 
 
 
@@ -17,9 +19,10 @@ const AccountSettingDetail = () => {
     const [isSwitchOn, setIsSwitchOn] = useState(false);
     const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
     const [visibleDialog, setVisibleDialog] = useState(false);
+    const [visibleEmailDialog, setVisibleEmailDialog] = useState(false);
     const [visibleChangePW, setVisibleChangePw] = useState(false);
     const [email, setEmail] = useState(user.email);
-    const [isChangeEmail, setIsChangeEmail] = useState(false);
+    const [isChangeEmail, setIsChangeEmail] = useState(true);
     const [phone, setPhone] = useState(user.phone);
     const [isChanged, setIsChanged] = useState(true);
 
@@ -37,10 +40,39 @@ const AccountSettingDetail = () => {
     }, []);
 
     const handleChange = (text) => {
-
         setPhone(text);
-        if (text.text === user.phone)
-            setIsChanged(true);
+        setIsChanged(text === user.phone)
+    }
+    const handleEmailChange = (email) => {
+        setEmail(email)
+        setIsChangeEmail(email === user.email)
+    }
+
+    const handlePressSaveMail = () => {
+        setVisibleEmailDialog(true);
+        checkMail();
+    }
+
+    const checkMail = async () => {
+        const formData = new FormData();
+        formData.append('email', email);
+        try {
+            const res = await authAPIs(token).post(endpoints['check-email'], formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    }
+                }
+            )
+            if (res.status === 400) {
+                Alert.alert("", res.data.error);
+            } else {
+
+            }
+        } catch (ex) {
+            console.error(ex);
+        }
+
     }
 
     //twilio
@@ -49,27 +81,18 @@ const AccountSettingDetail = () => {
             console.log("send");
             const formData = new FormData();
             formData.append("phone_number", formatPhoneNumber(phone));
+            console.log(formData);
             const res = await APIs.post(endpoints['send-otp'], formData,
                 {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     }
                 })
+
         } catch (e) {
             console.error(e);
         }
     }
-
-    // const [confirmation, setConfirmation] = useState(null);
-
-    // const handleSendOTP = async () => {
-    //     const confirmationResult = await sendOTP(phone);
-    //     if (confirmationResult) {
-    //         setConfirmation(confirmationResult);
-    //         Alert.alert("Mã OTP đã gửi đến số điện thoại của bạn.");
-    //     }
-    //     console.log("po1", confirmationResult);
-    // };
 
     const handleOnPressSave = () => {
         setVisibleDialog(true);
@@ -81,8 +104,8 @@ const AccountSettingDetail = () => {
     return (
         <ScrollView style={AccountSettingDetailStyle.container}>
             <ChangePassWord isVisible={visibleChangePW} setIsVisible={setVisibleChangePw} token={token} />
-
-            <OTPauth isVisible={visibleDialog} setVisible={setVisibleDialog} phone={phone} token={token} />
+            <OTPmail isVisible={visibleEmailDialog} setVisible={setVisibleEmailDialog} token={token} email={email} />
+            <OTPauth isVisible={visibleDialog} setVisible={setVisibleDialog} phone={formatPhoneNumber(phone)} token={token} />
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={AccountSettingDetailStyle.section}>
                 <Text style={{ fontSize: 18, fontWeight: 700 }}>Thông tin cá nhân</Text>
                 <Text style={AccountSettingDetailStyle.labelInput}>Tên</Text>
@@ -94,10 +117,12 @@ const AccountSettingDetail = () => {
                 <Text style={AccountSettingDetailStyle.labelInput}>Email</Text>
                 <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
                     activeOutlineColor="#FFBA00"
+                    value={email}
+
+                    onChangeText={handleEmailChange}
                     right={<TextInput.Icon disabled={isChangeEmail} icon={"content-save"} onPress={() => {
-                        handleOnPressSave();
-                        sendOTP();
-                    }} />}>{user.email}</TextInput>
+                        handlePressSaveMail();
+                    }} />}></TextInput>
                 <Text style={AccountSettingDetailStyle.labelInput}>Số điện thoại</Text>
                 <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
                     activeOutlineColor="#FFBA00"

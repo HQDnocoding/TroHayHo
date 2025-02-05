@@ -17,9 +17,9 @@ import json
 from django.http import JsonResponse
 from oauth2_provider.admin import AccessTokenAdmin, ApplicationAdmin, GrantAdmin, IDTokenAdmin, RefreshTokenAdmin
 
-from .models import (User, PostWant, PostForRent, District, Province, Ward, Role, Address, 
-                     PostImage, Notification, Conversation, Message, DetailNotification, 
-                     Comment, Following, FavoritePost)
+from .models import (User, PostWant, PostForRent, District, Province, Ward, Role, Address,
+                     PostImage, Notification, Conversation, Message, DetailNotification,
+                     Comment, Following, FavoritePost, ChuTro, TroImage)
 
 class MyAdminSite(AdminSite):
     site_header = "Quản lý hệ thống"
@@ -38,25 +38,25 @@ class MyAdminSite(AdminSite):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
         type=request.GET.get('type')
-        
+
         users_query = User.objects.all()
-        
+
         if type.__eq__("all") or not type:
             pass
         elif type.__eq__("thuetro"):
             users_query = users_query.filter(groups__name="Người thuê trọ")
         elif type.__eq__("chutro"):
             users_query = users_query.filter(groups__name="Chủ trọ")
-        
+
         if start_date and end_date:
             users_query = users_query.filter(
                 date_joined__range=[start_date, end_date]
             )
-            
+
         monthly_stats = (
             users_query.annotate(month=TruncMonth('date_joined'))
             .values('month')
-            .annotate(total=Count('id'), 
+            .annotate(total=Count('id'),
                      active=Count('id', filter=Q(is_active=True)))
             .order_by('month')
         )
@@ -101,7 +101,7 @@ class MyAdminSite(AdminSite):
                 'active': item['active']
             } for item in yearly_stats])
         }
-        
+
         return render(request, "admin/statistics.html", context)
 
 
@@ -120,14 +120,50 @@ class UserAdmin(admin.ModelAdmin):
                 '<img src="/static/{url}" width="120" />' \
                     .format(url=obj.image.name)
             )
-    
+
     change_list_template = "admin/change_list_with_button.html"
 
+class TroImageInline(admin.TabularInline):
+    model = TroImage
+    extra = 1  # Số dòng trống để nhập ảnh mới
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
         extra_context["statistics_url"] = "/admin/statspanel/"
         return super().changelist_view(request, extra_context=extra_context)
 
+class ChuTroAdmin(admin.ModelAdmin):
+    inlines = [TroImageInline]
+    verbose_name = "Chủ trọ"
+    verbose_name_plural = "Danh sách Chủ trọ"
+    list_display = ['id', 'username', 'phone']
+
+    list_display = ['id', 'username', 'phone', 'is_active', 'date_joined']
+    list_filter = ['is_active']
+    ordering = ['-date_joined']
+
+    def avatar_display(self, obj):
+        if obj.avatar:
+            return mark_safe('<img src="{}" width="50" height="50" />'.format(obj.avatar.url))
+        return "No avatar"
+    avatar_display.short_description = 'Avatar'
+
+admin.site.register(User,UserAdmin)
+admin.site.register(ChuTro,ChuTroAdmin)
+admin.site.register(PostForRent)
+admin.site.register(PostWant)
+admin.site.register(Role)
+admin.site.register(Province)
+admin.site.register(District)
+admin.site.register(Ward)
+admin.site.register(Address)
+admin.site.register(PostImage)
+admin.site.register(Notification)
+admin.site.register(Conversation)
+admin.site.register(Message)
+admin.site.register(DetailNotification)
+admin.site.register(Comment)
+admin.site.register(Following)
+admin.site.register(FavoritePost)
 # Đăng ký model với custom admin
 custom_admin_site.register(User, UserAdmin)
 custom_admin_site.register(PostForRent)
