@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PostImage from "./PostImages";
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import APIs, { endpoints } from "../../configs/APIs";
@@ -16,7 +16,7 @@ const PostForRentDetail = ({ route }) => {
     const id = route.params.postId;
     const [post, setPost] = useState(null);
 
-
+    const inputRef = useRef(null)
     console.log("lll", route.params.coordinates)
     const [latitude, longitude] = route.params?.coordinates.split(", ").map(Number);
     const [centerCoordinates, setCenterCoordinates] = useState({
@@ -100,7 +100,7 @@ const PostForRentDetail = ({ route }) => {
                                         borderRadius: 10
                                     }}>
                                         <MapView
-                                        provider={PROVIDER_DEFAULT}
+                                            provider={PROVIDER_DEFAULT}
                                             style={{
                                                 height: 300,
                                                 borderRadius: 10
@@ -118,7 +118,7 @@ const PostForRentDetail = ({ route }) => {
                                                 radius={600}
                                                 strokeColor="rgba(0, 0, 255, 0.5)"
                                                 fillColor="rgba(0, 0, 255, 0.2)"
-                                                
+
                                             />
                                         </MapView>
                                     </View>
@@ -130,21 +130,28 @@ const PostForRentDetail = ({ route }) => {
                                 <View style={{ padding: 10, backgroundColor: '#F8F4F4', borderRadius: 20, borderWidth: 1, borderColor: '#D2D0D7' }} >
                                     <View style={{ flexDirection: 'row' }}>
                                         <Image style={{ height: 60, width: 60, marginHorizontal: 5 }} source={require('../../assets/google-logo.png')} resizeMode="contain" />
-                                        <Text style={{ fontSize: 15, marginTop: 10 }}>{getFullName(post.user.last_name,post.user.first_name)}</Text>
+                                        <Text style={{ fontSize: 15, marginTop: 10 }}>{getFullName(post.user.last_name, post.user.first_name)}</Text>
                                         <Button onPress={() => { }} style={{ marginLeft: 70, justifyContent: 'center' }} textColor="#FFBA00">Theo dõi</Button>
                                     </View>
                                     <Text style={{ margin: 10 }}>Đã tham gia {moment(post.user.date_joined).fromNow()}</Text>
                                 </View>
                             </View>
                         </View>
-                        <CommentScreen postId={id} routName={'pfr-comment'} />
+                        <CommentScreen ref={inputRef} postId={id} routName={'pfr-comment'} />
                     </>
                 }
             </ScrollView>
 
             <View style={styles.footBarContainer}>
                 <IconButton icon={'chat-outline'} size={30} onPress={() => { }} />
-                <TouchableOpacity style={{ borderRadius: 10, borderWidth: 1, borderColor: 'black', paddingHorizontal: 20, paddingVertical: 10 }} onPress={() => { }}>
+                <TouchableOpacity style={{ borderRadius: 10, borderWidth: 1, borderColor: 'black', paddingHorizontal: 20, paddingVertical: 10 }}
+                    onPress={() => {
+                        setTimeout(() => {
+                            console.log("Ref:", inputRef.current); 
+                            inputRef.current?.focus();
+                        }, 100); // Delay 100ms để đảm bảo UI đã cập nhật
+                    }}
+                >
                     <Text style={styles.text}>Bình luận</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{

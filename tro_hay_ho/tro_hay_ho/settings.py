@@ -64,7 +64,6 @@ INSTALLED_APPS = [
 #     'OTP_EXPIRATION_TIME': 3600  # In seconds only
 # }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 CKEDITOR_UPLOAD_PATH = "images/ckeditor/"
 
@@ -196,12 +195,13 @@ def verify_firebase_token(id_token):
     
 
 
-
-
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "unique-snowflake",
     }
 }
+
+
+
 

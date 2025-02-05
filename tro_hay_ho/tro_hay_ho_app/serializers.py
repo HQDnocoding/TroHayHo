@@ -63,6 +63,7 @@ class UserSerializer(ModelSerializer):
         group_name = validated_data.pop('groups')
         print(group_name)
         user = User(**validated_data)
+        user.set_password(user.password)
         print(user)
         user.set_password(user.password)
         group = Group.objects.get(name=group_name[0])
@@ -111,9 +112,10 @@ class ProvinceSerializer(ModelSerializer):
         
 class TroImageSerializer(ModelSerializer):
     image_tro=serializers.ImageField(required=False)
+    chu_tro = serializers.PrimaryKeyRelatedField(queryset=ChuTro.objects.all())
     class Meta:
         model=TroImage
-        fields=['image_tro']
+        fields='__all__'
         
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -128,17 +130,31 @@ class ChuTroSerializer(ModelSerializer):
         many=True
     )
     address=AddressSerializer(required=False,many=False)
-    image_tro=TroImageSerializer(many=  True,required=False)
+    image_tro=TroImageSerializer(many=  True,read_only=True,required=False)
     is_active=serializers.BooleanField(default=False,required=False,read_only=True)
     class Meta:
         model=ChuTro
-        fields =  ['id', 'username', 'first_name', 'last_name','email','address',
+        fields =  ['id', 'username', 'first_name', 'last_name','email','address','is_active',
                   'avatar', 'password', 'phone', 'date_joined', 'groups','image_tro']
         extra_kwargs = {
             'password': {
                 'write_only': True
             }
         }
+    def create(self, validated_data):
+        group_name = validated_data.pop('groups')
+        group = Group.objects.get(name=group_name[0])
+        data = validated_data.copy()
+        
+        u = ChuTro(**data)
+        u.set_password(u.password)
+        
+        u.save()
+        u.groups.add(group)
+        u.save()
+
+        return u 
+    
     def validate_password(self, value):
         """
         Kiểm tra mật khẩu:

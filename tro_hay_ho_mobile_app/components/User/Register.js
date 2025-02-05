@@ -1,30 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button, Divider, HelperText, IconButton, RadioButton, TextInput } from "react-native-paper";
 import LoginStyles from "../../styles/dat/LoginStyles";
 import { Role } from "../../general/General";
-import APIs, { endpoints } from "../../configs/APIs";
+import APIs, { authAPIs, endpoints } from "../../configs/APIs";
 import PickedImages from "../PostCreating/PickedImages";
 import { launchImageLibrary } from "react-native-image-picker";
-import { ScrollView } from "react-native";
-import ExtendRegister from "./ExtendRegister";
 import { FlatList } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import PostCard from "../Home/search/PostCard";
-import { useNavigation } from "@react-navigation/native";
 
-const Register = () => {
-
-    const navigation = useNavigation
-    const [roles, setRoles] = useState([])
-    const loadRole = async () => {
-        const roles = await APIs.get(endpoints['roles']);
-        setRoles(roles.data);
-    }
-
-    useEffect(() => {
-        loadRole();
-    }, []);
+const Register = ({ navigation }) => {
 
     const [user, setUser] = useState({});
 
@@ -33,6 +18,8 @@ const Register = () => {
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
+
+    const [addressName, setAddressName] = useState({ province: '', ward: '', district: '' })
 
 
     const [address, setAddress] = useState({
@@ -111,7 +98,7 @@ const Register = () => {
 
     const removeImage = () => {
         console.log("ok")
-        setImg('');
+        setImg(null);
         setPicked(false);
     };
 
@@ -120,37 +107,78 @@ const Register = () => {
     const [img, setImg] = useState(null);
     const [images, setImages] = useState([]);
 
+    const check = () => {
+        if (!user.first_name || user.first_name.trim() === "") {
+            setErrContent("Vui lòng điền tên");
+            setErr(true);
+            return false;
+        }
+        if (!user.last_name || user.last_name.trim() === "") {
+            setErrContent("Vui lòng điền họ");
+            setErr(true);
+
+            return false;
+        }
+
+        if (img === null) {
+            setErrContent("Vui lòng chọn avatar");
+            setErr(true);
+
+            return false;
+        }
+
+        if (!user.username || user.username.includes(" ") || user.username.length < 8) {
+            setErrContent("Tên đăng nhập phải có ít nhất 8 ký tự và không chứa khoảng trắng.");
+            setErr(true);
+
+            return false;
+        }
+
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)\S{8,}$/;
+        if (!passwordRegex.test(user.password)) {
+            setErrContent("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa và số, không chứa khoảng trắng.");
+            setErr(true);
+
+            return false;
+        }
+
+        if (user.password !== user.confirm) {
+            setErrContent("Mật khẩu xác nhận không khớp.");
+            setErr(true);
+            return false;
+        }
+        if (!img || !img.uri) {
+            setErrContent("Vui lòng chọn ảnh đại diện.");
+            setErr(true);
+
+            return;
+        }
+    }
+
+
     const registerChuTro = async () => {
         try {
-            if (!user.username || user.username.includes(" ") || user.username.length < 8) {
-                alert("Tên đăng nhập phải có ít nhất 8 ký tự và không chứa khoảng trắng.");
-                return;
-            }
+            console.log(1)
+            const valid = check();
+            if (valid === false) return;
 
-            const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-            if (!user.password.match(passwordRegex)) {
-                alert("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa và số, không chứa khoảng trắng.");
-                return;
-            }
-
-            if (user.password !== user.confirm) {
-                alert("Mật khẩu nhập lại không khớp.");
-                return;
-            }
 
             const phoneRegex = /^(0[0-9]{9})$/;
-            if (!phone.match(phoneRegex)) {
-                alert("Số điện thoại không hợp lệ.");
+            if (!phoneRegex.test(phone)) {
+                setErrContent("Số điện thoại không hợp lệ.");
+                setErr(true);
                 return;
             }
 
             if (!address.province || !address.district || !address.ward || !specifiedAddress) {
-                alert("Vui lòng nhập đầy đủ thông tin địa chỉ.");
+                setErrContent("Vui lòng nhập đầy đủ thông tin địa chỉ.");
+                setErr(true);
                 return;
             }
 
             if (images.length < 3) {
-                alert("Bạn phải tải lên ít nhất 3 hình ảnh.");
+                setErrContent("Bạn phải tải lên ít nhất 3 hình ảnh.");
+                setErr(true);
                 return;
             }
 
@@ -167,14 +195,12 @@ const Register = () => {
                 type: img.type,
                 uri: img.uri
             });
+
+            console.log("avatar", img.uri)
             form.append("phone", phone);
             form.append("groups", checked);
 
-            images.forEach(img => form.append("image_tro", {
-                name: img.fileName,
-                type: img.type,
-                uri: img.uri
-            }));
+
 
             const addressJson = JSON.stringify({
                 province: address.province,
@@ -197,16 +223,33 @@ const Register = () => {
                 });
                 console.info(res.data);
                 if (res.status == 201) {
-                    navigation.navigate('login');
+                    images.forEach(img => {
+                        const form_image = new FormData()
+                        form_image.append("image_tro", {
+                            name: img.fileName,
+                            type: img.type,
+                            uri: img.uri
+                        });
+                        console.log(res.data.id);
+
+                        form_image.append("chu_tro", res.data.id);
+                        console.log(form_image)
+                        APIs.post(endpoints['image-tro'], form_image, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            }
+                        });
+
+                    });
+
                 }
+                if (res.status == 201) { navigation.navigate('login'); }
             } catch (error) {
-                if (error.response) {
-                    console.error('Error response:', error.response.data);
-                } else if (error.request) {
-                    console.error('Error request:', error.request);
-                } else {
-                    console.error('Error message:', error.message);
+                if (error) {
+                    setErrContent(error.response.data);
+                    setErr(true);
                 }
+                console.log(error);
             } finally {
                 setLoading(false);
             }
@@ -214,38 +257,16 @@ const Register = () => {
             console.error(e);
         } finally {
             setLoading(false);
+
         }
     };
 
 
     const register = async () => {
         try {
-            if (!user.username || user.username.includes(" ") || user.username.length < 8) {
-                Alert.alert("Tên đăng nhập phải có ít nhất 8 ký tự và không chứa khoảng trắng.");
-                return;
-            }
 
-            const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-            if (!user.password.match(passwordRegex)) {
-                alert("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa và số, không chứa khoảng trắng.");
-                return;
-            }
-
-            if (user.password !== user.confirm) {
-                alert("Mật khẩu nhập lại không khớp.");
-                return;
-            }
-
-            const phoneRegex = /^(0[0-9]{9})$/;
-            if (!phone.match(phoneRegex)) {
-                alert("Số điện thoại không hợp lệ.");
-                return;
-            }
-
-            if (!img || !img.uri) {
-                alert("Vui lòng chọn ảnh đại diện.");
-                return;
-            }
+            const valid = check();
+            if (valid === false) return;
 
             let form = new FormData();
 
@@ -260,8 +281,7 @@ const Register = () => {
                 type: img.type,
                 uri: img.uri
             });
-
-            form.append("phone", phone);
+            console.log(checked)
             form.append("groups", checked);
 
             console.log("Form Data:", form);
@@ -279,12 +299,10 @@ const Register = () => {
                 }
             } catch (error) {
                 if (error.response) {
-                    console.error('Error response:', error.response.data);
-                } else if (error.request) {
-                    console.error('Error request:', error.request);
-                } else {
-                    console.error('Error message:', error.message);
-                }
+                    setErrContent(error.response.data);
+                    setErr(true);
+                };
+                console.log(error);
             } finally {
                 setLoading(false);
             }
@@ -360,6 +378,7 @@ const Register = () => {
     const renderProvinces = useCallback(({ item }) => (
         <TouchableOpacity onPress={() => {
             handleSelectProvince(item.code);
+            setAddressName({ province: item.name });
         }}>
             <View style={{ flexDirection: 'row' }}>
 
@@ -382,6 +401,7 @@ const Register = () => {
     const renderDistricts = useCallback(({ item }) => (
         <TouchableOpacity onPress={() => {
             handleSelectDistrict(item.code);
+            setAddressName(prev => ({ ...prev, district: item.name }));
         }}>
             <View style={{ flexDirection: 'row' }}>
 
@@ -404,6 +424,7 @@ const Register = () => {
     const renderWards = useCallback(({ item }) => (
         <TouchableOpacity onPress={() => {
             setAddress((prev) => ({ ...prev, ward: item.code }));
+            setAddressName((prev)=>({...prev,ward:item.name}))
             sheetRef.current?.close();
             sheetRef2.current?.close();
             sheetRef3.current?.close();
@@ -448,8 +469,7 @@ const Register = () => {
                 ListHeaderComponent={
                     <View style={{ flexDirection: 'column' }}>
                         <Text style={{ fontSize: 20, fontWeight: 800, padding: 15 }}>Đăng ký</Text>
-                        <HelperText type="error" visible={err}>
-                            {err}
+                        <HelperText type="error" visible={err}>{errContent}
                         </HelperText>
                         <TextInput mode="outlined" key={users['username'].key}
                             outlineColor="#CAC4D0"
@@ -509,7 +529,7 @@ const Register = () => {
                                     color="#FFC11A"
                                     value={Role.CHU_TRO}
                                     status={checked === Role.CHU_TRO ? 'checked' : 'unchecked'}
-                                    onPress={() => setChecked(Role.CHU_TRO)}
+                                    onPress={() => { setChecked(Role.CHU_TRO) }}
                                 />
                                 <Text>Chủ trọ</Text>
                             </View>
@@ -561,7 +581,7 @@ const Register = () => {
                                             margin: 15,
                                         }}
                                         placeholder="Địa chỉ"
-                                        value={`${address.ward ? address.ward + ', ' : ''}${address.district ? address.district + ', ' : ''}${address.province}`} F
+                                        value={`${addressName.ward ? addressName.ward + ', ' : ''}${addressName.district ? addressName.district + ', ' : ''}${addressName.province}`}
                                     />
                                 </View>
                             </TouchableOpacity>
@@ -585,8 +605,10 @@ const Register = () => {
                         <Button style={{ margin: 15, borderRadius: 5, backgroundColor: '#FFBA00' }}
                             loading={loading} mode="contained"
                             onPress={() => {
-                                if (checked === Role.CHU_TRO) registerChuTro()
-                                else register()
+                                setErr(false);
+                                if (checked === Role.CHU_TRO) registerChuTro();
+                                else register();
+
                             }}>ĐĂNG KÝ</Button>
 
                     </View>} />
@@ -662,7 +684,7 @@ const styles = StyleSheet.create({
         height: 120,
         margin: 2,
         borderRadius: 100,
-        resizeMode: 'contain'
+        resizeMode: 'cover'
     },
 });
 

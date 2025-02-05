@@ -10,7 +10,6 @@ r = DefaultRouter()
 r.register('users', UserViewSet, basename='user')
 r.register('chu-tro', ChuTroViewSet, basename='chu-tro')
 r.register('roles', AvailableGroupsView, basename='role')
-
 r.register('addresses', AddressViewSet, basename='address')
 r.register('post-wants', PostWantViewSet, basename='post_wants')
 r.register('post-for-rents', PostForRentViewSet, basename='post_for_rents')
@@ -18,7 +17,7 @@ r.register('provinces', ProvinceViewSet, basename='province')
 r.register('districts', DistrictViewSet, basename='district')
 r.register('wards', WardViewSet, basename='ward')
 r.register('images', PostImageView, basename='image')
-r.register('follows',FollowingView,basename='follow')
+r.register('images-tro',TroImageViewSet,basename='tro-image')
 r.register('notifications',NotificationViewSet,basename='notification')
 
 # ================== duc========================
@@ -35,7 +34,7 @@ r.register('detail-notification', duc_views.DetailNotificationViewSet, basename=
 # =============================================
 r.register('notifications', NotificationViewSet, basename='notifications')
 
-r.register('comments', CommentViewSet, basename='comment')
+# r.register('comments', CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('', include(r.urls)),

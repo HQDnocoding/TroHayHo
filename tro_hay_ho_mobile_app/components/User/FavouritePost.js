@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
-import APIs, { authAPIs, endpoints } from "../../configs/APIs";
-import { ActivityIndicator, FlatList, Image, RefreshControl, Text, View } from "react-native";
+import { useContext, useEffect, useState } from "react"
+import APIs, { authAPIs, endpoints, endpointsDuc } from "../../configs/APIs";
+import { ActivityIndicator, FlatList, Image, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Divider } from "react-native-paper";
+import { Divider, Icon } from "react-native-paper";
+import { MyUserContext } from "../../configs/UserContexts";
 
 
 
@@ -50,6 +51,9 @@ const FavouritePost = () => {
             setPage(page + 1);
         }
     };
+    const [isSave, setIsSave] = useState(false)
+
+    const currentUser = useContext(MyUserContext);
 
 
     useEffect(() => {
@@ -60,24 +64,38 @@ const FavouritePost = () => {
 
     const render = ({ item }) => {
         if (item.post.post_image.length === 0) {
-            return (<View style={{ flexDirection: 'row', marginBottom: 10 ,paddingStart:10}}>
+            return (<View style={{ flexDirection: 'row', marginBottom: 10, paddingStart: 10 }}>
                 <Image source={require('../../assets/45_donald_trump.png')} style={{ width: 100, height: 100 }} />
                 <View style={{ marginLeft: 20 }}>
-                    <Text style={{ fontSize: 20 }}>{item.post.title}</Text>
-                    <Text style={{ color: 'red' }}>{item.post.price} VNĐ</Text>
+                    <View style={{flexDirection:'row'}}>
+                        <Text style={{ fontSize: 20, fontWeight: 800 }}>{item.post.title}</Text>
 
+                        <TouchableOpacity>
+                            <Icon size={27} source="heart-outline"/>
+                        </TouchableOpacity>
+
+                    </View>
+                    <Text style={{ color: 'red', fontSize: 10 }}>{item.post.price} VNĐ</Text>
+                    <Text style={{ fontSize: 10, marginTop: 10 }}>{item.post.description}</Text>
                 </View>
             </View>
             )
         } else {
             return (<View>
-                <View style={{ flexDirection: 'row', marginBottom: 10,paddingStart:10}}>
+                <View style={{ flexDirection: 'row', marginBottom: 10, paddingStart: 10 }}>
                     <Image source={{ uri: item.post.post_image[0].image }}
                         style={{ width: 100, height: 100 }} />
                     <View style={{ marginLeft: 20 }}>
+                        <View >
+                            <Text style={{ fontSize: 20, fontWeight: 800 }}>{item.post.title}</Text>
 
-                        <Text style={{ fontSize: 20 }}>{item.post.title}</Text>
-                        <Text style={{ color: 'red' }}>{item.post.price} VNĐ</Text>
+                            <TouchableOpacity>
+                                <Icon size={27} source="cards-heart-outline" />
+                            </TouchableOpacity>
+
+                        </View>
+                        <Text style={{ color: 'red', fontSize: 10 }}>{item.post.price} VNĐ</Text>
+                        <Text style={{ fontSize: 10, marginTop: 10 }}>{item.post.description}</Text>
                     </View>
 
                 </View>
@@ -90,7 +108,7 @@ const FavouritePost = () => {
 
 
     return (
-        <View style={{ flex:1}}>
+        <View style={{ flex: 1 }}>
             <FlatList
                 data={favPosts}
                 renderItem={render}

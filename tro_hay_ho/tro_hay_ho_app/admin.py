@@ -13,10 +13,9 @@ from django.db.models import Count
 from django.db.models import Q
 import json
 from datetime import datetime, timedelta
-import json
+from django.utils.html import format_html
 from django.http import JsonResponse
 from oauth2_provider.admin import AccessTokenAdmin, ApplicationAdmin, GrantAdmin, IDTokenAdmin, RefreshTokenAdmin
-
 from .models import (User, PostWant, PostForRent, District, Province, Ward, Role, Address,
                      PostImage, Notification, Conversation, Message, DetailNotification,
                      Comment, Following, FavoritePost, ChuTro, TroImage)
@@ -130,22 +129,32 @@ class TroImageInline(admin.TabularInline):
         extra_context = extra_context or {}
         extra_context["statistics_url"] = "/admin/statspanel/"
         return super().changelist_view(request, extra_context=extra_context)
+    
+        readonly_fields = ('image_display',)
+
+    def image_display(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" width="50" height="50" />', obj.image.url)
+        return 'No Image'
+    image_display.short_description = 'Image' 
 
 class ChuTroAdmin(admin.ModelAdmin):
     inlines = [TroImageInline]
     verbose_name = "Chủ trọ"
     verbose_name_plural = "Danh sách Chủ trọ"
-    list_display = ['id', 'username', 'phone']
-
-    list_display = ['id', 'username', 'phone', 'is_active', 'date_joined']
+    
+    list_display = ['id', 'username', 'phone', 'avatar_display', 'is_active', 'date_joined']
+    
     list_filter = ['is_active']
     ordering = ['-date_joined']
 
     def avatar_display(self, obj):
         if obj.avatar:
-            return mark_safe('<img src="{}" width="50" height="50" />'.format(obj.avatar.url))
-        return "No avatar"
-    avatar_display.short_description = 'Avatar'
+            return format_html('<img src="{}" width="50" height="50" />', obj.avatar.url)
+        return 'No Image'
+    
+    avatar_display.short_description = 'Avatar' 
+
 
 admin.site.register(User,UserAdmin)
 admin.site.register(ChuTro,ChuTroAdmin)
@@ -175,7 +184,7 @@ custom_admin_site.register(DetailNotification)
 custom_admin_site.register(Comment)
 custom_admin_site.register(Following)
 custom_admin_site.register(FavoritePost)
-
+custom_admin_site.register(ChuTro,ChuTroAdmin)
 
 # Đăng ký Authentication and Authorization
 custom_admin_site.register(Group, GroupAdmin)

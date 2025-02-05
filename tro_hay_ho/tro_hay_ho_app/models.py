@@ -38,9 +38,7 @@ class User(AbstractUser):
     email= models.EmailField(blank=True,null=True)
     class Meta:
         db_table = 'user'
-        constraints = [
-            models.UniqueConstraint(fields=['phone'], name='unique_phone')
-        ]
+
     def _str_(self):
         return self.username
 

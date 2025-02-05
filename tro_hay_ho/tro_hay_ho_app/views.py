@@ -71,8 +71,7 @@ class UserViewSet(ViewSet, CreateAPIView):
 
     def get_permissions(self):
         if self.action in ['get_current_user', 'get_favorites', 'get_follow_me',
-                           'get_following', 'get_favorites', 'change_password'
-                                                             'send_otp', 'verify_otp']:
+                           'get_following', 'get_favorites', 'change_password']:
             return [permissions.IsAuthenticated()]
 
         return [permissions.AllowAny()]
@@ -240,6 +239,12 @@ class UserViewSet(ViewSet, CreateAPIView):
             return Response({"error": "OTP không chính xác"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class TroImageViewSet(ViewSet,CreateAPIView):
+    serializer_class=TroImageSerializer
+    parser_classes=[MultiPartParser]
+    
+
+
 class ChuTroViewSet(UserViewSet ):
     serializer_class=ChuTroSerializer
     parser_classes = [MultiPartParser, JSONParser]
@@ -248,14 +253,16 @@ class ChuTroViewSet(UserViewSet ):
     def create(self, request, *args, **kwargs):
         print(request.data)
         try:
-            
             address_data=request.data.pop('address')
-            images_data=request.data.pop('image_tro')
-            
-            if len(images_data) < 3:
-                return Response({"error": "Phải có ít nhất 3 hình ảnh."}, status=status.HTTP_400_BAD_REQUEST)
+            username = request.data.get("username")
+            phone = request.data.get("phone")
 
-            
+            if ChuTro.objects.filter(username=username).exists():
+                return Response({"error": "Username đã tồn tại."}, status=status.HTTP_400_BAD_REQUEST)
+          
+            if ChuTro.objects.filter(phone=phone).exists():
+                return Response({"error": "Số điện thoại đã tồn tại."}, status=status.HTTP_400_BAD_REQUEST)
+                
             address_dict = json.loads(address_data[0])
             serializer=AddressSerializer(data=address_dict)
             if serializer.is_valid():
@@ -266,12 +273,7 @@ class ChuTroViewSet(UserViewSet ):
                 if chu_tro_serializer.is_valid():
                     chu_tro_serializer.validated_data['is_active']=False
                     chu_tro=chu_tro_serializer.save(address=address)
-                    for image in images_data:
-                        image_serializer=TroImageSerializer(data={'image_tro':image})
-                        if image_serializer.is_valid():
-                            image_serializer.save(chu_tro=chu_tro) 
-                        else: 
-                            pass
+                    
                     return Response(ChuTroSerializer(chu_tro).data, status=status.HTTP_201_CREATED)
                 else: 
                     print(chu_tro_serializer.errors)  
@@ -414,10 +416,10 @@ class AddressViewSet(ModelViewSet):
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CommentViewSet(ModelViewSet):
-    queryset = Comment.objects.filter(active=True)
-    serializer_class = CommentSerializer
-    pagination_class = ItemSmallPaginator
+# class CommentViewSet(ModelViewSet):
+#     queryset = Comment.objects.filter(active=True)
+#     serializer_class = CommentSerializer
+#     pagination_class = ItemSmallPaginator
 
 
 def get_access_token():
@@ -625,12 +627,20 @@ class PostImageView(ModelViewSet):
 ALLOWED_GROUPS = ["Chủ trọ", "Người thuê trọ"]
 
 
+class AccessGroupPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "GET":
+            return True
+        return request.user.is_staff    
+
 class AvailableGroupsView(ModelViewSet):
     permission_classes = [permissions.AllowAny]
     queryset = Group.objects.filter(name__in=ALLOWED_GROUPS)
     serializer_class = GroupSerializer
 
+class IsOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user
 
-class FollowingView(ModelViewSet):
-    serializer_class = FollowingSerializer
-    queryset = Following.objects.filter(active=True)
+
+    

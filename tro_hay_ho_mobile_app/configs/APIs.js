@@ -3,12 +3,12 @@ import axios from "axios";
 
 
 // ip cua Duc:http://192.168.129.238:8000/
-const BASE_URL="http://192.168.1.253:8000/"
+// const BASE_URL="http://192.168.1.253:8000/"
 // const BASE_URL="http://192.168.1.55:8000/"
 // const BASE_URL="http://192.168.1.12:8000/"
 //const BASE_URL="http://192.168.103.238:8000/"
 // const BASE_URL = "https://hqd2004.pythonanywhere.com/"
-// const BASE_URL = "http://192.168.1.11:8000/"
+const BASE_URL = "http://192.168.1.11:8000/"
 // const BASE_URL = "http://192.168.1.196:8000/"
 
 
@@ -28,11 +28,11 @@ export const endpoints = {
     'register-chu-tro': '/chu-tro/',
     'google-login': '/google-login/',
     'favourite-posts': '/users/favourites/',
-    'roles': '/roles/',
     'address': '/addresses/',
     'getListPostWant': '/post-wants/',
     'getListPostForRent': '/post-for-rents/',
     'image': '/images/',
+    'image-tro':'/images-tro/',
     'post-for-rent-detail': (postId) => `/post-for-rents/${postId}/`,
     'post-want-detail': (postId) => `/post-wants/${postId}/`,
     'pw-comment': (postId) => `/post-wants/${postId}/comments/`,
