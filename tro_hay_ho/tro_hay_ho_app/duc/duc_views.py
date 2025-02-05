@@ -152,14 +152,14 @@ class BasicUserInfoViewSet(ModelViewSet):
     pagination_class = ItemSmallPaginator
     serializer_class = BasicUserInfoSerializer
     queryset = User.objects.filter(is_active=True)
-    required_scopes = ['read', 'write', 'groups']
+    # required_scopes = ['read', 'write', 'groups']
 
-    def get_permissions(self):
-        if self.action in ['update_me_following_you', 'get_detail_notification',
-                           'update_me_favotite_post',
-                          'me_favorite_post',]:
-            return [IsInRenterOrOwnerGroup(), TokenHasScope()]
-        return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     if self.action in ['update_me_following_you', 'get_detail_notification',
+    #                        'update_me_favotite_post',
+    #                       'me_favorite_post',]:
+    #         return [IsInRenterOrOwnerGroup(), TokenHasScope()]
+    #     return [permissions.AllowAny()]
     
     @action(detail=True,methods=['get'],url_path='detail-notification')
     def get_detail_notification(self,request,pk=None):
