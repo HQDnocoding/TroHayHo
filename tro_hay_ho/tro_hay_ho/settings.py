@@ -184,9 +184,9 @@ client_secret = 'AG1n41T3umckBclAVuc97nNwW0YJTqxpDUanvjS2yju0kxLpwSp88FtuOZesCxm
 
 OAUTH2_PROVIDER = { 
                    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
-                   'ACCESS_TOKEN_EXPIRE_SECONDS': 360000,
                     
                    }
+                #    'ACCESS_TOKEN_EXPIRE_SECONDS': 360000,
 
 
 
