@@ -11,13 +11,14 @@ import { useNavigation } from '@react-navigation/native';
 
 const PostForRent = ({ item }) => {
     const nav = useNavigation()
-    const handleToRote=()=>{
-        if(item!==null){
-            let routeName='post_for_rent' 
-            let params={
+    const handleToRote = () => {
+        if (item !== null) {
+            let routeName = 'post_for_rent'
+            let params = {
                 postId: item.id,
-                 coordinates: item.address.coordinates }
-            nav.navigate(routeName,params)
+                coordinates: item.address.coordinates
+            }
+            nav.navigate(routeName, params)
         }
     }
 
@@ -37,7 +38,11 @@ const PostForRent = ({ item }) => {
                         <View>
                             <Text style={styles.title} numberOfLines={2}>{item ? item.title : ""}</Text>
                             <Text style={styles.priceRed}>{item ? item.price : ""} đ/tháng</Text>
-                            <Text style={styles.acreage}>Diện tích: {item ? item.acreage : ""} m2</Text>
+                            <View style={{flexDirection:'row' ,justifyContent: 'space-between'}}>
+                                <Text style={styles.acreage}>Diện tích: {item ? item.acreage : ""} m2</Text>
+                                <Text style={styles.acreage}>Người ở tối đa: {item ? item.max_number_of_people : ""} </Text>
+
+                            </View>
 
                         </View>
                     </TouchableNativeFeedback>

@@ -19,6 +19,7 @@ import { endpointsDucFilter } from '../../../configs/UrlFilter';
 import APIs from '../../../configs/APIs';
 import { Searchbar } from 'react-native-paper';
 import myTheme from '../../../general/MyTheme';
+import BottomViewNumberPeople from './BottomView/BottomViewNumberPeople';
 
 const CustomRadioButton = ({ selected, onSelect }) => {
     const [animation] = useState(new Animated.Value(selected === 'newest' ? 0 : 1));
@@ -92,6 +93,7 @@ const BottomSheetType = {
     ACREAGE: 'ACREAGE',
     PRICE: 'PRICE',
     TYPE: 'TYPE',
+    NUMBER_PEOPLE: 'NUMBER_PEOPLE'
 };
 export const AddressEnum = {
     PROVINCE: 'PROVINCE',
@@ -114,6 +116,7 @@ export const SearchScreen = () => {
     const [urlFilter, setUrlFilter] = useState("/post-parent/?is_newest=1")
 
     //chi de hien thi
+    const [selectedNumberPeople, setSelectedNumberPeople] = useState('Không giới hạn người ở');
     const [selectedAcreage, setSelectedAcreage] = useState('Diện tích');
     const [selectedAddress, setSelectedAddress] = useState('Toàn quốc');
     const [selectedPrice, setSelectedPrice] = useState('Giá');
@@ -137,12 +140,15 @@ export const SearchScreen = () => {
     const [type, setType] = useState(TypeEnum.ALL);
     //timkiem
     const [title, setTitle] = useState("");
+    // so luong nguoi
+    const [numberPeople, setNumberPeople] = useState(0);
 
 
     const bottomAddressRef = useRef(null);
     const bottomPriceRef = useRef(null);
     const bottomTypeRef = useRef(null);
     const bottomAcreageRef = useRef(null);
+    const bottomNumberPeopleRef = useRef(null);
 
     const bottomProvincesRef = useRef(null);
     const bottomDistrictsRef = useRef(null);
@@ -157,6 +163,7 @@ export const SearchScreen = () => {
                 bottomAcreageRef.current?.close();
                 bottomPriceRef.current?.close();
                 bottomTypeRef.current?.close();
+                bottomNumberPeopleRef.current?.close();
 
                 bottomDistrictsRef.current?.close();
                 bottomWardsRef.current?.close();
@@ -168,6 +175,7 @@ export const SearchScreen = () => {
                 bottomAddressRef.current?.close();
                 bottomPriceRef.current?.close();
                 bottomTypeRef.current?.close();
+                bottomNumberPeopleRef.current?.close();
 
                 bottomDistrictsRef.current?.close();
                 bottomWardsRef.current?.close();
@@ -179,6 +187,7 @@ export const SearchScreen = () => {
                 bottomAcreageRef.current?.close();
                 bottomAddressRef.current?.close();
                 bottomTypeRef.current?.close();
+                bottomNumberPeopleRef.current?.close();
 
                 bottomDistrictsRef.current?.close();
                 bottomWardsRef.current?.close();
@@ -190,6 +199,19 @@ export const SearchScreen = () => {
                 bottomAcreageRef.current?.close();
                 bottomPriceRef.current?.close();
                 bottomAddressRef.current?.close();
+                bottomNumberPeopleRef.current?.close();
+
+                bottomDistrictsRef.current?.close();
+                bottomWardsRef.current?.close();
+                bottomProvincesRef.current?.close();
+                break;
+            case BottomSheetType.NUMBER_PEOPLE:
+                bottomNumberPeopleRef.current?.open();
+
+                bottomAcreageRef.current?.close();
+                bottomPriceRef.current?.close();
+                bottomAddressRef.current?.close();
+                bottomTypeRef.current?.close();
 
                 bottomDistrictsRef.current?.close();
                 bottomWardsRef.current?.close();
@@ -241,6 +263,9 @@ export const SearchScreen = () => {
             case BottomSheetType.TYPE:
                 bottomTypeRef.current?.close();
                 break;
+            case BottomSheetType.NUMBER_PEOPLE:
+                bottomNumberPeopleRef.current?.close();
+                break;
             default:
                 console.warn('Unknown bottom sheet type');
         }
@@ -262,10 +287,10 @@ export const SearchScreen = () => {
         }
     };
 
-    const handleChangeText =useCallback( (text) => {
+    const handleChangeText = useCallback((text) => {
         setTitle(text);
         console.info(text);
-    },[]);
+    }, []);
     const handleAddressSelected = (address) => {
         setSelectedProvince(address.province)
         setSelectedDistrict(address.district)
@@ -300,6 +325,13 @@ export const SearchScreen = () => {
     const handleTypeSelected = (newType) => {
         setType(newType)
         handleClose(BottomSheetType.TYPE);
+
+    };
+    const handleNumberPeopleSelected = (number) => {
+        setNumberPeople(parseInt(number))
+
+
+        handleClose(BottomSheetType.NUMBER_PEOPLE);
 
     };
     const handleProvinceSelected = (item) => {
@@ -385,9 +417,15 @@ export const SearchScreen = () => {
 
         }
 
-        if(title.trim()!==""){
-            url.kw_title(title.trim())
+        if(numberPeople>0){
+            url.number_people(numberPeople)
         }else{
+            url.params.delete('number_people')
+        }
+
+        if (title.trim() !== "") {
+            url.kw_title(title.trim())
+        } else {
             url.params.delete('kw_title');
 
         }
@@ -458,7 +496,7 @@ export const SearchScreen = () => {
             // </View>
         )
     }
-    const flatListHeader  = useMemo(() => {
+    const flatListHeader = useMemo(() => {
         return (
             <PaperProvider theme={myTheme}>
                 <View style={styles.mainContent}>
@@ -478,6 +516,12 @@ export const SearchScreen = () => {
                             selectedAcreage,
                             () => handleOpen(BottomSheetType.ACREAGE),
                             'speedometer-outline'
+                        )}
+                        {renderFilterButton(
+                            'Number',
+                            selectedNumberPeople,
+                            () => handleOpen(BottomSheetType.NUMBER_PEOPLE),
+                            'people-outline'
                         )}
                     </View>
                     <View style={styles.rowLine}>
@@ -519,7 +563,7 @@ export const SearchScreen = () => {
             </PaperProvider>
 
         )
-    },[title, handleChangeText, selectedAddress, selectedAcreage, selectedPrice, selectedType, sortBy, handleSortChange, handleFilter])
+    }, [title, handleChangeText, selectedAddress, selectedAcreage, selectedPrice, selectedType, sortBy, handleSortChange, handleFilter])
     React.useEffect(() => {
         if (selectedProvince.code === "-1") {
             setSelectedAddress("Toàn quốc")
@@ -552,13 +596,13 @@ export const SearchScreen = () => {
             setSelectedAcreage(`Mọi Diện tích`);
         } else if (minAcreage === 0) {
 
-            setSelectedAcreage(`< ${maxAcreage}`);
+            setSelectedAcreage(`< ${maxAcreage} m2`);
         } else if (maxAcreage === 0) {
-            setSelectedAcreage(`> ${minAcreage}`);
+            setSelectedAcreage(`> ${minAcreage} m2`);
 
         } else {
 
-            setSelectedAcreage(`${minAcreage} - ${maxAcreage}`);
+            setSelectedAcreage(`${minAcreage} - ${maxAcreage} (m2)`);
 
         }
 
@@ -582,6 +626,17 @@ export const SearchScreen = () => {
 
 
     }, [type])
+    React.useEffect(() => {
+        if (numberPeople === 0) {
+
+            setSelectedNumberPeople("Không giới hạn người ở");
+        } else {
+
+            setSelectedNumberPeople(`người ở > ${numberPeople}`);
+
+        }
+
+    }, [numberPeople])
     React.useEffect(() => {
         if (page > 0) {
 
@@ -624,6 +679,10 @@ export const SearchScreen = () => {
             <BottomViewAcreage
                 ref={bottomAcreageRef}
                 onSelectAcreage={handleAcreageSelected}
+            />
+            <BottomViewNumberPeople
+                ref={bottomNumberPeopleRef}
+                onSelectNumberPeople={handleNumberPeopleSelected}
             />
             <BottomViewType
                 ref={bottomTypeRef}

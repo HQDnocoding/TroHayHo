@@ -386,6 +386,7 @@ class PostParentViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         ward_code = self.request.query_params.get('ward_code')
         kw_title = self.request.query_params.get('kw_title')
         is_newest = self.request.query_params.get('is_newest')
+        number_people = self.request.query_params.get('number_people')
 
         # sap xep lai thu tu
         if is_newest is not None:
@@ -413,6 +414,10 @@ class PostParentViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
                     queryset = queryset.filter(postforrent__acreage__gte=float(min_acreage))
                 if max_acreage:
                     queryset = queryset.filter(postforrent__acreage__lte=float(max_acreage))
+                    
+                if number_people:
+                    queryset = queryset.filter(postforrent__max_number_of_people__lte=int(number_people))
+                
 
         if province_code:
             queryset = queryset.filter(address__province=province_code)

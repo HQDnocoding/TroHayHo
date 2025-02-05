@@ -52,6 +52,10 @@ class URLBuilder {
         if (value!==null) this.params.set('is_newest', value);
         return this;
       }
+    number_people(value){
+      if (value) this.params.set('number_people', value);
+      return this;
+    }
     build() {
       const queryString = this.params.toString();
       return queryString ? `${this.baseUrl}?${queryString}` : this.baseUrl;
