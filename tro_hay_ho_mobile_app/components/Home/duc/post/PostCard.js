@@ -16,7 +16,7 @@ import { useBottomSendToFollowedContext } from '../../../../utils/BottomSendToFo
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
-
+    console.log("post card",item)
     const nav = useNavigation()
     const { showDialog } = useRequestLoginDialog()
     const { openBottomSheet, assignPost } = useBottomSendToFollowedContext();
@@ -33,7 +33,13 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
     const loadUser = async () => {
         try {
             setIsLoadingUser(true)
-            const res = await APIs.get(endpointsDuc.getBasicUserInfoByUserId(item.user))
+            let res
+             if (Number.isFinite(item.user)) {
+                res= await APIs.get(endpointsDuc.getBasicUserInfoByUserId(item.user))
+
+            }else{
+                res= await APIs.get(endpointsDuc.getBasicUserInfoByUserId(item.user.id))
+            }
             if (res.data) {
                 setInfoUser(res.data)
             }
