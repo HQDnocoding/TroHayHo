@@ -21,9 +21,9 @@ const AccountSettingDetail = () => {
     const [visibleDialog, setVisibleDialog] = useState(false);
     const [visibleEmailDialog, setVisibleEmailDialog] = useState(false);
     const [visibleChangePW, setVisibleChangePw] = useState(false);
-    const [email, setEmail] = useState(user.email);
+    const [email, setEmail] = useState(user.email !== null ? user.email : '');
     const [isChangeEmail, setIsChangeEmail] = useState(true);
-    const [phone, setPhone] = useState(user.phone);
+    const [phone, setPhone] = useState(user.phone !== null ? user.phone : '');
     const [isChanged, setIsChanged] = useState(true);
 
 
@@ -41,17 +41,23 @@ const AccountSettingDetail = () => {
 
     const handleChange = (text) => {
         setPhone(text);
-        setIsChanged(text === user.phone)
+        if (user.phone !== null)
+            setIsChanged(text === user.phone);
+        else setIsChanged(true);
     }
     const handleEmailChange = (email) => {
         setEmail(email)
-        setIsChangeEmail(email === user.email)
+        if (user.email !== null)
+            setIsChangeEmail(email === user.email);
+        else setIsChanged(true);
     }
 
     const handlePressSaveMail = () => {
         setVisibleEmailDialog(true);
         checkMail();
     }
+
+
 
     const checkMail = async () => {
         const formData = new FormData();
@@ -109,15 +115,15 @@ const AccountSettingDetail = () => {
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={AccountSettingDetailStyle.section}>
                 <Text style={{ fontSize: 18, fontWeight: 700 }}>Thông tin cá nhân</Text>
                 <Text style={AccountSettingDetailStyle.labelInput}>Tên</Text>
-                <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
+                <TextInput disabled={true}  mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
                     activeOutlineColor="#FFBA00" >{user.first_name}</TextInput>
                 <Text style={AccountSettingDetailStyle.labelInput}>Họ và chữ lót</Text>
-                <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
+                <TextInput disabled={true}  mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
                     activeOutlineColor="#FFBA00" >{user.last_name}</TextInput>
                 <Text style={AccountSettingDetailStyle.labelInput}>Email</Text>
                 <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
                     activeOutlineColor="#FFBA00"
-                    value={email}
+                    value={email ? email : ''}
 
                     onChangeText={handleEmailChange}
                     right={<TextInput.Icon disabled={isChangeEmail} icon={"content-save"} onPress={() => {
@@ -127,7 +133,7 @@ const AccountSettingDetail = () => {
                 <TextInput mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
                     activeOutlineColor="#FFBA00"
                     onChangeText={handleChange}
-                    value={phone}
+                    value={phone ? phone : ''}
                     right={<TextInput.Icon disabled={isChanged} icon={"content-save"} onPress={() => {
                         handleOnPressSave();
                         sendOTP();

@@ -8,6 +8,7 @@ import 'moment/locale/vi';
 import MapView, { Circle, Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from 'react-native-maps';
 import CommentScreen from "./CommentPostWant";
 import { getFullName } from "../../utils/MyFunctions";
+import { formatPrice } from "../../utils/Formatter";
 
 moment.locale('vi');
 
@@ -16,7 +17,6 @@ const PostForRentDetail = ({ route }) => {
     const id = route.params.postId;
     const [post, setPost] = useState(null);
 
-    const inputRef = useRef(null)
     console.log("lll", route.params.coordinates)
     const [latitude, longitude] = route.params?.coordinates.split(", ").map(Number);
     const [centerCoordinates, setCenterCoordinates] = useState({
@@ -51,7 +51,7 @@ const PostForRentDetail = ({ route }) => {
                         <View style={styles.containerTitle}>
                             <Text style={styles.title}>{post.title}</Text>
                             <View style={styles.containerHeader}>
-                                <Text style={styles.price}>{post.price}/tháng</Text>
+                                <Text style={styles.price}>{formatPrice(post.price)}/tháng</Text>
                                 <Text style={styles.text}>• {post.acreage}m²</Text>
                                 <Text style={styles.text}>• Tối đa {post.max_number_of_people} người</Text>
                             </View>
@@ -60,7 +60,7 @@ const PostForRentDetail = ({ route }) => {
                                 <View style={styles.containerHeader}>
                                     <Icon style={styles.addressIcon} source={'map-marker'} size={23} />
                                     <Text style={styles.address}>
-                                        {post.address.specified_address}
+                                        {post.address.specified_address} {post.address.ward}
                                     </Text>
                                 </View>
                                 <View style={styles.containerHeader}>
@@ -137,7 +137,7 @@ const PostForRentDetail = ({ route }) => {
                                 </View>
                             </View>
                         </View>
-                        <CommentScreen ref={inputRef} postId={id} routName={'pfr-comment'} />
+                        <CommentScreen postId={id} routName={'pfr-comment'} />
                     </>
                 }
             </ScrollView>

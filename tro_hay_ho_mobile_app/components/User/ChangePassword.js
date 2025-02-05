@@ -55,7 +55,7 @@ const ChangePassWord = ({ isVisible, setIsVisible, token }) => {
     }
 
     useEffect(() => {
-        if (oldPw === '' || newPw === '' || newPwConfirming === '' || newPw !== newPwConfirming) {
+        if (oldPw === '' || newPw === '' || newPwConfirming === '' || newPw == newPwConfirming) {
             setEnable(false)
         } else setEnable(true);
     }, [oldPw, newPw, newPwConfirming]);
@@ -71,7 +71,7 @@ const ChangePassWord = ({ isVisible, setIsVisible, token }) => {
                             style={{}}
                             onChangeText={setOldPw}
                             mode='outlined'
-                            keyboardType="number-pad"
+                            secureTextEntry={true}
                         />
                     </Dialog.Content>
                     <Dialog.Content>
@@ -79,15 +79,15 @@ const ChangePassWord = ({ isVisible, setIsVisible, token }) => {
                             style={{}}
                             onChangeText={setNewPw}
                             mode='outlined'
-                            keyboardType="number-pad"
+                            secureTextEntry={true}
                         />
                     </Dialog.Content>
                     <Dialog.Content>
                         <TextInput label="Xác nhận mật khẩu mới"
                             style={{}}
+                            secureTextEntry={true}
                             onChangeText={setNewPwConfirming}
                             mode='outlined'
-                            keyboardType="number-pad"
                         />
                     </Dialog.Content>
                     <Dialog.Actions>

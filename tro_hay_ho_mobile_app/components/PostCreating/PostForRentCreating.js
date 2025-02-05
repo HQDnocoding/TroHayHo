@@ -25,11 +25,11 @@ const PostForRentCreating = () => {
     };
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
     const [pId, setPId] = useState(null);
     const [dId, setDId] = useState(null);
     const [wId, setWId] = useState(null);
     const [location, setLocation] = useState({ province: '', district: '', ward: '' });
-    const [wards, setWards] = useState([]);
     const sheetRef = useRef(null);
     const sheetRef2 = useRef(null);
     const sheetRef3 = useRef(null);
@@ -188,6 +188,7 @@ const PostForRentCreating = () => {
                     setDistricts('');
                     setData({ coordinates: '', district: '', province: '', specified_address: '', ward: '' })
                     setProvinces('');
+
                     setWards('');
                     setImageList([]);
                 }
@@ -235,6 +236,7 @@ const PostForRentCreating = () => {
 
     const loadProvinces = async () => {
         try {
+            loadProvinces();
             const res = await APIs.get(endpoints["provinces"]);
             const provinces = res.data;
             setProvinces(provinces);
@@ -262,12 +264,6 @@ const PostForRentCreating = () => {
             console.error(ex);
         }
     }
-
-    useEffect(() => {
-        loadProvinces();
-    }, []);
-
-
 
     const handleSnapPress = useCallback((index) => {
 
@@ -403,6 +399,7 @@ const PostForRentCreating = () => {
                         <TextInput style={styles.input} mode="outlined"
                             label={"Tên bài đăng"}
                             outlineColor="#CAC4D0"
+                            value={postValues.title}
                             onChange={(newText) => {
                                 const textValue = newText.nativeEvent.text;
                                 setPostValues((prev) => ({
@@ -419,6 +416,7 @@ const PostForRentCreating = () => {
                             outlineColor="#CAC4D0"
                             label={"Mô tả"}
                             multiline={true}
+                            value={postValues.description}
                             onChange={(newText) => {
                                 const textValue = newText.nativeEvent.text;
                                 setPostValues((prev) => ({
@@ -434,6 +432,7 @@ const PostForRentCreating = () => {
                             outlineColor="#CAC4D0"
                             label={"Tên người đại diện bên cho thuê"}
                             multiline={true}
+                            value={postValues.name_agent}
                             onChange={(newText) => {
                                 const textValue = newText.nativeEvent.text;
                                 setPostValues((prev) => ({
@@ -451,7 +450,7 @@ const PostForRentCreating = () => {
                         <TextInput style={styles.input} mode="outlined"
                             outlineColor="#CAC4D0"
                             label={"Số người ở tối đa"}
-
+                            value={postValues.max_number_of_people}
                             placeholderTextColor="#CAC4D0"
                             onChange={(newText) => {
                                 const textValue = newText.nativeEvent.text;
@@ -466,6 +465,7 @@ const PostForRentCreating = () => {
                         <TextInput style={styles.input} mode="outlined"
                             outlineColor="#CAC4D0"
                             label={"Diện tích"}
+                            value={postValues.acreage}
                             keyboardType="number-pad"
                             onChange={(newText) => {
                                 const textValue = newText.nativeEvent.text;
@@ -486,7 +486,7 @@ const PostForRentCreating = () => {
                     <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
                         <Text style={styles.label}>Địa chỉ</Text>
                     </View>
-                    <TouchableWithoutFeedback onPress={() => { handleSnapPress(2) }}>
+                    <TouchableWithoutFeedback onPress={() => { loadProvinces(),handleSnapPress(2) }}>
                         <View style={styles.flexRow}>
 
                             <TextInput style={styles.input} mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"
@@ -504,7 +504,7 @@ const PostForRentCreating = () => {
                     <View style={styles.flexRow}>
                         <TextInput style={styles.input} mode="outlined"
                             outlineColor="#CAC4D0"
-
+                            value={postValues.specified_address}
                             label={"Số nhà, Tên đường"}
                             onChange={(newText) => {
                                 // Lấy giá trị từ sự kiện trước khi sử dụng
@@ -560,7 +560,7 @@ const PostForRentCreating = () => {
                 <BottomSheetFlatList
                     data={provinces}
                     renderItem={renderProvinces}
-                    keyExtractor={(item) => item.code.toString()}
+                    keyExtractor={(item) => item?.code.toString()}
                     contentContainerStyle={{ backgroundColor: 'white' }}
                 />
             </BottomSheet>
@@ -574,7 +574,7 @@ const PostForRentCreating = () => {
                     data={districts}
                     indicatorStyle="default"
                     renderItem={renderDistricts}
-                    keyExtractor={(item) => item.code.toString()}
+                    keyExtractor={(item) => item?.code.toString()}
                     contentContainerStyle={{ backgroundColor: 'white' }}
                 />
 
@@ -589,7 +589,7 @@ const PostForRentCreating = () => {
                 <BottomSheetFlatList
                     data={wards}
                     renderItem={renderWards}
-                    keyExtractor={(item) => item.code.toString()}
+                    keyExtractor={(item) => item?.code.toString()}
                     contentContainerStyle={{ backgroundColor: 'white' }}
                 />
             </BottomSheet>

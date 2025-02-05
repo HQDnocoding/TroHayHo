@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import APIs, { authAPIs, endpoints } from "../../configs/APIs";
 import moment from "moment";
@@ -7,7 +7,7 @@ import { FlatList } from "react-native";
 import { MyUserContext } from "../../configs/UserContexts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CommentScreen = ({ postId, routName, ref }) => {
+const CommentScreen = ({ postId, routName }) => {
     const user = useContext(MyUserContext);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -180,7 +180,6 @@ const CommentScreen = ({ postId, routName, ref }) => {
                     )}
 
                     <TextInput
-                        ref={ref}
                         mode="flat"
                         style={styles.input}
                         placeholder="Thêm bình luận..."

@@ -1,6 +1,6 @@
     import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
     import CommentScreen from "./CommentPostWant"
-    import { useEffect, useRef, useState } from "react";
+    import { useEffect,  useState } from "react";
     import APIs, { endpoints } from "../../configs/APIs";
     import { ActivityIndicator, Button, Divider, Icon } from "react-native-paper";
     import moment from "moment";
@@ -10,7 +10,6 @@
 
 
     const PostWantDetail = ({ route }) => {
-        const inputRef = useRef(null);
 
         const postId = route.params.postId;
 
@@ -46,7 +45,7 @@
                 {post === null ? < ActivityIndicator /> :
                     <View style={styles.container}>
                         <View style={styles.userContainer}>
-                            <Image style={styles.avatar} source={{ uri: post.user.avatar }} />
+                            <Image style={styles.avatar} source={{ uri: post?.user?.avatar }} />
                             <View style={styles.inforContainer}>
                                 <View style={styles.nameFollowingBtn}>
                                     <Text style={styles.userName}>{post.user.last_name} {post.user.first_name}</Text>
@@ -123,7 +122,7 @@
 
                         </View>
 
-                        <CommentScreen ref={inputRef} postId={postId} routName={'pw-comment'}/>
+                        <CommentScreen postId={postId} routName={'pw-comment'}/>
                     </View>
                 }
 

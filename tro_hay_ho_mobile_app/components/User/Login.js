@@ -36,7 +36,7 @@ const Login = () => {
             });
 
             await AsyncStorage.setItem("access_token", res.data.access_token);
-            await AsyncStorage.setItem("refresh_token", res.data.refresh_token);
+            // await AsyncStorage.setItem("refresh_token", res.data.refresh_token);
 
             // Lấy thông tin người dùng
             const token = res.data.access_token;

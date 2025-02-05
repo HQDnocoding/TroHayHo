@@ -8,6 +8,7 @@ import PickedImages from "../PostCreating/PickedImages";
 import { launchImageLibrary } from "react-native-image-picker";
 import { FlatList } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import { formatPhoneNumber } from "../../utils/Formatter";
 
 const Register = ({ navigation }) => {
 
@@ -160,6 +161,13 @@ const Register = ({ navigation }) => {
         try {
             console.log(1)
             const valid = check();
+
+            if (otp.length < 6) {
+                setErrContent("Vui lòng nhập đầy đủ mã OTP");
+                setErr(true);
+                return;
+            }
+
             if (valid === false) return;
 
 
@@ -199,7 +207,7 @@ const Register = ({ navigation }) => {
             console.log("avatar", img.uri)
             form.append("phone", phone);
             form.append("groups", checked);
-
+            form.append("otp", otp);
 
 
             const addressJson = JSON.stringify({
@@ -245,11 +253,8 @@ const Register = ({ navigation }) => {
                 }
                 if (res.status == 201) { navigation.navigate('login'); }
             } catch (error) {
-                if (error) {
-                    setErrContent(error.response.data);
-                    setErr(true);
-                }
-                console.log(error);
+               
+                console.error(error);
             } finally {
                 setLoading(false);
             }
@@ -298,11 +303,8 @@ const Register = ({ navigation }) => {
                     navigation.navigate('login');
                 }
             } catch (error) {
-                if (error.response) {
-                    setErrContent(error.response.data);
-                    setErr(true);
-                };
-                console.log(error);
+
+                console.error(error);
             } finally {
                 setLoading(false);
             }
@@ -424,7 +426,7 @@ const Register = ({ navigation }) => {
     const renderWards = useCallback(({ item }) => (
         <TouchableOpacity onPress={() => {
             setAddress((prev) => ({ ...prev, ward: item.code }));
-            setAddressName((prev)=>({...prev,ward:item.name}))
+            setAddressName((prev) => ({ ...prev, ward: item.name }))
             sheetRef.current?.close();
             sheetRef2.current?.close();
             sheetRef3.current?.close();
@@ -460,6 +462,19 @@ const Register = ({ navigation }) => {
     };
 
     const [errContent, setErrContent] = useState('');
+
+    const [otp, setOtp] = useState(null);
+
+    const sendOtp = async () => {
+        const form = new FormData();
+        form.append("phone_number", formatPhoneNumber(phone));
+        await APIs.post(endpoints['send-otp'], form, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        })
+    }
+
     return (
         <View style={{ flex: 1 }}>
             <FlatList
@@ -473,39 +488,39 @@ const Register = ({ navigation }) => {
                         </HelperText>
                         <TextInput mode="outlined" key={users['username'].key}
                             outlineColor="#CAC4D0"
-                            placeholderTextColor="#CAC4D0"
+                            labelTextColor="#CAC4D0"
                             activeOutlineColor="#FFBA00"
-                            style={LoginStyles.textInput} placeholder={users['username'].title}
+                            style={LoginStyles.textInput} label={users['username'].title}
                             value={user['username']} onChangeText={t => change(t, 'username')} />
 
                         <TextInput mode="outlined" key={users['first_name'].key}
                             outlineColor="#CAC4D0"
-                            placeholderTextColor="#CAC4D0"
+                            labelTextColor="#CAC4D0"
                             activeOutlineColor="#FFBA00"
-                            style={LoginStyles.textInput} placeholder={users['first_name'].title}
+                            style={LoginStyles.textInput} label={users['first_name'].title}
                             value={user['first_name']} onChangeText={t => change(t, 'first_name')} />
 
                         <TextInput mode="outlined" key={users['last_name'].key}
                             outlineColor="#CAC4D0"
-                            placeholderTextColor="#CAC4D0"
+                            labelTextColor="#CAC4D0"
                             activeOutlineColor="#FFBA00"
-                            style={LoginStyles.textInput} placeholder={users['last_name'].title}
+                            style={LoginStyles.textInput} label={users['last_name'].title}
                             value={user['last_name']} onChangeText={t => change(t, 'last_name')} />
                         <TextInput mode="outlined" key={users['password'].key}
                             secureTextEntry={true}
                             outlineColor="#CAC4D0"
-                            placeholderTextColor="#CAC4D0"
+                            labelTextColor="#CAC4D0"
                             activeOutlineColor="#FFBA00"
-                            style={LoginStyles.textInput} placeholder={users['password'].title}
+                            style={LoginStyles.textInput} label={users['password'].title}
                             value={user['password']} onChangeText={t => change(t, 'password')} />
 
                         <TextInput mode="outlined" key={users['confirm'].key}
                             secureTextEntry={secureTE}
                             outlineColor="#CAC4D0"
                             right={<TextInput.Icon icon={users['password'].icon} onPress={() => setSecureTE(!secureTE)} />}
-                            placeholderTextColor="#CAC4D0"
+                            labelTextColor="#CAC4D0"
                             activeOutlineColor="#FFBA00"
-                            style={LoginStyles.textInput} placeholder={users['confirm'].title}
+                            style={LoginStyles.textInput} label={users['confirm'].title}
                             value={user['confirm']} onChangeText={t => change(t, 'confirm')} />
 
 
@@ -572,7 +587,7 @@ const Register = ({ navigation }) => {
                                     <TextInput
                                         mode="outlined"
                                         outlineColor="#CAC4D0"
-                                        placeholderTextColor="#CAC4D0"
+                                        labelTextColor="#CAC4D0"
                                         activeOutlineColor="#FFBA00"
                                         editable={false}
                                         style={{
@@ -580,22 +595,31 @@ const Register = ({ navigation }) => {
                                             borderColor: "#FFBA00",
                                             margin: 15,
                                         }}
-                                        placeholder="Địa chỉ"
+                                        label="Địa chỉ"
                                         value={`${addressName.ward ? addressName.ward + ', ' : ''}${addressName.district ? addressName.district + ', ' : ''}${addressName.province}`}
                                     />
                                 </View>
                             </TouchableOpacity>
                             <TextInput mode="outlined"
                                 outlineColor="#CAC4D0"
-                                placeholderTextColor="#CAC4D0"
+                                labelTextColor="#CAC4D0"
                                 activeOutlineColor="#FFBA00"
-                                style={LoginStyles.textInput} placeholder="Số điện thoại"
+                                style={LoginStyles.textInput} label="Số điện thoại"
                                 value={phone} onChangeText={t => setPhone(t)} />
+                            <Button onPress={() => { sendOtp(); }} >Gởi mã OTP</Button>
                             <TextInput mode="outlined"
                                 outlineColor="#CAC4D0"
-                                placeholderTextColor="#CAC4D0"
+                                keyboardType="number-pad"
+                                labelTextColor="#CAC4D0"
+                                
                                 activeOutlineColor="#FFBA00"
-                                style={LoginStyles.textInput} placeholder="Địa chỉ cụ thể (Số nhà,Tên đường)"
+                                style={LoginStyles.textInput} label="Nhập mã OTP"
+                                value={otp} onChangeText={t => setOtp(t)} />
+                            <TextInput mode="outlined"
+                                outlineColor="#CAC4D0"
+                                labelTextColor="#CAC4D0"
+                                activeOutlineColor="#FFBA00"
+                                style={LoginStyles.textInput} label="Địa chỉ cụ thể (Số nhà,Tên đường)"
                                 value={specifiedAddress} onChangeText={t => setSpecifiedAddress(t)} />
                             <PickedImages imageList={images} setImageList={setImages} />
 

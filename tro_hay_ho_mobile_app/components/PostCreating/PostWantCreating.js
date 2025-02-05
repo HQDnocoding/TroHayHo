@@ -374,7 +374,7 @@ const PostWantCreating = () => {
                     <View style={{ backgroundColor: '#D9D9D9', paddingVertical: 10, paddingStart: 30 }}>
                         <Text style={styles.label}>Địa chỉ</Text>
                     </View>
-                    <TouchableWithoutFeedback onPress={() => { handleSnapPress(2) }}>
+                    <TouchableWithoutFeedback onPress={() => { loadProvinces(), handleSnapPress(2) }}>
                         <View style={styles.flexRow}>
 
                             <TextInput style={styles.input} mode="outlined" outlineColor="#CAC4D0" placeholderTextColor="#CAC4D0"

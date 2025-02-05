@@ -67,7 +67,7 @@ const FavouritePost = () => {
             return (<View style={{ flexDirection: 'row', marginBottom: 10, paddingStart: 10 }}>
                 <Image source={require('../../assets/45_donald_trump.png')} style={{ width: 100, height: 100 }} />
                 <View style={{ marginLeft: 20 }}>
-                    <View style={{flexDirection:'row'}}>
+                    <View >
                         <Text style={{ fontSize: 20, fontWeight: 800 }}>{item.post.title}</Text>
 
                         <TouchableOpacity>

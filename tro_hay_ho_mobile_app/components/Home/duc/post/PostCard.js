@@ -24,6 +24,11 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
     const [infoUser, setInfoUser] = React.useState(null)
     const [isLoadingPost, setIsLoadingPost] = useState(true)
     const [isLoadingUser, setIsLoadingUser] = useState(true)
+
+
+    
+
+
     const loadUser = async () => {
         try {
             setIsLoadingUser(true)
@@ -83,11 +88,11 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
                 postId: item.id,
                 coordinates: item.address.coordinates
             }
-            if (post.type.toLowerCase() === POST_WANT) {
+            if (post?.type.toLowerCase() === POST_WANT) {
                 let routeName = 'post_want'
                 nav.navigate(routeName, params)
 
-            } else if (post.type.toLowerCase() === POST_FOR_RENT) {
+            } else if (post?.type.toLowerCase() === POST_FOR_RENT) {
                 let routeName = 'post_for_rent'
                 nav.navigate(routeName, params)
             }
@@ -152,11 +157,11 @@ const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
                         <ActivityIndicator size="large" color={myYellow} />
                     </View>
                 ) : post && <>
-                    {post.type.toLowerCase() === POST_WANT ?
+                    {post?.type.toLowerCase() === POST_WANT ?
                         <>
                             <PostWant item={post} routeName={'post_want'} params={{ postId: post.id, coordinates: post.address.coordinates }} />
                         </>
-                        : post.type.toLowerCase() === POST_FOR_RENT ?
+                        : post?.type.toLowerCase() === POST_FOR_RENT ?
                             <>
                                 <PostForRent item={post} routeName={'post_for_rent'} params={{ postId: post.id, coordinates: post.address.coordinates }} />
                             </> :
