@@ -8,7 +8,7 @@ import { formatDate } from '../../../utils/TimeFormat';
 import APIs, { authAPIs, endpointsDuc } from '../../../configs/APIs';
 import PostForRent from '../duc/post/PostForRent';
 import PostWant from '../duc/post/PostWant';
-import { checkExistConversation, getUserConversations } from '../../../utils/ChatFunction';
+import { checkExistConversation, getUserConversations ,createConversation} from '../../../utils/ChatFunction';
 import { MyUserContext } from '../../../configs/UserContexts';
 import { useNavigation } from '@react-navigation/native';
 import { RequestLoginDialogContext, useRequestLoginDialog } from '../../../utils/RequestLoginDialogContext';
@@ -184,12 +184,24 @@ const ProfileUser = ({ navigation, route }) => {
             const conversation = await checkExistConversation(currentUser.id, infoUser.id)
             // neu da ton tai cuoc tro chuyen thi di chuyen den man hinh tro chuyen
             if (conversation !== null) {
+                console.log("tro chuyen ko null",conversation)
 
                 const item = conversation
                 const partner = infoUser
                 navigation.navigate("message", { item, currentUser, partner })
             } else {
                 //tao moi cuoc tro chuyen va dan den 
+                const ab=await createConversation(currentUser.id, infoUser.id)
+                console.log("tro chuyen  null a ",ab )
+                const newConversation = await checkExistConversation(currentUser.id, infoUser.id)
+                console.log("tro chuyen  null b",newConversation)
+                
+                if(newConversation){
+                    const item = newConversation
+                    const partner = infoUser
+                    navigation.navigate("message", { item, currentUser, partner })
+                }
+                
             }
 
 
