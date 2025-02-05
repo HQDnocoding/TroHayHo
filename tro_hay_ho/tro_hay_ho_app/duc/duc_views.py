@@ -17,6 +17,8 @@ from django.db.models import Q
 from django.db.models.functions import Lower
 from django.db.models.functions import TruncMonth, TruncYear, TruncQuarter,ExtractQuarter
 from django.db.models import Count
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
+from .dpermissions import *
 import json
 class ConversationViewSet(ReadOnlyModelViewSet):
     serializer_class = ConsersationSerializer
@@ -150,6 +152,15 @@ class BasicUserInfoViewSet(ModelViewSet):
     pagination_class = ItemSmallPaginator
     serializer_class = BasicUserInfoSerializer
     queryset = User.objects.filter(is_active=True)
+    # required_scopes = ['read', 'write', 'groups']
+
+    # def get_permissions(self):
+    #     if self.action in ['update_me_following_you', 'get_detail_notification',
+    #                        'update_me_favotite_post',
+    #                       'me_favorite_post',]:
+    #         return [IsInRenterOrOwnerGroup(), TokenHasScope()]
+    #     return [permissions.AllowAny()]
+    
     @action(detail=True,methods=['get'],url_path='detail-notification')
     def get_detail_notification(self,request,pk=None):
     
@@ -231,24 +242,32 @@ class BasicUserInfoViewSet(ModelViewSet):
             following = Following.objects.filter(follower_id=pk, followed_id=user_id).first()
 
             if not following:
-                new_following=Following.objects.create(follower_id=pk,followed_id=user_id)
-                new_following.active=active_status
-                new_following.save()
+
+
+                if bool(active_status) == True:
+                    new_following = Following.objects.create(follower_id=pk, followed_id=user_id)
+                    new_following.active = active_status
+                    new_following.save()
+
                 return Response({
                 'message': 'Following relationship updated successfully.',
                 'follower_id': pk,
                 'followed_id': user_id,
-                'active': new_following.active
+                'active': active_status
             }, status=HTTP_200_OK)
 
-            following.active = active_status
-            following.save()
+
+            if bool(active_status) == True:
+                following.active = active_status
+                following.save()
+            elif bool(active_status) == False :
+                following.delete()
 
             return Response({
                 'message': 'Following relationship updated successfully.',
                 'follower_id': pk,
                 'followed_id': user_id,
-                'active': following.active
+                'active': active_status
             }, status=HTTP_200_OK)
 
         except Exception as e:
@@ -368,7 +387,7 @@ class BasicUserInfoViewSet(ModelViewSet):
 class PostParentViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     queryset = Post.objects.filter(Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),active=True).order_by('-created_date')
     serializer_class=PostParentSerializer
-    pagination_class=ItemPaginator
+    pagination_class=ItemSmallPaginator
     def get_queryset(self):
         queryset = Post.objects.filter(
             Q(is_show=True) | Q(is_show=None) | Q(is_show__isnull=True),

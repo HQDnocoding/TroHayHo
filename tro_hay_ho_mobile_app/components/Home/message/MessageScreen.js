@@ -9,6 +9,9 @@ import { TEXT } from "../../../utils/MyValues";
 const MessageScreen = ({ navigation, route }) => {
   const params = route.params || {};
   const { item, currentUser, partnerUser } = params;
+  console.log("mesage item",item)
+  console.log("mesage currentUser",currentUser)
+
   const [message, setMessage] = React.useState([])
   const flatListRef = React.useRef(null);
 

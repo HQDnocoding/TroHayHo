@@ -121,6 +121,11 @@ class UserAdmin(admin.ModelAdmin):
             )
 
     change_list_template = "admin/change_list_with_button.html"
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context["statistics_url"] = "/admin/statspanel/"
+        return super().changelist_view(request, extra_context=extra_context)
+
 
 class TroImageInline(admin.TabularInline):
     model = TroImage

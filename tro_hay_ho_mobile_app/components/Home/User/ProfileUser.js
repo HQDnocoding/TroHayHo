@@ -5,16 +5,17 @@ import { Button } from 'react-native-paper';
 import { data_patch_active, role_id_chu_tro, sampleAvatar, sampleImage2 } from '../../../utils/MyValues';
 import { ActivityIndicator } from "react-native-paper";
 import { formatDate } from '../../../utils/TimeFormat';
-import APIs, { endpointsDuc } from '../../../configs/APIs';
+import APIs, { authAPIs, endpointsDuc } from '../../../configs/APIs';
 import PostForRent from '../duc/post/PostForRent';
 import PostWant from '../duc/post/PostWant';
-import { checkExistConversation, getUserConversations } from '../../../utils/ChatFunction';
+import { checkExistConversation, getUserConversations ,createConversation} from '../../../utils/ChatFunction';
 import { MyUserContext } from '../../../configs/UserContexts';
 import { useNavigation } from '@react-navigation/native';
 import { RequestLoginDialogContext, useRequestLoginDialog } from '../../../utils/RequestLoginDialogContext';
 import PostCard from '../duc/post/PostCard';
 import { getFullName, getInfoPostFavoriteOfUser } from '../../../utils/MyFunctions';
 import { Role } from '../../../general/General';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileUser = ({ navigation, route }) => {
     const currentUser = useContext(MyUserContext)
@@ -22,6 +23,7 @@ const ProfileUser = ({ navigation, route }) => {
     const { requestLoginDialog } = useRequestLoginDialog();
     const params = route.params || {}
     const { infoUser } = params
+    console.log("profile user", infoUser)
     const [post, setPost] = React.useState([])
     const [loading, setLoading] = React.useState(false);
     const [page, setPage] = React.useState(1);
@@ -58,8 +60,7 @@ const ProfileUser = ({ navigation, route }) => {
         if (page > 0) {
             setLoading(true)
             if (infoUser !== null) {
-                console.log("profile user", infoUser)
-
+                
                 try {
 
                     let url;
@@ -132,8 +133,9 @@ const ProfileUser = ({ navigation, route }) => {
         if (currentUser !== null) {
             try {
                 setLoadingFollow(true)
+                const token = await AsyncStorage.getItem("access_token");
                 let url = `${endpointsDuc['updateMeFollowingYou'](currentUser.id, infoUser.id)}`
-                const res = await APIs.patch(url, data_patch_active(!checkMeFollowYour))
+                const res = await authAPIs(token).patch(url, data_patch_active(!checkMeFollowYour))
                 if (res.data.active !== null) {
                     setCheckMeFollowYour(res.data.active)
                 } else {
@@ -182,12 +184,24 @@ const ProfileUser = ({ navigation, route }) => {
             const conversation = await checkExistConversation(currentUser.id, infoUser.id)
             // neu da ton tai cuoc tro chuyen thi di chuyen den man hinh tro chuyen
             if (conversation !== null) {
+                console.log("tro chuyen ko null",conversation)
 
                 const item = conversation
                 const partner = infoUser
                 navigation.navigate("message", { item, currentUser, partner })
             } else {
                 //tao moi cuoc tro chuyen va dan den 
+                const ab=await createConversation(currentUser.id, infoUser.id)
+                console.log("tro chuyen  null a ",ab )
+                const newConversation = await checkExistConversation(currentUser.id, infoUser.id)
+                console.log("tro chuyen  null b",newConversation)
+                
+                if(newConversation){
+                    const item = newConversation
+                    const partner = infoUser
+                    navigation.navigate("message", { item, currentUser, partner })
+                }
+                
             }
 
 
