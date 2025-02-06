@@ -70,8 +70,8 @@ const FollowersTab = () => {
             <View style={styles.itemRender}>
                 {item.follower.avatar === '' ? <Image source={require('../../assets/noavatar.png')} style={styles.avatar} />
                     : <Image source={{ uri: item.follower.avatar }} style={styles.avatar} />}
-                {(item.follower.firt_name === '' && item.follower.last_name === '') ? <Text style={styles.name}>No name user</Text> :
-                    <Text style={styles.name}>{item.follower.last_name} {item.follower.last_name}</Text>
+                {(item.follower.first_name === '' && item.follower.last_name === '') ? <Text style={styles.name}>No name user</Text> :
+                    <Text style={styles.name}>{item.follower.first_name} {item.follower.last_name}</Text>
                 }
             </View>
         )
@@ -150,9 +150,10 @@ const FollowingTab = () => {
             <View style={styles.itemRender}>
                 {item.followed.avatar === '' ? <Image source={require('../../assets/noavatar.png')} style={styles.avatar} /> :
                     <Image source={{ uri: item.followed.avatar }} style={styles.avatar} />}
-                {(item.followed.firt_name === '' && item.followed.last_name === '') ?
-                    <Text style={styles.name}>{item.followed.last_name} {item.followed.last_name}</Text> :
-                    <Text style={styles.name}>No name user</Text>
+                {(item.followed.first_name === '' && item.followed.last_name === '') ?
+                <Text style={styles.name}>No name user</Text>:
+                    <Text style={styles.name}>{item.followed.first_name} {item.followed.last_name}</Text> 
+                    
                 }
             </View>
         )

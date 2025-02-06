@@ -18,7 +18,7 @@ const PostForRentDetail = ({ route }) => {
     const [post, setPost] = useState(null);
 
     console.log("lll", route.params.coordinates)
-    const [latitude, longitude] = route.params?.coordinates.split(", ").map(Number);
+    const [latitude, longitude] = route.params?.coordinates.split(",").map(Number);
     const [centerCoordinates, setCenterCoordinates] = useState({
         latitude: latitude,
         longitude: longitude,
