@@ -16,7 +16,6 @@ import { useBottomSendToFollowedContext } from '../../../../utils/BottomSendToFo
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PostCard = ({ item, routeName, params, dataPostFav, currentUser }) => {
-    console.log("post card",item)
     const nav = useNavigation()
     const { showDialog } = useRequestLoginDialog()
     const { openBottomSheet, assignPost } = useBottomSendToFollowedContext();

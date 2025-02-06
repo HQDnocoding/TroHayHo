@@ -25,6 +25,7 @@ const Home = () => {
 
    
     const loadPost = async () => {
+        console.log("load ",page)
 
         if (page > 0) {
             setLoading(true)
@@ -122,7 +123,7 @@ const Home = () => {
                     refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
                     data={allPosts}
                     renderItem={renderItemPost}
-                    keyExtractor={item => `${item.type}-${item.id}-${Date.now()}`}
+                    keyExtractor={item => `${item.type}-${item.id}`}
                     onEndReached={loadMore}
                     ListFooterComponent={() => loading ? <ActivityIndicator /> : null}
                 />
