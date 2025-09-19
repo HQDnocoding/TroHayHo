@@ -36,7 +36,6 @@ The app helps tenants easily search for rental rooms, view locations on maps, ch
 - **Database**:  MySQL  
 - **Realtime**: FireBase  
 - **Mobile App**: React Native  
-- **Maps**: Google Maps API  
 
 ---
 
